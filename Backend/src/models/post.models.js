@@ -3,6 +3,7 @@ import { model, Schema } from "mongoose";
 const postSchema = new Schema({
     content: {
         type: String,
+        trim: true,
         required: true
     },
     attachment: {
