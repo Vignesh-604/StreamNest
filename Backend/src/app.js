@@ -27,15 +27,15 @@ import likeRouter from "./routes/like.routes.js"
 import playlistRouter from "./routes/playlist.routes.js"
 import dashboardRouter from "./routes/dashboard.routes.js"
 import videoRouter from "./routes/video.routes.js"
-import subscriptioonRouter from "./routes/subscription.routes.js"
+import subscriptionRouter from "./routes/subscription.routes.js"
 
-app.use("/users", userRouter)               // All urls followed by /users is defined in user routes
-app.use("/post", postRouter)
-app.use("/comment", commentRouter)
-app.use("/like", likeRouter)
-app.use("/playlist", playlistRouter)
-app.use("/dashboard", dashboardRouter)
-app.use("/video", videoRouter)
-app.use("/subscription", subscriptioonRouter)
+app.use("/api/users", userRouter)
+app.use("/api/post", postRouter)
+app.use("/api/comment", commentRouter)
+app.use("/api/like", likeRouter)
+app.use("/api/playlist", playlistRouter)
+app.use("/api/dashboard", dashboardRouter)
+app.use("/api/video", videoRouter)
+app.use("/api/subscription", subscriptionRouter)
 
 export {app}
