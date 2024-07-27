@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { Popover, PopoverButton, PopoverPanel, Dialog, DialogPanel } from '@headlessui/react'
 import { MagnifyingGlassIcon, IdentificationIcon, ListBulletIcon, HandThumbUpIcon, ClockIcon, ArrowLeftOnRectangleIcon, Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
