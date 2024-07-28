@@ -7,7 +7,7 @@ function App() {
   return (
     <>
     <Navbar />
-    <div className='mx-14'>
+    <div className=' min-w-3xl'>
       <LikedVideos />
       {/* <h1>Welcome to StreamNest</h1> */}
     </div>

@@ -21,7 +21,7 @@ const toggleCommentLike = asyncHandler( async (req, res) => {
             likedBy: user,
             comment: commentId
         })
-        if (!commentLike) throw new ApiError(402, "Could not dislike comment")
+        if (!commentLike) throw new ApiError(400, "Could not dislike comment")
 
         res.status(202).json( new ApiResponse(202, "", "Comment like removed"))
     } else {
@@ -29,7 +29,7 @@ const toggleCommentLike = asyncHandler( async (req, res) => {
             likedBy: user,
             comment: commentId
         })
-        if (!commentLike) throw new ApiError(402, "Could not likecomment")
+        if (!commentLike) throw new ApiError(400, "Could not likecomment")
 
         res.status(202).json( new ApiResponse(202,commentLike, "Comment liked"))
     }
@@ -53,7 +53,7 @@ const togglePostLike = asyncHandler( async (req, res) => {
             likedBy: user,
             post: postId
         })
-        if (!postLike) throw new ApiError(402, "Could not dislike post")
+        if (!postLike) throw new ApiError(400, "Could not dislike post")
 
         res.status(200).json( new ApiResponse(200, "", "Post like removed"))
     } else {
@@ -61,7 +61,7 @@ const togglePostLike = asyncHandler( async (req, res) => {
             likedBy: user,
             post: postId
         })
-        if (!postLike) throw new ApiError(402, "Could not like post")
+        if (!postLike) throw new ApiError(400, "Could not like post")
 
         res.status(200).json( new ApiResponse(200,postLike, "Post liked"))
     }
@@ -138,10 +138,12 @@ const getLikedVideos = asyncHandler( async (req, res) => {
         },
         {
             $project: {
+                "videos._id": 1,
                 "videos.title": 1,
                 "videos.description": 1,
                 "videos.thumbnail": 1,
                 "videos.views": 1,
+                "videos.duration": 1,
                 "videos.owner.username": 1
             }
         }
