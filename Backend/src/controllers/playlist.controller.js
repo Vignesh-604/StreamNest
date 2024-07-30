@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Playlist } from "../models/playlist.models.js"
+import { Video } from "../models/video.models.js"
 import mongoose from "mongoose";
 
 const createPlaylist = asyncHandler( async (req, res) => {
@@ -26,7 +27,7 @@ const deletePlaylist = asyncHandler( async (req, res) => {
 
     await Playlist.findByIdAndDelete(playlistId)
 
-    res.status(203).json( new ApiResponse(203, "", "Playlist deleted"))
+    res.status(200).json( new ApiResponse(200, "", "Playlist deleted"))
 })
 
 const updatePlaylist = asyncHandler( async (req, res) => {
@@ -73,6 +74,10 @@ const getUserPlaylists = asyncHandler( async (req, res) => {
     if (!userId) throw new ApiError(402, "No user ID found")
 
     const userPlaylists = await Playlist.find({ owner: userId})
+
+    for (let obj of userPlaylists) {
+        obj["poster"] = (await Video.findById(obj.videos[0]).select("thumbnail"))
+    }
 
     res.status(201).json( new ApiResponse(201, userPlaylists, "User Playlists fetched"))
 })

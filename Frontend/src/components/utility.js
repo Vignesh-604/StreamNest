@@ -30,8 +30,8 @@ export function parseDate(date) {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ]
 
-    let dateString = (updatedDate.getDay() + " " + months[updatedDate.getMonth()] + " " + updatedDate.getFullYear())
-    console.log(updatedDate.toLocaleDateString());
+    let dateString = (updatedDate.getDate() + " " + months[updatedDate.getMonth()] + " " + updatedDate.getFullYear())
+    // console.log(updatedDate.toLocaleDateString());
 
     return dateString
 }

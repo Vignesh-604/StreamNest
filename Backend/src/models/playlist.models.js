@@ -8,6 +8,12 @@ const playlistSchema = new Schema({
     description: {
         type: String,
     },
+    poster: {
+        type: {
+            _id: String,
+            thumbnail: String
+        }
+    },
     videos: [
         {
             type: Schema.Types.ObjectId,
