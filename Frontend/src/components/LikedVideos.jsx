@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import VideoItem from "./VideoItem";
-import {parseTime} from "./time"
+import {parseTime} from "./utility"
 
 export default function LikedVideos() {
     const [videos, setVideos] = useState([]);

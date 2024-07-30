@@ -24,8 +24,14 @@ export function parseTime(seconds) {
     return timeString
 }
 
-// // Example usage:
+export function parseDate(date) {
+    let updatedDate = new Date(date)
+    let months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ]
 
-// const seconds = 4755
+    let dateString = (updatedDate.getDay() + " " + months[updatedDate.getMonth()] + " " + updatedDate.getFullYear())
+    console.log(updatedDate.toLocaleDateString());
 
-// console.log(parseTime(seconds))
+    return dateString
+}
