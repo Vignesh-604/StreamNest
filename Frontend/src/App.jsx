@@ -2,6 +2,7 @@ import Navbar from './components/Navbar'
 import VideoItem from './components/VideoItem'
 import LikedVideos from './components/LikedVideos'
 import Playlists from './components/Playlists'
+import Profile from './components/Profile'
 import axios from 'axios'
 import Cookies from "js-cookie"
 import { Sidebar } from './components/Sidebar'
@@ -25,8 +26,10 @@ function App() {
       {/* <Sidebar /> */}
       {/* <div className=' ml-64 p-8'> */}
       <div className='mt-36'>
-        <Playlists />
-        <LikedVideos/>
+        {/* <Playlists /> */}
+        {/* <LikedVideos/> */}
+        <Profile/>
+
       </div>
     </div>
   )
