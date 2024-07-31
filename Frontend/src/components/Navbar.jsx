@@ -21,8 +21,8 @@ export default function Navbar() {
     const user = JSON.parse(Cookies.get("user"))
 
     return (
-        <header className="bg-gray-800 shadow-2xl p-2 border-b-2 border-b-slate-700">
-            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
+        <header className="fixed top-0 w-full shadow-2xl p-2 border-b-2 bg-gray-800 border-y-slate-700 z-50">
+            <nav aria-label="Global" className="mx-auto -m-5 flex max-w-7xl items-center justify-between p-4 lg:px-8">
                 <div className="flex items-center space-x-6 lg:flex-1">
                     <a href="#" className="-m-1.5 p-1.5">
                         <span className="sr-only">Your Company</span>

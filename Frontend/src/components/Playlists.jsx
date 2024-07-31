@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { parseDate } from "./utility";
-import { TrashIcon, PencilIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import defaultImg from "../assets/thumbnail.jpeg"
 
 export default function Playlists({ user = "" }) {
@@ -63,11 +63,11 @@ export default function Playlists({ user = "" }) {
                 </button>
             </form>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {
                     playlists.length ?
                         playlists.map(plst => (
-                            <div key={plst._id} className="w-full rounded-md border p-3 flex-col items-start hover:bg-slate-800">
+                            <div key={plst._id} className=" rounded-md border p-3 flex-col items-start hover:bg-slate-800">
                                 <img
                                     src={plst.poster ? plst.poster?.thumbnail : defaultImg}
                                     onError={(e) => e.target.src = { defaultImg }}
