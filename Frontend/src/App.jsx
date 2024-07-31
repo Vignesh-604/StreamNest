@@ -5,17 +5,17 @@ import Playlists from './components/Playlists'
 import axios from 'axios'
 import Cookies from "js-cookie"
 function App() {
-        axios.post("/api/users/login",{
-            username: "bobo",
-            email: "bob@gmail.com",
-            password: "12345678"
-          }
-          )
-        .then((res) => {
-          let userDetails = res.data.data.user
-          Cookies.set("user", JSON.stringify(userDetails))
-        })
-        .catch(error => console.log(error))
+        // axios.post("/api/users/login",{
+        //     username: "bobo",
+        //     email: "bob@gmail.com",
+        //     password: "12345678"
+        //   }
+        //   )
+        // .then((res) => {
+        //   let userDetails = res.data.data.user
+        //   Cookies.set("user", JSON.stringify(userDetails))
+        // })
+        // .catch(error => console.log(error))
         // console.log("Cookies:",Cookies.get("user"))
   return (
     <>

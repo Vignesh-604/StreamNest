@@ -1,19 +1,32 @@
 import { useState } from 'react'
 import { Popover, PopoverButton, PopoverPanel, Dialog, DialogPanel } from '@headlessui/react'
-import { MagnifyingGlassIcon, IdentificationIcon, ListBulletIcon, HandThumbUpIcon, ClockIcon, ArrowLeftOnRectangleIcon, Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
-import logo from "../assets/logo.webp"
+import {
+    MagnifyingGlassIcon,
+    IdentificationIcon,
+    ListBulletIcon,
+    HandThumbUpIcon,
+    ClockIcon,
+    ArrowLeftOnRectangleIcon,
+    Bars3Icon,
+    XMarkIcon,
+    UserCircleIcon,
+    BanknotesIcon
+} from '@heroicons/react/24/outline'
+import logo from "../assets/SNlogo.png"
 import profile from "../assets/profile.webp"
+import Cookies from "js-cookie"
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const user = JSON.parse(Cookies.get("user"))
 
     return (
-        <header className="bg-gray-800 shadow p-2">
-            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+        <header className="bg-gray-800 shadow-2xl p-2 border-b-2 border-b-slate-700">
+            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
                 <div className="flex items-center space-x-6 lg:flex-1">
                     <a href="#" className="-m-1.5 p-1.5">
                         <span className="sr-only">Your Company</span>
-                        <img src={logo} alt="Logo" className="h-16 w-auto" />
+                        <img src={logo} alt="Logo" className="h-28 w-auto" />
                     </a>
                     <div className="flex flex-grow items-center justify-center">
                         <div className="flex items-center rounded-full bg-gray-900 p-2 w-full max-w-md mx-6">
@@ -32,7 +45,12 @@ export default function Navbar() {
                         <a href="#" className="text-white hover:text-red-500 mx-2 font-semibold text-xl">My Channel</a>
                         <Popover className="relative">
                             <PopoverButton className="block mx-2 text-sm/6 font-semibold text-white/50 focus:outline-none data-[active]:text-white data-[hover]:text-white data-[focus]:outline-1 data-[focus]:outline-white">
-                                <img src={profile} alt="Profile" className="h-12 w-auto rounded-full border-emerald-500 border-4" />
+                                <img
+                                    src={user.avatar}
+                                    title={user.username}
+                                    alt="Profile"
+                                    onError={(e) => e.target.src = profile}
+                                    className="h-14 w-auto rounded-full border-emerald-500 border-2" />
                             </PopoverButton>
                             <PopoverPanel
                                 transition
@@ -41,7 +59,7 @@ export default function Navbar() {
                                 <div className="p-3 font-semibold text-white">
                                     <a className="block rounded-lg py-2 px-3 transition hover:bg-white/5" href="#">
                                         <div className="flex items-center gap-2">
-                                            <IdentificationIcon className="h-5 w-5 text-white/30" />
+                                            <UserCircleIcon className="h-5 w-5 text-white/30" />
                                             View Profile
                                         </div>
                                     </a>
@@ -89,14 +107,19 @@ export default function Navbar() {
                 <div className="fixed inset-0 z-10 bg-gray-800 bg-opacity-75" />
                 <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-gray-800 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="flex items-center justify-between">
-                        <a href="#" className="-m-1.5 p-1.5">
-                            <span className="sr-only">Your Company</span>
-                            <img
-                                src={logo}
-                                alt="Logo"
-                                className="h-16 w-auto"
-                            />
-                        </a>
+                        <div className='flex'>
+                            <a href="#" className="-m-1.5 p-1.5">
+                                <span className="sr-only">Your Company</span>
+                                <img
+                                    src={logo}
+                                    alt="Logo"
+                                    className="h-28 w-auto"
+                                />
+                            </a>
+                            <h1 className='flex ms-2 -mt-6 items-center font-semibold text-xl'>
+                                Hello, {user.fullname}
+                            </h1>
+                        </div>
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
@@ -111,39 +134,39 @@ export default function Navbar() {
                             <div className="py-6">
                                 <a
                                     href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
-                                    Subscriptions
+                                    <UserCircleIcon className='h-6 me-2' />View Profile
                                 </a>
                                 <a
                                     href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                                    className="flex items-center -mx-3 rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
-                                    My Channel
+                                    <ListBulletIcon className='h-6 me-2' />Playlists
                                 </a>
                                 <a
                                     href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
-                                    View Profile
+                                    <HandThumbUpIcon className='h-6 me-2' />Liked Videos
                                 </a>
                                 <a
                                     href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
-                                    Playlists
+                                    <ClockIcon className='h-6 me-2' />Watch History
                                 </a>
                                 <a
                                     href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
-                                    Liked Videos
+                                    <BanknotesIcon className='h-6 me-2' />Subscriptions
                                 </a>
                                 <a
                                     href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
-                                    Watch History
+                                    <IdentificationIcon className='h-6 me-2' />My Channel
                                 </a>
                                 <div className="flex items-center rounded-full bg-gray-900 p-2 mt-5">
                                     <input
