@@ -27,10 +27,10 @@ function App() {
       {/* <Sidebar /> */}
       {/* <div className=' ml-64 p-8'> */}
       <div className='mt-36'>
-        {/* <Playlists /> */}
         {/* <LikedVideos/> */}
         {/* <Profile/> */}
         <Channel/>
+        {/* <Playlists /> */}
 
       </div>
     </div>
