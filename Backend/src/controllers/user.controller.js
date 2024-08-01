@@ -121,7 +121,7 @@ const loginUser = asyncHandler(async (req, res) => {
     // Password checking
     // Custom made methods can only be accessed from db fetched user details
     const validPassword = await user.isPasswordCorrect(password)
-    if (!user) throw new ApiError(402, "Password incorrect!!")
+    if (!user) throw new ApiError(400, "Password incorrect!!")
 
     // Refresh and access tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
@@ -176,7 +176,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         if (!user) throw new ApiError(401, "Invalid refresh Token")
 
         // Compares the incomingRefreshToken with the refresh token stored in the user's record
-        if (incomingRefreshToken !== user.refreshToken) throw new ApiError(402, "Refresh token is expired or used")
+        if (incomingRefreshToken !== user.refreshToken) throw new ApiError(400, "Refresh token is expired or used")
 
         // Generate new tokens
         const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
@@ -204,7 +204,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
     const user = await User.findById(req.user?._id)
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
-    if (!isPasswordCorrect) throw new ApiError(401, "Old password incorrect")
+    if (!isPasswordCorrect) throw new ApiError(403, "Old password incorrect")
 
     user.password = newPassword
     await user.save({ validateBeforeSave: false })
@@ -214,14 +214,80 @@ const changePassword = asyncHandler(async (req, res) => {
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    return res.status(200).json(new ApiResponse(200, req.user, "User fetched successfully"))
+
+    const userDetails = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user?._id)
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "likedBy",
+                as: "likedVids"
+            }
+        },
+        {
+            $lookup: {
+                from: "playlists",
+                localField: "_id",
+                foreignField: "owner",
+                as: "playlists"
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as: "subscriptions"
+            }
+        },
+        {
+            $addFields: {
+                likedVidCount: {
+                    $size: {
+                        $filter: {
+                            input: "$likedVids",
+                            as: "likedVid",
+                            cond: {$ne: ["$likedVid.video", null]}
+                        }
+                    }
+                },
+                playlists :{
+                    $size: "$playlists"
+                },
+                subscriptions: {
+                   $size: "$subscriptions" 
+                }
+            }
+        },
+        {
+            $project: {
+                username:1,
+                fullname: 1,
+                avatar: 1,
+                createdAt:1,
+                email: 1,
+
+                likedVidCount: 1,
+                playlists: 1,
+                subscriptions: 1
+            }
+        }
+    ])
+    if (!userDetails.length) throw new ApiError(404, "Found nothing")
+
+    return res.status(200).json(new ApiResponse(200, userDetails[0], "User fetched successfully"))
 })
 
 const updateDetails = asyncHandler(async (req, res) => {
 
     const { fullname, email } = req.body
 
-    if (!fullname || !email) throw new ApiError(402, "Both fields are required!")
+    if (!fullname || !email) throw new ApiError(400, "Both fields are required!")
 
     // Updates the values and returns the user w/o password
     const user = await User.findByIdAndUpdate(
@@ -239,10 +305,10 @@ const updateDetails = asyncHandler(async (req, res) => {
 const updateAvatar = asyncHandler(async (req, res) => {
 
     const avatarPath = req.file?.path
-    if (!avatarPath) throw new ApiError(402, "Avatar file is missing")
+    if (!avatarPath) throw new ApiError(404, "Avatar file is missing")
 
     const avatar = await uploadOnCloudinary(avatarPath)     // returns avatar object - need to fetch only url
-    if (!avatar) throw new ApiError(402, "Avatar file is missing in cloudinary")
+    if (!avatar) throw new ApiError(404, "Avatar file is missing in cloudinary")
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -257,15 +323,13 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
 })
 
-// TODO : Delete old image from cloudinary
-
 const updateCoverImage = asyncHandler(async (req, res) => {
 
     const coverImagePath = req.file?.path
-    if (!coverImagePath) throw new ApiError(402, "Cover Image file is missing")
+    if (!coverImagePath) throw new ApiError(404, "Cover Image file is missing")
 
     const coverImage = await uploadOnCloudinary(coverImagePath)     // returns coverImage object - need to fetch only url
-    if (!coverImage) throw new ApiError(402, "Cover Image file is missing in cloudinary")
+    if (!coverImage) throw new ApiError(404, "Cover Image file is missing in cloudinary")
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -283,7 +347,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 const getUserChannelProfile = asyncHandler(async (req, res) => {
 
     const { username } = req.params
-    if (!username) throw new ApiError(402, "Username is required!")
+    if (!username) throw new ApiError(400, "Username is required!")
 
     const channel = await User.aggregate([
         {
