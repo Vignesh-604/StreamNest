@@ -31,11 +31,29 @@ const getChannelStats = asyncHandler(async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: "posts",
+                    localField: "owner",
+                    foreignField: "owner",
+                    as: "posts"
+                }
+            },
+            {
+                $lookup: {
+                    from: "playlists",
+                    localField: "owner",
+                    foreignField: "owner",
+                    as: "playlists"
+                }
+            },
+            {
                 $group: {
                     _id: null,
                     totalVideos: { $sum: 1, },
                     totalLikes: { $sum: { $size: "$likes" }},
                     // $size -> gives array of amount of likes in each video, $sum -> adds it all upto give total
+                    totalPosts: { $first: { $size: "$posts" }},
+                    totalPlaylists: { $first: { $size: "$playlists" }},
                     totalSubscribers: { $first: { $size: "$subscribers" } },
                     // gets subscriber count from first video document since all videos have same subscriber count
                     totalViews: { $sum: "$views" },
@@ -48,6 +66,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
                     _id: 0,
                     totalVideos: 1,
                     totalLikes: 1,
+                    totalPosts: 1,
+                    totalPlaylists: 1,
                     totalSubscribers: 1,
                     totalViews: 1,
                     // likes: 1,
@@ -56,7 +76,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
         ])
         if (!stats) throw new ApiError(400, "Couldn't fetch stats")
     
-        res.status(200).json(new ApiResponse(200, stats, "Stats fetched"))
+        res.status(200).json(new ApiResponse(200, stats[0], "Stats fetched"))
         
     } catch (error) {
         res.status(500).json(new ApiResponse(500, error, "Something went wrong"))

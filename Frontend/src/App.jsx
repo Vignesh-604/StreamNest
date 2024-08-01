@@ -6,6 +6,7 @@ import Profile from './components/Profile'
 import axios from 'axios'
 import Cookies from "js-cookie"
 import { Sidebar } from './components/Sidebar'
+import Channel from './components/Channel'
 
 function App() {
   // axios.post("/api/users/login",{
@@ -28,7 +29,8 @@ function App() {
       <div className='mt-36'>
         {/* <Playlists /> */}
         {/* <LikedVideos/> */}
-        <Profile/>
+        {/* <Profile/> */}
+        <Channel/>
 
       </div>
     </div>
