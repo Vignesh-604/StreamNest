@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { parseDate } from "./utility";
@@ -19,6 +19,7 @@ export default function Playlists({ user = "" }) {
             .then((res) => setPlaylists(res.data.data))
             .catch(error => console.log(error));
     }, []);
+    // console.log("Playlist:",playlists);    
 
     const deletePlaylist = (id) => {
         axios.delete(`/api/playlist/${id}`)
@@ -38,14 +39,14 @@ export default function Playlists({ user = "" }) {
     }
 
     return (
-        <div className="flex flex-col  px-4 min-w-[36rem]">
+        <div className="flex flex-col px-4 min-w-[36rem]">
             <h1 className="font-bold text-start text-5xl mt-7 mb-4">
             {userId == myId ? ("Your Playlists") : ("Channel Playlists")}
             </h1>
 
             {
                 userId === myId ? (
-                    <form className="flex flex-row my-6 border-white text-lg" onSubmit={() => newPlaylist()}>
+                    <form className="flex flex-row my-6 border-white text-lg" onSubmit={newPlaylist}>
                         <h1 className=" my-auto me-4 font-semibold">
                             Create new playlist:
                         </h1>

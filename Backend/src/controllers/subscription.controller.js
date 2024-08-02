@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Subscription } from "../models/subscription.models.js"
+import mongoose from "mongoose";
 
 const toggleSubscription = asyncHandler( async (req, res) => {
     const user = req.user?._id
@@ -27,7 +28,35 @@ const getChannelSubscribers = asyncHandler( async (req, res) => {
     const {channelId }= req.params
     if (!channelId) throw new ApiError(404, "Not the channel")
 
-    const subscribers = await Subscription.find({channel: channelId}).select("subscriber")
+    // const subscribers = await Subscription.find({channel: channelId}).select("subscriber")
+    const subscribers = await Subscription.aggregate([
+        {
+            $match: {
+                channel: new mongoose.Types.ObjectId(channelId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "subscriber",
+                foreignField: "_id",
+                as: "subscriber"
+            }
+        },
+        {
+            $addFields: {
+                subscriber: { $first: "$subscriber"}
+            }
+        },
+        {
+            $project: {
+                "subscriber._id": 1,
+                "subscriber.fullname": 1,
+                "subscriber.username": 1,
+                "subscriber.avatar": 1
+            }
+        }
+    ])
 
     res.status(200).json( new ApiResponse(200, subscribers, "Subscribers fetched"))
 })
