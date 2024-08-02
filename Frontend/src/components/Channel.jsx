@@ -33,7 +33,7 @@ export default function Channel({channelId = ""}) {
 
     return (
         <>
-            <div className="flex flex-col lg:flex-row place-items-center">
+            <div className="flex flex-col xl:flex-row place-items-center">
                 <div className="flex">
                     <div className="flex space-x-5 ps-5">
                         <img
