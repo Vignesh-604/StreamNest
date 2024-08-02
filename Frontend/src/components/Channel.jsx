@@ -4,6 +4,7 @@ import { parseDate } from "./utility";
 import axios from "axios";
 import Playlists from "./Playlists";
 import Subscribers from "./Subscribers";
+import ChannelVideos from "./ChannelVideos";
 
 export default function Channel({channelId = ""}) {
     const user = JSON.parse(Cookies.get("user"))
@@ -33,7 +34,7 @@ export default function Channel({channelId = ""}) {
 
     return (
         <>
-            <div className="flex flex-col xl:flex-row place-items-center">
+            <div className="flex flex-col xl:flex-row place-items-center pb-12">
                 <div className="flex">
                     <div className="flex space-x-5 ps-5">
                         <img
@@ -86,8 +87,8 @@ export default function Channel({channelId = ""}) {
             </div>
             {toggle == "playlists" ? <Playlists /> : null}
             {toggle == "subs" ? <Subscribers /> : null}
+            {toggle == "videos" ? <ChannelVideos /> : null}
             {/* {toggle == "subs" ? <Posts /> : null} */}
-            {/* {toggle == "subs" ? <MyVideos /> : null} */}
         </>
     );
 }

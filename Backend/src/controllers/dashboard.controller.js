@@ -86,8 +86,10 @@ const getChannelStats = asyncHandler(async (req, res) => {
 })
 
 const getChannelVideos = asyncHandler(async (req, res) => {
+    const {channelId} = req.params
+    if (!channelId) throw new ApiError(400, "No channel ID mentioned")
 
-    const videos = await Video.find({ owner: req.user?._id })
+    const videos = await Video.find({ owner: channelId })
 
     res.status(200).json(new ApiResponse(200, videos, "Videos fetched"))
 })
