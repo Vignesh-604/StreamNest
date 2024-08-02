@@ -6,12 +6,14 @@ import mongoose from "mongoose";
 
 // Get the channel stats like total video views, total subscribers, total videos, total likes etc.
 const getChannelStats = asyncHandler(async (req, res) => {
+    const {channelId} = req.params
+    if (!channelId) throw new ApiError(400, "No channel ID mentioned")
 
     try {
         const stats = await Video.aggregate([
             {
                 $match: {
-                    owner: new mongoose.Types.ObjectId(req.user?._id)
+                    owner: new mongoose.Types.ObjectId(channelId)
                 }
             },
             {

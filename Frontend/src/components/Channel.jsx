@@ -3,23 +3,26 @@ import Cookies from "js-cookie";
 import { parseDate } from "./utility";
 import axios from "axios";
 import Playlists from "./Playlists";
+import Subscribers from "./Subscribers";
 
-export default function Channel() {
+export default function Channel({channelId = ""}) {
     const user = JSON.parse(Cookies.get("user"))
+    const id = channelId === "" ? (JSON.parse(Cookies.get("user")))._id : channelId
+
     const [userStats, setUserStats] = useState({})
+    
 
     const [toggle, setToggle] = useState("")
 
     useEffect(() => {
-        axios.get("/api/dashboard/stats")
+        axios.get(`/api/dashboard/stats/${id}`)
             .then(res => setUserStats(res.data.data))
             .catch(e => console.log(e))
     }, [])
 
     // Toggle which section to load
-    const toggleState = (e) => {
-        toggle === e.target.id ? setToggle("") : setToggle(e.target.id)
-    }
+    const toggleState = (e) => toggle === e.currentTarget.id ? setToggle("") : setToggle(e.currentTarget.id)
+    
 
     const stats = [
         { label: "Total Videos", value: userStats.totalVideos, id: "videos" },
@@ -64,7 +67,7 @@ export default function Channel() {
                 <div className="flex-col max-lg:mt-4 w-[650px]">
                     <div className="bg-gray-900 text-white p-6 rounded-lg">
                         <h2 className="text-xl font-semibold mb-4">Your details</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-2 gap-6">
                             {stats.map((stat, index) => (
                                 <div key={index}
                                     id={stat.id}
@@ -81,7 +84,10 @@ export default function Channel() {
                     </div>
                 </div>
             </div>
-            {toggle === "playlists" ? <Playlists /> : null}
+            {toggle == "playlists" ? <Playlists /> : null}
+            {toggle == "subs" ? <Subscribers /> : null}
+            {/* {toggle == "subs" ? <Posts /> : null} */}
+            {/* {toggle == "subs" ? <MyVideos /> : null} */}
         </>
     );
 }
