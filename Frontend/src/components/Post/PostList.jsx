@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import img from "../assets/profile.webp";
 import Cookies from "js-cookie";
 import axios from 'axios';
-import { MessageSquareText, ThumbsUpIcon } from 'lucide-react';
+import { MessageSquareText, ThumbsUp, ThumbsUpIcon } from 'lucide-react';
 import { parseDate } from '../utility';
 
 export default function PostList({ channelId = "", owner }) {
@@ -16,6 +16,20 @@ export default function PostList({ channelId = "", owner }) {
             .catch(error => console.log(error));
     }, []);
 
+    const togglePostLike = (postId) => {
+        axios.post(`/api/like/p/${postId}`)
+            .then((res) => setPosts(
+                posts => posts.map(post =>
+                    post._id === postId ? {
+                        ...post,
+                        isLiked: !post.isLiked,
+                        likes: post.isLiked ? post.likes - 1 : post.likes + 1
+                    } : post
+                )
+            ))
+            .catch(error => console.log(error));
+    }
+
     return (
         <div className=" max-w-7xl">
             <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Posts</h1>
@@ -24,7 +38,7 @@ export default function PostList({ channelId = "", owner }) {
                     {
                         posts.length !== 0 ? (
                             posts.map((post, index) => (
-                                <div key={index} className="bg-gray-800 text-white p-4 rounded-lg mb-4 shadow-md w-full">
+                                <div key={index} className="bg-gray-800 hover:bg-slate-700 cursor-pointer text-white p-4 rounded-lg mb-4 shadow-md w-full">
                                     <div className="flex items-center mb-4">
                                         <img
                                             src={owner.avatar}
@@ -33,22 +47,28 @@ export default function PostList({ channelId = "", owner }) {
                                             className="h-10 w-10 rounded-full object-cover mr-3"
                                         />
                                         <div>
-                                            <div className="font-semibold">{owner.fullname}</div>
+                                            <span className="font-semibold">{owner.fullname}</span>
+                                            <span className="font-normal ms-2 text-gray-400">@{owner.username}</span>
+
                                             <div className="text-sm text-gray-400">{parseDate(post.updatedAt)}</div>
                                         </div>
                                     </div>
                                     <div className="mb-4 whitespace-pre-line">{post.content}</div>
                                     <div className="flex text-gray-400">
                                         <div className="flex items-center mr-4">
-                                            <span className="flex items-center mr-2 cursor-pointer">
-                                                <ThumbsUpIcon className='me-2' />531
-                                                {/* {post.likes} */}
+                                            <span className="flex items-center mr-2 cursor-pointer" onClick={() => togglePostLike(post._id)}>
+                                                <ThumbsUp
+                                                    strokeWidth={3}
+                                                    absoluteStrokeWidth
+                                                    className={post.isLiked ? "me-2 text-blue-600" : "me-2"}
+                                                />
+                                                {post.likes}
                                             </span>
                                         </div>
                                         <div className="flex items-center">
                                             <span className="flex items-center cursor-pointer">
-                                                <MessageSquareText className='me-2' />89
-                                                {/* {post.comments} */}
+                                                <MessageSquareText className='me-2' />
+                                                {post.comments}
                                             </span>
                                         </div>
                                     </div>

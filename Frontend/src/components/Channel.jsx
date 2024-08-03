@@ -4,15 +4,14 @@ import { parseDate } from "./utility";
 import img from "./assets/profile.webp"
 import axios from "axios";
 import Playlists from "./Playlist/Playlists"
-import Subscribers from "./Subscription//Subscribers";
+import Subscribers from "./Subscription/Subscribers";
 import ChannelVideos from "./Video/ChannelVideos";
-import Posts from "./Post/Posts";
+import PostList from "./Post/PostList";
 
 export default function Channel({ channelId = "" }) {
-    // const user = 
+
     const [user, setUser] = useState(JSON.parse(Cookies.get("user")))
     const id = channelId === "" ? user._id : channelId
-    console.log(id);
 
     const [userStats, setUserStats] = useState({})
 
@@ -105,7 +104,7 @@ export default function Channel({ channelId = "" }) {
             {toggle == "playlists" ? <Playlists /> : null}
             {toggle == "subs" ? <Subscribers /> : null}
             {toggle == "videos" ? <ChannelVideos /> : null}
-            {toggle == "posts" ? <Posts owner={user}/> : null}
+            {toggle == "posts" ? <PostList owner={user}/> : null}
         </>
     );
 }

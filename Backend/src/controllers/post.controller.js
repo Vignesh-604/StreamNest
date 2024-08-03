@@ -54,19 +54,61 @@ const getUserPosts = asyncHandler(async (req, res) => {
     const { userId } = req.params
     if (!userId) throw new ApiError(403, "No userId")
 
-    const posts = await Post.find({ owner: userId }).select("content updatedAt")
-    // const posts = await Post.aggregate([
-    //     {
-    //         $match: {
-    //             owner: new mongoose.Types.ObjectId(userId)
-    //         }
-    //     },
-    //     {
-    //         $lookup: {
-
-    //         }
-    //     }
-    // ])
+    // const posts = await Post.find({ owner: userId }).select("content updatedAt")
+    const posts = await Post.aggregate([
+        {
+            $match: {
+                owner: new mongoose.Types.ObjectId(userId)
+            }
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "likes"
+            }
+        },
+        {
+            $addFields: {
+                likes: {
+                    $size: "$likes"
+                },
+                comments: {
+                    $size: "$comments"
+                },
+                isLiked: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$likes.likedBy"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                content: 1,
+                updatedAt: 1,
+                likes: 1,
+                comments: 1,
+                isLiked: 1,
+            }
+        },
+        {
+            $sort : {
+                updatedAt: -1
+            }
+        }
+    ])
     if (!posts) throw new ApiError(404, "No posts found")
 
     res.status(203).json(new ApiResponse(200, posts, "Posts fetched successfully"))
