@@ -13,7 +13,7 @@ router.use(verifyJWT)
 
 router.route("/c/:commentId").post(toggleCommentLike)
 
-router.route("/t/:postId").post(togglePostLike)
+router.route("/p/:postId").post(togglePostLike)
 
 router.route("/v/:videoId").post(toggleVideoLike)
 

@@ -32,10 +32,10 @@ const updatePost = asyncHandler(async (req, res) => {
     const post = await Post.findByIdAndUpdate(
         postId,
         { $set: { content } },
-        { new: true}
+        { new: true }
     )
 
-    res.status(201).json( new ApiResponse(201, post, "Post updated successfully!"))
+    res.status(201).json(new ApiResponse(201, post, "Post updated successfully!"))
 })
 
 // Get post id and delete
@@ -45,14 +45,14 @@ const deletePost = asyncHandler(async (req, res) => {
 
     await Post.findByIdAndDelete("6697926628ea7ca31cb73734")
 
-    res.status(201).json( new ApiResponse(201, "", "Post updated successfully!"))
+    res.status(201).json(new ApiResponse(201, "", "Post updated successfully!"))
 })
 
 // Get userId from params
 const getUserPosts = asyncHandler(async (req, res) => {
 
-    const {userId} = req.params
-    if (!userId.trim()) throw new ApiError(403, "No userId")
+    const { userId } = req.params
+    if (!userId) throw new ApiError(403, "No userId")
 
     const posts = await Post.find({ owner: userId }).select("content updatedAt")
     // const posts = await Post.aggregate([
@@ -72,9 +72,70 @@ const getUserPosts = asyncHandler(async (req, res) => {
     res.status(203).json(new ApiResponse(200, posts, "Posts fetched successfully"))
 })
 
+const getPostById = asyncHandler(async (req, res) => {
+
+    const { postId } = req.params
+    if (!postId) throw new ApiError(403, "No postId")
+
+    const post = await Post.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(postId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "likes"
+            }
+        },
+        {
+            $addFields: {
+                likes: {
+                    $size: "$likes"
+                },
+                isLiked: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$likes.likedBy"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                content: 1,
+                updatedAt: 1,
+                likes: 1,
+                isLiked: 1,
+                owner: {
+                    username: 1,
+                    fullname: 1,
+                    avatar: 1
+                }
+            }
+        }
+    ])
+    if (!post) throw new ApiError(400, "Couldn't fetch")
+
+    res.status(200).json(new ApiResponse(200, post[0], "Post details fetched"))
+})
+
 export {
     createPost,
     updatePost,
     deletePost,
     getUserPosts,
+    getPostById,
 }
