@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { parseDate } from "./utility";
+import { parseDate } from "../utility"
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import defaultImg from "../assets/thumbnail.jpeg"
+import img from "../assets/thumbnail.jpeg"
 
 export default function Playlists({ user = "" }) {
     const [playlists, setPlaylists] = useState([]);
@@ -77,8 +77,8 @@ export default function Playlists({ user = "" }) {
                         playlists.map(plst => (
                             <div key={plst._id} className=" rounded-md border p-3 flex-col items-start hover:bg-slate-800 max-md:w-[420px]" >
                                 <img
-                                    src={plst.poster ? plst.poster?.thumbnail : defaultImg}
-                                    onError={(e) => e.target.src = { defaultImg }}
+                                    src={plst.poster ? plst.poster?.thumbnail : img}
+                                    onError={(e) => e.target.src = { img }}
                                     className="h-[200px] w-full rounded-t-md object-cover"
                                 />
                                 <div className="p-4">

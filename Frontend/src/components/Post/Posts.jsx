@@ -3,7 +3,7 @@ import img from "../assets/profile.webp";
 import Cookies from "js-cookie";
 import axios from 'axios';
 import { MessageSquareText, ThumbsUpIcon } from 'lucide-react';
-import { parseDate } from './utility';
+import { parseDate } from '../utility';
 
 export default function PostList({ channelId = "", owner }) {
 

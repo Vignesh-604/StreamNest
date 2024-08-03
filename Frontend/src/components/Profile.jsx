@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { parseDate } from "./utility";
-import { PencilIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import { PencilLine, PencilLineIcon, PencilOff, Save } from "lucide-react";
+import { PencilLine, PencilOff, Save } from "lucide-react";
 
 export default function Profile() {
     // const [user, setUser] = useState(JSON.parse(Cookies.get("user")));   // FOR TESTING

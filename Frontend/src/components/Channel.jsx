@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { parseDate } from "./utility";
-import img from "../assets/profile.webp"
+import img from "./assets/profile.webp"
 import axios from "axios";
-import Playlists from "./Playlists";
-import Subscribers from "./Subscribers";
-import ChannelVideos from "./ChannelVideos";
-import Posts from "./Posts";
+import Playlists from "./Playlist/Playlists"
+import Subscribers from "./Subscription//Subscribers";
+import ChannelVideos from "./Video/ChannelVideos";
+import Posts from "./Post/Posts";
 
 export default function Channel({ channelId = "" }) {
     // const user = 
     const [user, setUser] = useState(JSON.parse(Cookies.get("user")))
     const id = channelId === "" ? user._id : channelId
     console.log(id);
-
 
     const [userStats, setUserStats] = useState({})
 

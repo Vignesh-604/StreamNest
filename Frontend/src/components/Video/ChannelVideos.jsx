@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie"
 import VideoItem from "./VideoItem";
-import { parseTime } from "./utility";
+import { parseTime } from "../utility";
 
 export default function ChannelVideos({ channelId = ""}) {
     const id = channelId === "" ? (JSON.parse(Cookies.get("user")))._id : channelId
