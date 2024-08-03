@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { parseDate } from "./utility";
+import img from "../assets/profile.webp"
 import axios from "axios";
 import Playlists from "./Playlists";
 import Subscribers from "./Subscribers";
 import ChannelVideos from "./ChannelVideos";
+import Posts from "./Posts";
 
-export default function Channel({channelId = ""}) {
-    const user = JSON.parse(Cookies.get("user"))
-    const id = channelId === "" ? (JSON.parse(Cookies.get("user")))._id : channelId
+export default function Channel({ channelId = "" }) {
+    // const user = 
+    const [user, setUser] = useState(JSON.parse(Cookies.get("user")))
+    const id = channelId === "" ? user._id : channelId
+    console.log(id);
+
 
     const [userStats, setUserStats] = useState({})
-    
 
     const [toggle, setToggle] = useState("")
 
     useEffect(() => {
+        axios.get(`/api/users/channel/${id}`)
+            .then(res => setUser(res.data.data))
+            .catch(e => console.log(e))
+
         axios.get(`/api/dashboard/stats/${id}`)
             .then(res => setUserStats(res.data.data))
             .catch(e => console.log(e))
@@ -23,13 +31,12 @@ export default function Channel({channelId = ""}) {
 
     // Toggle which section to load
     const toggleState = (e) => toggle === e.currentTarget.id ? setToggle("") : setToggle(e.currentTarget.id)
-    
 
     const stats = [
-        { label: "Total Videos", value: userStats.totalVideos, id: "videos" },
-        { label: "Total Playlists", value: userStats.totalPlaylists, id: "playlists" },
-        { label: "Total Posts", value: userStats.totalPosts, id: "posts" },
-        { label: "Total Subscribers", value: userStats.totalSubscribers, id: "subs" },
+        { label: "Total Videos", value: userStats.totalVideos || 0, id: "videos" },
+        { label: "Total Playlists", value: userStats.totalPlaylists || 0, id: "playlists" },
+        { label: "Total Posts", value: userStats.totalPosts || 0, id: "posts" },
+        { label: "Total Subscribers", value: userStats.totalSubscribers || 0, id: "subs" },
     ];
 
     return (
@@ -40,6 +47,7 @@ export default function Channel({channelId = ""}) {
                         <img
                             src={user.avatar}
                             alt="User avatar"
+                            onError={e => e.target.src = img}
                             className="h-56 rounded-full mb-4 border object-cover w-56"
                         />
 
@@ -55,17 +63,27 @@ export default function Channel({channelId = ""}) {
                                 Channel created at: {parseDate(user.createdAt)}
                             </h2>
                             <div className="flex flex-col ms-2 lg:me-10 max-lg:space-y-2 lg:flex-row lg:space-x-2">
-                                <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
-                                    Total Views: {userStats.totalViews}
-                                </div>
-                                <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
-                                    Total Likes: {userStats.totalLikes}
-                                </div>
+                                {userStats.totalVideos == 0 ? (
+                                    <div>
+                                        <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
+                                            User does not have a channel
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
+                                            Total Views: {userStats.totalViews}
+                                        </div>
+                                        <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
+                                            Total Likes: {userStats.totalLikes}
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="flex-col max-lg:mt-4 w-[650px]">
+                <div className={userStats.totalVideos != 0 ? "flex-col max-lg:mt-4 w-[650px]" : "hidden"}>
                     <div className="bg-gray-900 text-white p-6 rounded-lg">
                         <h2 className="text-xl font-semibold mb-4">Your details</h2>
                         <div className="grid grid-cols-2 gap-6">
@@ -88,7 +106,7 @@ export default function Channel({channelId = ""}) {
             {toggle == "playlists" ? <Playlists /> : null}
             {toggle == "subs" ? <Subscribers /> : null}
             {toggle == "videos" ? <ChannelVideos /> : null}
-            {/* {toggle == "subs" ? <Posts /> : null} */}
+            {toggle == "posts" ? <Posts owner={user}/> : null}
         </>
     );
 }

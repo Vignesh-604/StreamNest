@@ -346,13 +346,13 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
 
-    const { username } = req.params
-    if (!username) throw new ApiError(400, "Username is required!")
+    const { userId } = req.params
+    if (!userId) throw new ApiError(400, "UserId is required!")
 
     const channel = await User.aggregate([
         {
-            $match: {                               // match current user username
-                username: username?.toLowerCase()
+            $match: {                               // match current user userId
+                _id: new mongoose.Types.ObjectId(userId)
             },
         },
         {
@@ -363,22 +363,22 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 as: "subscribers"           // create new set of documents with param user_id in channel field
             },
         },
-        {
-            $lookup: {                     // to get channles you've subscibed to
-                from: "subscriptions",
-                localField: "_id",
-                foreignField: "subscriber",
-                as: "subscribedTo"
-            },
-        },
+        // {
+        //     $lookup: {                     // to get channles you've subscibed to
+        //         from: "subscriptions",
+        //         localField: "_id",
+        //         foreignField: "subscriber",
+        //         as: "subscribedTo"
+        //     },
+        // },
         {
             $addFields: {
-                subscribersCount: {
-                    $size: "$subscribers"
-                },
-                channelSubscribedTo: {
-                    $size: "$subscribedTo"
-                },
+                // subscribersCount: {
+                //     $size: "$subscribers"
+                // },
+                // channelSubscribedTo: {
+                //     $size: "$subscribedTo"
+                // },
                 isSubscribed: {
                     // subscribers document has param_user_id as the channel and multiple user_ids of subscribers
                     // searching current userid in param_userid's subscriber list
@@ -397,15 +397,15 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 email: 1,
                 avatar: 1,
                 coverImage: 1,
-                subscribersCount: 1,
-                channelSubscribedTo: 1,
+                createdAt: 1,
+                // subscribersCount: 1,
+                // channelSubscribedTo: 1,
                 isSubscribed: 1
             }
         }
     ])
 
     if (!channel?.length) throw new ApiError(404, "Channel does not exist")
-        console.log(channel);
     
     res.status(200).json(new ApiResponse(200, channel[0], "Channel found"))
 })

@@ -74,11 +74,29 @@ const getChannelStats = asyncHandler(async (req, res) => {
                     totalViews: 1,
                     // likes: 1,
                 }
+            },
+            {
+                $addFields: {
+                    totalVideos: { $ifNull: ["$totalVideos", 0] },
+                    totalLikes: { $ifNull: ["$totalLikes", 0] },
+                    totalPosts: { $ifNull: ["$totalPosts", 0] },
+                    totalPlaylists: { $ifNull: ["$totalPlaylists", 0] },
+                    totalSubscribers: { $ifNull: ["$totalSubscribers", 0] },
+                    totalViews: { $ifNull: ["$totalViews", 0] },
+                }
             }
         ])
-        if (!stats) throw new ApiError(400, "Couldn't fetch stats")
-    
-        res.status(200).json(new ApiResponse(200, stats[0], "Stats fetched"))
+        
+        const statsWithDefaults = stats.length > 0 ? stats[0] : {
+            totalVideos: 0,
+            totalLikes: 0,
+            totalPosts: 0,
+            totalPlaylists: 0,
+            totalSubscribers: 0,
+            totalViews: 0
+        }
+
+        res.status(200).json(new ApiResponse(200, statsWithDefaults, "Stats fetched"))
         
     } catch (error) {
         res.status(500).json(new ApiResponse(500, error, "Something went wrong"))
