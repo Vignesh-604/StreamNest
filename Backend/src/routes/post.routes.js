@@ -10,6 +10,6 @@ router.route("/new").post(createPost)
 
 router.route("/:postId").post(updatePost).delete(deletePost)
 
-router.route("/user/:userId").post(getUserPosts)
+router.route("/user/:userId").get(getUserPosts)
 
 export default router
