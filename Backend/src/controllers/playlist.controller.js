@@ -86,8 +86,74 @@ const getPlaylistById = asyncHandler( async (req, res) => {
     const {playlistId} = req.params
     if (!playlistId) throw new ApiError(402, "No playlist ID found")
 
-    const playlist = await Playlist.findById(playlistId)
-    res.status(200).json( new ApiResponse(200, playlist, "Playlist fetched"))
+    // const playlist = await Playlist.findById(playlistId)
+    const playlist = await Playlist.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(playlistId)
+            }
+        },
+        {
+            $lookup: {
+                from: 'videos',
+                localField: 'videos',
+                foreignField: '_id',
+                as: 'videos',
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'owner',
+                            foreignField: '_id',
+                            as: 'owner'
+                        }
+                    },
+                    {
+                        $unwind: '$owner'
+                    },
+                    {
+                        $project: {
+                            title: 1,
+                            description: 1,
+                            thumbnail: 1,
+                            views: 1,
+                            duration: 1,
+                            owner: {
+                                fullname: 1,
+                                username: 1,
+                                avatar: 1
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'owner'
+            }
+        },
+        {
+            $unwind: "$owner"
+        },
+        {
+            $project: {
+                name: 1,
+                description: 1,
+                updatedAt: 1,
+                videos: 1,
+                owner : {
+                    fullname: 1,
+                    username: 1,
+                    avatar:1,
+                }
+            }
+        }
+    ]);
+    res.status(200).json( new ApiResponse(200, playlist[0], "Playlist fetched"))
 })
 
 export {
