@@ -2,11 +2,14 @@ import img from "../assets/profile.webp"
 import Cookies from "js-cookie"
 import axios from "axios"
 import { useState, useEffect } from "react"
+import { useOutletContext, useNavigate, NavLink } from "react-router-dom";
 
 export default function Subscribers({ channelId = "" }) {
 
-    const id = channelId === "" ? (JSON.parse(Cookies.get("user")))._id : channelId
+    const currentUser = useOutletContext()
+    const navigate = useNavigate()
 
+    const id = channelId === "" ? currentUser._id : channelId
     const [subscribers, setSubscribers] = useState([])
 
     useEffect(() => {
@@ -23,7 +26,13 @@ export default function Subscribers({ channelId = "" }) {
                     {
                         subscribers.length !== 0 ? (
                             subscribers.map(sub => (
-                                <div key={sub._id} className="flex flex-col items-center">
+                                <NavLink 
+                                    key={sub._id}
+                                    // If subscriber is the current user then redirect to channel without Id
+                                    to={sub.subscriber._id !== currentUser._id ? `/channel/${sub.subscriber._id}` : "/channel"} 
+                                    reloadDocument
+                                    className="flex flex-col items-center"
+                                >
                                     <img
                                         className="rounded-full h-24 w-24 object-cover mb-4"
                                         src={sub.subscriber.avatar}
@@ -32,7 +41,7 @@ export default function Subscribers({ channelId = "" }) {
                                     />
                                     <h3 className="text-lg font-semibold">{sub.subscriber.fullname}</h3>
                                     <p className="text-gray-400">{sub.subscriber.username}</p>
-                                </div>
+                                </NavLink>
                             ))
                         ) : (
                             <h1 className="font-bold text-center text-3xl mt-7">You have no subs</h1>
