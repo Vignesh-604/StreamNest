@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import img from "../assets/profile.webp";
-import Cookies from "js-cookie";
 import axios from 'axios';
-import { MessageSquareText, ThumbsUp, ThumbsUpIcon } from 'lucide-react';
+import { MessageSquareText, ThumbsUp } from 'lucide-react';
 import { parseDate } from '../utility';
+import { useOutletContext, useNavigate } from "react-router-dom";
 
 export default function PostList({ channelId = "", owner }) {
 
+    const currentUser = useOutletContext()
+    const navigate = useNavigate()
+
     const [posts, setPosts] = useState([]);
-    const id = channelId === "" ? (JSON.parse(Cookies.get("user")))._id : channelId;
+    const id = channelId === "" ? currentUser._id : channelId;
 
     useEffect(() => {
         axios.get(`/api/post/user/${id}`)
@@ -38,7 +41,9 @@ export default function PostList({ channelId = "", owner }) {
                     {
                         posts.length !== 0 ? (
                             posts.map((post, index) => (
-                                <div key={index} className="bg-gray-800 hover:bg-slate-700 cursor-pointer text-white p-4 rounded-lg mb-4 shadow-md w-full">
+                                <div key={index} onClick={() => navigate(`/post/${post._id}`)}
+                                    className="bg-gray-800 hover:bg-slate-700 cursor-pointer text-white p-4 rounded-lg mb-4 shadow-md w-full"
+                                >
                                     <div className="flex items-center mb-4">
                                         <img
                                             src={owner.avatar}

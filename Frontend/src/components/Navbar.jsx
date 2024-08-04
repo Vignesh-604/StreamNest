@@ -15,9 +15,12 @@ import {
 import logo from "./assets/SNlogo.png"
 import profile from "./assets/profile.webp"
 import Cookies from "js-cookie"
-import { NavLink } from 'react-router-dom'
+import { NavLink, useOutletContext, useParams } from 'react-router-dom'
 
 export default function Navbar() {
+
+    const { channelId } = useParams()
+
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const user = JSON.parse(Cookies.get("user"))
 
@@ -51,8 +54,12 @@ export default function Navbar() {
                             Subscriptions
 
                         </NavLink>
-                        <NavLink to={"/channel"} 
-                        className={({isActive}) => `${isActive ? "text-red-500 hover:text-white" : "text-white hover:text-red-500"} mx-2 font-semibold text-xl`}
+                        <NavLink to={"/channel/"} reloadDocument
+                            className={({ isActive }) => (
+                                `${isActive ? (
+                                    !channelId ? "text-red-500 hover:white" : "text-white hover:text-red-500"
+                                ) : "text-white hover:text-red-500"} mx-2 font-semibold text-xl`
+                            )}
                         >
                             My Channel
 

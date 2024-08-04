@@ -8,7 +8,6 @@ import { useParams } from "react-router-dom";
 export default function Playlist() {
 
     const {id} = useParams()
-    console.log(id);
     
     const [playlist, setPlaylist] = useState(null)
 
@@ -17,7 +16,6 @@ export default function Playlist() {
             .then(res => setPlaylist(res.data.data))
             .catch(e => console.log(e))
     }, [])
-    console.log(playlist);
 
     // Remove video from playlist broken
     const removeVideo = (plstId, vidId) => {

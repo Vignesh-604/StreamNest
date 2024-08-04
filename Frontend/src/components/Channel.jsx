@@ -13,7 +13,7 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
     const {channelId} = useParams()
 
     const [user, setUser] = useState(currentUser)
-    const id = channelId === "" ? user._id : channelId
+    const id = !channelId ? user._id : channelId  
 
     const [userStats, setUserStats] = useState({})
 

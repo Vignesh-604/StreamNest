@@ -5,13 +5,11 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { parseDate } from '../utility';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import {
-    PencilIcon,
-    TrashIcon,
-} from '@heroicons/react/16/solid'
+import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
+import { useParams } from "react-router-dom";
 
-
-export default function PostItem({ postId = "66adea053ce85ffaeda677dd" }) {
+export default function PostItem() {
+    const {postId} = useParams()
 
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
@@ -56,7 +54,7 @@ export default function PostItem({ postId = "66adea053ce85ffaeda677dd" }) {
         <div className="container mx-auto p-4">
             {
                 post ? (
-                    <div className="bg-gray-800 text-white p-4 rounded-lg mb-4 shadow-md">
+                    <div className="bg-gray-800 lg:w-[1000px] text-white p-4 rounded-lg mb-4 shadow-md">
                         <div className="flex items-center mb-4 justify-between">
                             <div className='flex items-center'>
                                 <img
