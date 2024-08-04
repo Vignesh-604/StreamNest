@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import { parseDate } from "./utility";
 import img from "./assets/profile.webp"
 import axios from "axios";
@@ -7,10 +6,13 @@ import Playlists from "./Playlist/Playlists"
 import Subscribers from "./Subscription/Subscribers";
 import ChannelVideos from "./Video/ChannelVideos";
 import PostList from "./Post/PostList";
+import { useOutletContext, useParams } from "react-router-dom";
 
-export default function Channel({ channelId = "" }) {
+export default function Channel() {//66afcbb1791f57ba50bea9cb
+    const currentUser = useOutletContext()   
+    const {channelId} = useParams()
 
-    const [user, setUser] = useState(JSON.parse(Cookies.get("user")))
+    const [user, setUser] = useState(currentUser)
     const id = channelId === "" ? user._id : channelId
 
     const [userStats, setUserStats] = useState({})
@@ -54,7 +56,7 @@ export default function Channel({ channelId = "" }) {
                                 {user.fullname}
                             </h1>
                             <h2 className="text-xl text-gray-400 m-2">
-                                {user.username}
+                                @{user.username}
                             </h2>
                             <hr className="ms-2 lg:me-10" />
                             <h2 className="text-lg text-gray-400 m-2">
@@ -101,10 +103,10 @@ export default function Channel({ channelId = "" }) {
                     </div>
                 </div>
             </div>
-            {toggle == "playlists" ? <Playlists /> : null}
-            {toggle == "subs" ? <Subscribers /> : null}
-            {toggle == "videos" ? <ChannelVideos /> : null}
-            {toggle == "posts" ? <PostList owner={user}/> : null}
+            {toggle == "playlists" ? <Playlists channelId={channelId}/> : null}
+            {toggle == "subs" ? <Subscribers  channelId={channelId}/> : null}
+            {toggle == "videos" ? <ChannelVideos channelId={channelId}/> : null}
+            {toggle == "posts" ? <PostList channelId={channelId} owner={user}/> : null}
         </>
     );
 }

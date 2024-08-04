@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Cookies from "js-cookie";
 import { parseDate } from "../utility"
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import img from "../assets/thumbnail.jpeg"
+import img from "../assets/noPlaylist.jpeg"
+import { useOutletContext, useNavigate } from "react-router-dom";
 
-export default function Playlists({ user = "" }) {
+export default function Playlists({ channelId = "" }) {
+
+    const currentUser = useOutletContext()
+    const navigate = useNavigate()
+
     const [playlists, setPlaylists] = useState([]);
-    const myId = (JSON.parse(Cookies.get("user")))._id
 
-    const userId = user === "" ? (myId) : user
+    const userId = channelId === "" ? currentUser._id : channelId
 
     let [name, setName] = useState("")
     let [desc, setDesc] = useState("")
@@ -35,17 +38,17 @@ export default function Playlists({ user = "" }) {
                 setPlaylists(plst => plst.push(res))
             })
             .catch(e => console.log(e))
-
     }
 
     return (
         <div className="flex flex-col px-4 min-w-[36rem]">
-            <h1 className="font-bold text-start text-5xl mt-7 mb-4">
-            {userId == myId ? ("Your Playlists") : ("Channel Playlists")}
+            <h1 className="font-bold text-start text-5xl mt-7 mb-10">
+                Playlists
             </h1>
 
+            {/* Create new playlist - only if playlist belongs to current user */}
             {
-                userId === myId ? (
+                userId === currentUser._id ? (
                     <form className="flex flex-row my-6 border-white text-lg" onSubmit={newPlaylist}>
                         <h1 className=" my-auto me-4 font-semibold">
                             Create new playlist:
@@ -75,7 +78,10 @@ export default function Playlists({ user = "" }) {
                 {
                     playlists.length ?
                         playlists.map(plst => (
-                            <div key={plst._id} className=" rounded-md border p-3 flex-col items-start hover:bg-slate-800 max-md:w-[420px]" >
+                            <div key={plst._id}
+                                onClick={() => navigate(`/playlist/${plst._id}`)}
+                                className=" rounded-md border p-3 flex-col items-start hover:bg-slate-800 max-md:w-[420px]"
+                            >
                                 <img
                                     src={plst.poster ? plst.poster?.thumbnail : img}
                                     onError={(e) => e.target.src = { img }}

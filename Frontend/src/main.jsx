@@ -9,6 +9,7 @@ import Post from "./components/Post/Post"
 import Playlist from './components/Playlist/Playlist'
 import LikedVideos from "./components/Video/LikedVideos"
 import Playlists from './components/Playlist/Playlists.jsx'
+import { ErrorPage } from './components/ErrorPage.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -16,8 +17,12 @@ const router = createBrowserRouter(         // For web applications
 
             <Route index element={<Profile />} />
             <Route path='/channel' element={<Channel />} />
+            <Route path='/channel/:channelId' element={<Channel />} />
             <Route path='/liked' element={<LikedVideos />} />
             <Route path='/playlist' element={<Playlists />} />
+            <Route path='/playlist/:id' element={<Playlist />} />
+            
+            <Route path='*' element={<ErrorPage />} />
 
         </Route>
     ))

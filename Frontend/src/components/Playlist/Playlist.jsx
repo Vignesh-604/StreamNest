@@ -1,14 +1,19 @@
 import axios from "axios";
-import img from "../assets/thumbnail.jpeg"
+import img from "../assets/noPlaylist.jpeg"
 import { useEffect, useState } from "react";
 import { parseDate, parseTime } from "../utility";
 import VideoItem from "../Video/VideoItem";
+import { useParams } from "react-router-dom";
 
 export default function Playlist() {
+
+    const {id} = useParams()
+    console.log(id);
+    
     const [playlist, setPlaylist] = useState(null)
 
     useEffect(() => {
-        axios.get(`/api/playlist/669acb14f5c6a7ec30ae2fba`)
+        axios.get(`/api/playlist/${id}`)
             .then(res => setPlaylist(res.data.data))
             .catch(e => console.log(e))
     }, [])
@@ -28,7 +33,7 @@ export default function Playlist() {
                     <div className="flex flex-col md:flex-row max-md:w-full md:space-x-4">
                         <div className="flex flex-col items-center p-5 rounded-lg bg-gray-800">
                             <img
-                                src={playlist.videos[0].thumbnail}
+                                src={playlist.videos[0] ? playlist.videos[0]?.thumbnail : img}
                                 alt="User avatar"
                                 onError={e => e.target.src = img}
                                 className="h-56 rounded-lg  border object-cover w-full my-auto"
@@ -76,7 +81,7 @@ export default function Playlist() {
                                         </div>
                                     ))
                                 ) : (
-                                    <h1 className="flex items-center font-semibold">No videos</h1>
+                                    null
                                 )
                             }
                         </div>
