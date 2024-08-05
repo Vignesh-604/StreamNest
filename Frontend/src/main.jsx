@@ -11,6 +11,7 @@ import LikedVideos from "./components/Video/LikedVideos"
 import Playlists from './components/Playlist/Playlists.jsx'
 import { ErrorPage } from './components/ErrorPage.jsx'
 import PostList from './components/Post/PostList.jsx'
+import Subscriptions from './components/Subscription/Subsciptions.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -22,6 +23,7 @@ const router = createBrowserRouter(         // For web applications
             <Route path='/channel/:channelId' element={<Channel />} />
             
             <Route path='/liked' element={<LikedVideos />} />
+            <Route path='/subscriptions' element={<Subscriptions />} />
 
             <Route path='/playlist' element={<Playlists />} />
             <Route path='/playlist/:id' element={<Playlist />} />

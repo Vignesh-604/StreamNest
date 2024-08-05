@@ -66,7 +66,52 @@ const getUserSubscribedChannels = asyncHandler( async (req, res) => {
     const user = req.user?._id
     if (!user) throw new ApiError(404, "Not the user")
 
-    const subscriptions = await Subscription.find({subscriber: user})
+    // const subscriptions = await Subscription.find({subscriber: user})
+    const subscriptions = await Subscription.aggregate([
+        {
+            $match: {
+                subscriber: new mongoose.Types.ObjectId(user)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "channel",
+                foreignField: "_id",
+                as: "subscribedTo",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "subscriptions",
+                            localField: "_id",
+                            foreignField: "channel",
+                            as: "subscribers"
+                        }
+                    },
+
+                    {
+                        $addFields: {
+                            subscribers: { $size: "$subscribers"}
+                        }
+                    },
+                ]
+            }
+        },
+        {
+            $unwind: "$subscribedTo"
+        },
+        {
+            $project: {
+                subscribedTo: {
+                    _id: 1,
+                    fullname: 1,
+                    username:1,
+                    avatar: 1,
+                    subscribers:1
+                }
+            }
+        }
+    ])
 
     res.status(200).json( new ApiResponse(200, subscriptions, "Subs fetched"))
 })

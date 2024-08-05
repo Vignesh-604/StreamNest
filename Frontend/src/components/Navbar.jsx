@@ -50,7 +50,9 @@ export default function Navbar() {
 
                     {/* NavItems */}
                     <div className="hidden lg:flex items-center space-x-6">
-                        <NavLink to className="text-white hover:text-red-500 mx-2 font-semibold text-xl">
+                        <NavLink to={"/subscriptions"}
+                            className= {({isActive}) => isActive ? `text-red-500 hover:white mx-2 font-semibold text-xl` : `text-white hover:text-red-500 mx-2 font-semibold text-xl`}
+                        >
                             Subscriptions
 
                         </NavLink>
