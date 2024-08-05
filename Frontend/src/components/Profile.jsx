@@ -15,6 +15,7 @@ export default function Profile() {
     useEffect(() => {
         axios.get("/api/users/current_user")
             .then(res => {
+                // console.log("User data:",res.data.data);
                 setUser(res.data.data)
                 setFormData({...formData,
                     fullname: res.data.data.fullname,
@@ -24,7 +25,7 @@ export default function Profile() {
             })
             .catch(e => console.log(e))
     }, [])
-    console.log(user);
+    // console.log(user);
 
 
     const handleInputChange = (e) => {
@@ -35,13 +36,17 @@ export default function Profile() {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Check if any changes made to fullname or email
-        if (formData.fullname !== user.fullname && formData.email !== user.email) {
+        if (formData.fullname !== user.fullname || formData.email !== user.email) {
 
             axios.patch("/api/users/update_details", {
                 fullname: formData.fullname,
                 email: formData.email
             })
-                .then(res => setUser(res.data.data))
+                .then(res => setUser(user => ({
+                    ...user, 
+                    email: res.data.data.email,
+                    fullname: res.data.data.fullname,
+                })))
                 .catch(e => console.log(e))
         }
 
@@ -63,7 +68,7 @@ export default function Profile() {
             axios.patchForm("/api/users/update_avatar", {
                 "avatar": avatarFile
             })
-                .then(res => setUser(res.data.data))
+                .then(res => setUser(user => ({...user, avatar: res.data.data.avatar})))
                 .catch(e => console.log(e))
         }
 
@@ -75,14 +80,16 @@ export default function Profile() {
             axios.patchForm("/api/users/update_cover_image", {
                 "coverImage": covImgFile
             })
-                .then(res => setUser(res.data.data))
+                .then(res => setUser(user => ({...user, coverImage: res.data.data.coverImage})))
                 .catch(e => console.log(e))
         }
+
+        // clear passwords fields
         setFormData({...formData,
             oldPassword: "",
             newPassword: "",
-        }
-        )
+        })
+
         // close the form
         setIsEditing(false);
     };

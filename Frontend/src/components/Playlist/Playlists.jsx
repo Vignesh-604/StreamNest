@@ -54,7 +54,7 @@ export default function Playlists({ channelId = "" }) {
             {/* Create new playlist - only if playlist belongs to current user */}
             {
                 userId === currentUser._id ? (
-                    <form className="flex flex-row my-6 border-white text-lg" onSubmit={newPlaylist}>
+                    <form className="flex flex-row mb-6 mx-auto shadow-2xl p-2 border-white text-lg" onSubmit={newPlaylist}>
                         <h1 className=" my-auto me-4 font-semibold">
                             Create new playlist:
                         </h1>

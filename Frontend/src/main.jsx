@@ -12,12 +12,15 @@ import Playlists from './components/Playlist/Playlists.jsx'
 import { ErrorPage } from './components/ErrorPage.jsx'
 import PostList from './components/Post/PostList.jsx'
 import Subscriptions from './components/Subscription/Subsciptions.jsx'
+import SignIn from './components/Account/SignIn.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
         <Route path='/' element={<App />}>
 
             <Route index element={<Profile />} />
+            
+            <Route path='/signin' element={<SignIn />} />
 
             <Route path='/channel' element={<Channel />} />
             <Route path='/channel/:channelId' element={<Channel />} />

@@ -116,12 +116,12 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
         $or: [{ username }, { email }]
     })
-    if (!user) throw new ApiError(401, "User not found!!")
+    if (!user) return res.status(404).json( new ApiResponse(404, "Incorrect username or email"))
 
     // Password checking
     // Custom made methods can only be accessed from db fetched user details
     const validPassword = await user.isPasswordCorrect(password)
-    if (!user) throw new ApiError(400, "Password incorrect!!")
+    if (!validPassword) return res.status(404).json( new ApiResponse(404,"Password incorrect"))
 
     // Refresh and access tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
@@ -132,7 +132,6 @@ const loginUser = asyncHandler(async (req, res) => {
     return res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
-        // .cookie("user", loggedInUser)
         .json(
             new ApiResponse(
                 200,
