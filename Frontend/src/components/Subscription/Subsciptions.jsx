@@ -1,7 +1,6 @@
-import { ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useOutlet, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 export default function Subscriptions() {
     
@@ -14,15 +13,16 @@ export default function Subscriptions() {
             .then(res => setSubs(res.data.data))
             .catch(e => console.log(e))
     }, [])
-    console.log(subs);
+    // console.log(subs);
 
     const unsubscribe = (e, id) => {
-        e.stopPropogation()
+        e.stopPropagation()
         axios.post(`/api/subscription/channel/${id}`)
             .then(res => {
                 console.log(res.data);
                 setSubs(subs => subs.filter(sub => sub.subscribedTo._id !== id))
             })
+            .catch(e => console.log(e))
     }
 
     return (
@@ -54,7 +54,7 @@ export default function Subscriptions() {
                                     </p>
 
                                     <button
-                                        type="button" onClick={() => unsubscribe(sub.subscribedTo._id)}
+                                        type="button" onClick={(e) => unsubscribe(e, sub.subscribedTo._id)}
                                         className="mx-auto mt-4 w-48 rounded-sm bg-black px-2 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                                     >
                                         Unsubscribe

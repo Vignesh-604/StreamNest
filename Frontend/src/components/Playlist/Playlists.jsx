@@ -24,18 +24,23 @@ export default function Playlists({ channelId = "" }) {
     }, []);
     // console.log("Playlist:",playlists);    
 
-    const deletePlaylist = (id) => {
+    const deletePlaylist = (e, id) => {
+        e.stopPropagation()
         axios.delete(`/api/playlist/${id}`)
         console.log("Deleted playlist");
         setPlaylists(playlists.filter(pst => pst._id !== id))
     }
 
-    const newPlaylist = () => {
+    const newPlaylist = (e) => {
+        e.preventDefault()
+
         if (!(name.trim())) return console.log("Enter name");
 
-        axios.post(`api/playlist`, { name, description: desc })
+        axios.post(`/api/playlist`, { name, description: desc })
             .then(res => {
-                setPlaylists(plst => plst.push(res))
+                setPlaylists([...playlists, res.data.data])
+                setName("")
+                setDesc("")
             })
             .catch(e => console.log(e))
     }
@@ -102,7 +107,7 @@ export default function Playlists({ channelId = "" }) {
                                     <button
                                         type="button"
                                         className="flex items-center gap-2 transition mt-4 w-full rounded-sm bg-red-700 px-2 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                                        onClick={() => deletePlaylist(plst._id)}
+                                        onClick={(e) => deletePlaylist(e, plst._id)}
                                     >
                                         <TrashIcon className="h-5 w-5 text-white" />
                                         Delete Playlist
