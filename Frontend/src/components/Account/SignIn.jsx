@@ -13,6 +13,14 @@ export default function SignIn() {
 
     const navigate = useNavigate()
 
+    // If user logged in then redirect to home page
+    useEffect(() => {
+        const user = Cookies.get("user") ? true : false
+
+        if (user) navigate("/")
+    }, [])
+
+    // Login
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -27,13 +35,13 @@ export default function SignIn() {
 
         // Form submission logic here
         axios.post("/api/users/login", formData)
-        .then((res) => {
-          let userDetails = res.data.data.user
-          Cookies.set("user", JSON.stringify(userDetails))  
+            .then((res) => {
+                let userDetails = res.data.data.user
+                Cookies.set("user", JSON.stringify(userDetails))
 
-          navigate("/")
-        })
-        .catch(error => setErrorMessage(error.response.data.data))
+                navigate("/")   // Redirect to home page
+            })
+            .catch(error => setErrorMessage(error.response.data.data))
     };
 
     return (
@@ -49,7 +57,7 @@ export default function SignIn() {
                     <p className="mt-3 text-center text-sm text-gray-400">
                         Don't have an account?{' '}
                         <NavLink
-                            to={"/signup"}
+                            to={"/register"}
                             title=""
                             className="font-semibold text-gray- transition-all duration-200 hover:underline"
                         >

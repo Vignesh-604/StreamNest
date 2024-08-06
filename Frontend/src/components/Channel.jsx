@@ -41,7 +41,14 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
 
     return (
         <>
-            <div className="flex flex-col xl:flex-row place-items-center pb-12">
+            <div className="flex flex-col xl:flex-row place-items-center pb-12 rounded-md" 
+                  style={user.coverImage ? {
+                    backgroundImage: `url(${user.coverImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                  } : null}
+            >
                 <div className="flex">
                     <div className="flex space-x-5 ps-5">
                         <img
@@ -84,7 +91,7 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
                     </div>
                 </div>
                 <div className={userStats.totalVideos != 0 ? "flex-col max-lg:mt-4 w-[650px]" : "hidden"}>
-                    <div className="bg-gray-900 text-white p-6 rounded-lg">
+                    <div className=" text-white p-6 rounded-lg">
                         <h2 className="text-xl font-semibold mb-4">Your details</h2>
                         <div className="grid grid-cols-2 gap-6">
                             {stats.map((stat, index) => (

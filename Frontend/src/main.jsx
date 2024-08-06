@@ -13,6 +13,7 @@ import { ErrorPage } from './components/ErrorPage.jsx'
 import PostList from './components/Post/PostList.jsx'
 import Subscriptions from './components/Subscription/Subsciptions.jsx'
 import SignIn from './components/Account/SignIn.jsx'
+import Register from './components/Account/Register.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -21,6 +22,7 @@ const router = createBrowserRouter(         // For web applications
             <Route index element={<Profile />} />
             
             <Route path='/signin' element={<SignIn />} />
+            <Route path='/register' element={<Register />} />
 
             <Route path='/channel' element={<Channel />} />
             <Route path='/channel/:channelId' element={<Channel />} />

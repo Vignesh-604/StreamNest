@@ -22,17 +22,19 @@ function App() {
   const navigate = useNavigate()
 
   const user = Cookies.get("user") ? true : false
-  console.log(user)
-  
-  useEffect(() => !user ? navigate("/signin") : null, [])
+  // console.log(user)
 
-  if (!user) return <Outlet/>
+  useEffect(() => {
+    if (!user) navigate("/signin")
+  }, [])
+
+  if (!user) return <Outlet />
 
   return (
     <div className='flex justify-center'>
       <Navbar />
       <div className='mt-36'>
-        <Outlet context={JSON.parse(Cookies.get("user"))}/>
+        <Outlet context={JSON.parse(Cookies.get("user"))} />
       </div>
     </div>
   )
