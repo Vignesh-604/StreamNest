@@ -15,14 +15,22 @@ import {
 import logo from "./assets/SNlogo.png"
 import profile from "./assets/profile.webp"
 import Cookies from "js-cookie"
-import { NavLink, useOutletContext, useParams } from 'react-router-dom'
+import axios from "axios"
+import { NavLink, useParams, useNavigate } from 'react-router-dom'
 
 export default function Navbar() {
 
     const { channelId } = useParams()
+    const navigate = useNavigate()
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const user = JSON.parse(Cookies.get("user"))
+
+    const logout = () => {
+        axios.post("/api/users/logout")
+            .then(res => navigate("/signin"))
+            .catch(e => console.log(e))
+    }
 
     return (
         <header className="fixed top-0 w-full shadow-2xl p-2 border-b-2 bg-gray-950 border-y-slate-700 z-50">
@@ -51,7 +59,7 @@ export default function Navbar() {
                     {/* NavItems */}
                     <div className="hidden lg:flex items-center space-x-6">
                         <NavLink to={"/subscriptions"}
-                            className= {({isActive}) => isActive ? `text-red-500 hover:white mx-2 font-semibold text-xl` : `text-white hover:text-red-500 mx-2 font-semibold text-xl`}
+                            className={({ isActive }) => isActive ? `text-red-500 hover:white mx-2 font-semibold text-xl` : `text-white hover:text-red-500 mx-2 font-semibold text-xl`}
                         >
                             Subscriptions
 
@@ -106,10 +114,12 @@ export default function Navbar() {
                                     </NavLink>
                                 </div>
                                 <div className="p-3">
-                                    <NavLink to className="flex items-center gap-2 transition hover:bg-white/5 py-2 px-3 rounded-lg">
+                                    <a
+                                        onClick={logout}
+                                        className="flex items-center gap-2 transition hover:bg-white/5 py-2 px-3 rounded-lg">
                                         <ArrowLeftOnRectangleIcon className="h-5 w-5 text-white/30" />
                                         Log out
-                                    </NavLink>
+                                    </a>
                                 </div>
                             </PopoverPanel>
                         </Popover>
@@ -184,6 +194,11 @@ export default function Navbar() {
                                     className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
                                     <IdentificationIcon className='h-6 me-2' />My Channel
+                                </NavLink>
+                                <NavLink onClick={logout}
+                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                                >
+                                    <ArrowLeftOnRectangleIcon className='h-6 me-2' />Log out
                                 </NavLink>
                                 <div className="flex items-center rounded-full bg-gray-900 p-2 mt-5">
                                     <input
