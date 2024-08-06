@@ -25,7 +25,7 @@ function App() {
   // console.log(user)
 
   useEffect(() => {
-    if (!user) navigate("/signin")
+    if (!user) navigate("/register")
   }, [])
 
   if (!user) return <Outlet />

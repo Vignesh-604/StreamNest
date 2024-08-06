@@ -25,7 +25,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // Validation - checking if each field is not empty or just spaces
     if ([fullname, username, email, password].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "All input fields must be filled")
+        return res.status(400).json( new ApiResponse(400, "All input fields must be filled"))
     }
 
     // Check for user - find username or password
@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
         $or: [{ username }, { email }]
     })
 
-    if (existingUser) throw new ApiError(409, "User with email or username already exists")
+    if (existingUser) return res.status(409).json( new ApiResponse(409, "User with email or username already exists"))
 
     // Checking for images in local folder uploaded by multer
     // console.log(req.files);
@@ -44,7 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (req.files?.coverImage && Array.isArray(req.files?.coverImage) && req.files.coverImage.length > 0) coverImagePath = req.files?.coverImage[0]?.path
 
     if (!avatarPath) {
-        throw new ApiError(400, "Avatar Image is required")
+        return res.status(404).json( new ApiResponse(404, "Avatar Image is required"))
     }
 
     // Uploading on Cloudinary and checking for img url
@@ -65,15 +65,19 @@ const registerUser = asyncHandler(async (req, res) => {
         password
     })
 
+    // Refresh and access tokens
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
+
     // Removing password and refresh tokens
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
-    if (!createdUser) throw new ApiError(500, "Something went wrong while registering the user")
+    if (!createdUser) return res.status(500).json( new ApiResponse(500, "Something went wrong while registering the user"))
 
-    return res.status(201).json(
-        new ApiResponse(200, createdUser, "User Registered successfully!!")
-    )
+    return res.status(201)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(new ApiResponse(200, createdUser, "User Registered successfully!!"))
 })
 
 // Steps to login user:
