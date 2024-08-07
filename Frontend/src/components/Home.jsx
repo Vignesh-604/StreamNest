@@ -2,50 +2,11 @@ import React, { useState, useEffect } from 'react';
 import img from "./assets/thumbnail.jpeg"
 import axios from 'axios';
 import { timeAgo } from './utility';
-import { useNavigate } from 'react-router-dom';
-
-
-const videos = [
-    {
-        id: 1,
-        thumbnail: 'thumbnail1.jpg',
-        title: 'Video Title 1',
-        channel: 'Channel Name',
-        views: '1M views · 1 day ago'
-    },
-    {
-        id: 2,
-        thumbnail: 'thumbnail2.jpg',
-        title: 'Video Title 2',
-        channel: 'Channel Name',
-        views: '500K views · 3 days ago'
-    },
-    {
-        id: 2,
-        thumbnail: 'thumbnail2.jpg',
-        title: 'Video Title 2',
-        channel: 'Channel Name',
-        views: '500K views · 3 days ago'
-    },
-    {
-        id: 2,
-        thumbnail: 'thumbnail2.jpg',
-        title: 'Video Title 2',
-        channel: 'Channel Name',
-        views: '500K views · 3 days ago'
-    },
-    {
-        id: 2,
-        thumbnail: 'thumbnail2.jpg',
-        title: 'Video Title 2',
-        channel: 'Channel Name',
-        views: '500K views · 3 days ago'
-    },
-    // Add more video objects as needed
-];
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 export default function Home() {
 
+    const currentUser = useOutletContext()
     const [videos, setVideos] = useState([])
     const navigate = useNavigate()
 
@@ -77,7 +38,7 @@ export default function Home() {
                                     title = {video.owner[0].fullname}
                                     src = {video.owner[0].avatar}
                                     className = "rounded-full object-cover w-12 h-12 min-w-[12px] mt-1 cursor-pointer"
-                                    onClick = {() => navigate(`/channel/${video.owner[0]._id}`)}
+                                    onClick = {() => navigate(video.owner[0]._id !== currentUser._id ? `/channel/${video.owner[0]._id}` : "/channel")}
                                 />
                             </div>
 
@@ -89,7 +50,7 @@ export default function Home() {
                                 <p
                                     title = {video.owner[0].fullname}
                                     className="text-gray-400 cursor-pointer"
-                                    onClick={() => navigate(`/channel/${video.owner[0]._id}`)}
+                                    onClick={() => navigate(video.owner[0]._id !== currentUser._id ? `/channel/${video.owner[0]._id}` : "/channel")}
                                 >
                                     {video.owner[0].fullname} · @{video.owner[0].username}
                                 </p>
