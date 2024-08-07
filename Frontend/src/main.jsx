@@ -15,6 +15,7 @@ import Subscriptions from './components/Subscription/Subsciptions.jsx'
 import SignIn from './components/Account/SignIn.jsx'
 import Register from './components/Account/Register.jsx'
 import Home from './components/Home.jsx'
+import PostConfig from './components/Post/PostConfig.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -37,6 +38,8 @@ const router = createBrowserRouter(         // For web applications
 
             <Route path='/post' element={<PostList />} />
             <Route path='/post/:postId' element={<Post />} />
+            <Route path='/post/new' element={<PostConfig />} />
+            <Route path='/post/edit/:postId' element={<PostConfig />} />
             
             <Route path='*' element={<ErrorPage />} />
 

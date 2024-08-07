@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import img from "../assets/profile.webp";
 import axios from 'axios';
-import { MessageSquareText, ThumbsUp } from 'lucide-react';
+import { MessageSquareText, Plus, ThumbsUp } from 'lucide-react';
 import { parseDate } from '../utility';
-import { useOutletContext, useNavigate } from "react-router-dom";
+import { useOutletContext, useNavigate, Link } from "react-router-dom";
 
 export default function PostList({ channelId = "", owner }) {
 
@@ -19,7 +19,9 @@ export default function PostList({ channelId = "", owner }) {
             .catch(error => console.log(error));
     }, []);
 
-    const togglePostLike = (postId) => {
+    const togglePostLike = (e, postId) => {
+        e.stopPropagation()
+
         axios.post(`/api/like/p/${postId}`)
             .then((res) => setPosts(
                 posts => posts.map(post =>
@@ -35,7 +37,14 @@ export default function PostList({ channelId = "", owner }) {
 
     return (
         <div className=" max-w-7xl">
-            <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Posts</h1>
+            <div className='flex justify-between'>
+                <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Posts</h1>
+                <Link className="font-bold text-start text-lg my-auto me-10 inline-flex" to={"/post/new"}>
+                    New post 
+                    <Plus strokeWidth={2} absoluteStrokeWidth className="ms-2 my-auto" />
+                </Link>
+            
+            </div>
             <div className="container mx-auto px-6">
                 <div className="flex flex-col items-center">
                     {
@@ -61,7 +70,7 @@ export default function PostList({ channelId = "", owner }) {
                                     <div className="mb-4 whitespace-pre-line">{post.content}</div>
                                     <div className="flex text-gray-400">
                                         <div className="flex items-center mr-4">
-                                            <span className="flex items-center mr-2 cursor-pointer" onClick={() => togglePostLike(post._id)}>
+                                            <span className="flex items-center mr-2 cursor-pointer" onClick={(e) => togglePostLike(e, post._id)}>
                                                 <ThumbsUp
                                                     strokeWidth={3}
                                                     absoluteStrokeWidth

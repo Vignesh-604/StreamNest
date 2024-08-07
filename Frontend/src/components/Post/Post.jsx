@@ -6,10 +6,11 @@ import { useEffect, useState } from 'react';
 import { parseDate } from '../utility';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 export default function PostItem() {
-    const {postId} = useParams()
+    const { postId } = useParams()
+    const navigate = useNavigate()
 
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
@@ -24,7 +25,9 @@ export default function PostItem() {
             .catch(error => console.log(error));
     }, []);
 
-    const togglePostLike = (postId) => {
+    const togglePostLike = (e) => {
+        e.stopPropagation()
+
         axios.post(`/api/like/p/${postId}`)
             .then((res) => setPost(
                 post => ({
@@ -50,6 +53,13 @@ export default function PostItem() {
             .catch(error => console.log(error));
     }
 
+    const deletePost = () => {
+
+        axios.delete(`/api/post/${postId}`)
+            .then((res) => navigate(-1))
+            .catch(error => console.log(error))
+    }
+
     return (
         <div className="container mx-auto p-4">
             {
@@ -69,7 +79,7 @@ export default function PostItem() {
                                     <div className="text-sm text-gray-400">{parseDate(post.updatedAt)}</div>
                                 </div>
                             </div>
-                            <button className='flex place-items-start'>
+                            <div className='flex place-items-start'>
                                 <Menu>
                                     <MenuButton className="">
                                         <EllipsisVertical />
@@ -81,26 +91,32 @@ export default function PostItem() {
                                         className="w-52 origin-top-right rounded-xl border border-white/20 bg-gray-800 p-1 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
                                     >
                                         <MenuItem>
-                                            <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10">
+                                            <Link
+                                                className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
+                                                onClick={() => navigate(`/post/edit/${postId}`)}
+                                            >
                                                 <PencilIcon className="size-4 fill-white/30" />
                                                 Edit
-                                            </button>
+                                            </Link>
                                         </MenuItem>
                                         <MenuItem>
-                                            <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10">
+                                            <a
+                                                className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
+                                                onClick={deletePost}
+                                            >
                                                 <TrashIcon className="size-4 fill-white/30" />
                                                 Delete
-                                            </button>
+                                            </a>
                                         </MenuItem>
                                     </MenuItems>
                                 </Menu>
-                            </button>
+                            </div>
                         </div>
                         <div className="mb-4 whitespace-pre-line">{post.content}</div>
                         <div className="flex justify-between text-gray-400">
                             <div className="flex text-gray-400">
                                 <div className="flex items-center mr-4">
-                                    <span className="flex items-center mr-2 cursor-pointer" onClick={() => togglePostLike(post._id)}>
+                                    <span className="flex items-center mr-2 cursor-pointer" onClick={(e) => togglePostLike(e, post._id)}>
                                         <ThumbsUp
                                             strokeWidth={3}
                                             absoluteStrokeWidth

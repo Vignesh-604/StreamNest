@@ -17,17 +17,17 @@ const createPost = asyncHandler(async (req, res) => {
         content, owner
     })
 
-    res.status(200).json(new ApiResponse(200, post, "Posted successfully"))
+    res.status(201).json(new ApiResponse(201, post, "Posted successfully"))
 })
 
 // Get post based on postId
 // Find by id and update
 const updatePost = asyncHandler(async (req, res) => {
     const { postId } = req.params
-    if (!postId) throw new ApiError(402, "No post id found")
+    if (!postId) throw new ApiError(404, "No post id found")
 
     const { content } = req.body
-    if (!content.trim()) throw new ApiError(402, "Enter your post content")
+    if (!content.trim()) throw new ApiError(400, "Enter your post content")
 
     const post = await Post.findByIdAndUpdate(
         postId,
@@ -35,7 +35,7 @@ const updatePost = asyncHandler(async (req, res) => {
         { new: true }
     )
 
-    res.status(201).json(new ApiResponse(201, post, "Post updated successfully!"))
+    res.status(200).json(new ApiResponse(200, post, "Post updated successfully!"))
 })
 
 // Get post id and delete
@@ -43,16 +43,16 @@ const deletePost = asyncHandler(async (req, res) => {
     const { postId } = req.params
     if (!postId) throw new ApiError(402, "No post id found")
 
-    await Post.findByIdAndDelete("6697926628ea7ca31cb73734")
+    await Post.findByIdAndDelete(postId)
 
-    res.status(201).json(new ApiResponse(201, "", "Post updated successfully!"))
+    res.status(200).json(new ApiResponse(200, "", "Post deleted successfully!"))
 })
 
 // Get userId from params
 const getUserPosts = asyncHandler(async (req, res) => {
 
     const { userId } = req.params
-    if (!userId) throw new ApiError(403, "No userId")
+    if (!userId) throw new ApiError(404, "No userId")
 
     // const posts = await Post.find({ owner: userId }).select("content updatedAt")
     const posts = await Post.aggregate([
@@ -111,7 +111,7 @@ const getUserPosts = asyncHandler(async (req, res) => {
     ])
     if (!posts) throw new ApiError(404, "No posts found")
 
-    res.status(203).json(new ApiResponse(200, posts, "Posts fetched successfully"))
+    res.status(200).json(new ApiResponse(200, posts, "Posts fetched successfully"))
 })
 
 const getPostById = asyncHandler(async (req, res) => {
