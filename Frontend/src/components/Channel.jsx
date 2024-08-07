@@ -6,11 +6,12 @@ import Playlists from "./Playlist/Playlists"
 import Subscribers from "./Subscription/Subscribers";
 import ChannelVideos from "./Video/ChannelVideos";
 import PostList from "./Post/PostList";
-import { useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 export default function Channel() {//66afcbb1791f57ba50bea9cb
     const currentUser = useOutletContext()   
     const {channelId} = useParams()
+    const navigate = useNavigate()
 
     const [user, setUser] = useState(currentUser)
     const id = !channelId ? user._id : channelId  
@@ -22,11 +23,11 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
     useEffect(() => {
         axios.get(`/api/users/channel/${id}`)
             .then(res => setUser(res.data.data))
-            .catch(e => console.log(e))
+            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error))
 
         axios.get(`/api/dashboard/stats/${id}`)
             .then(res => setUserStats(res.data.data))
-            .catch(e => console.log(e))
+            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error))
     }, [])
 
     // Toggle which section to load

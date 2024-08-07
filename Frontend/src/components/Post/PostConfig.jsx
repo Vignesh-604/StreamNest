@@ -20,15 +20,17 @@ export default function PostConfig() {
     const [content, setContent] = useState("")
     const [currContent, setCurrContent] = useState("")
     const { postId } = useParams()
-
     useEffect(() => {
         if (editMode) {
 
             axios.get(`/api/post/${postId}`)
                 .then((res) => {
-                    setPost(res.data.data)
-                    setContent(res.data.data.content)
-                    setCurrContent(res.data.data.content)
+                    const postDetails = res.data.data
+                    if (postDetails.owner[0]?._id !== user._id) navigate(-1)
+
+                    setPost(postDetails)
+                    setContent(postDetails.content)
+                    setCurrContent(postDetails.content)
                 })
                 .catch(error => console.log(error));
         }

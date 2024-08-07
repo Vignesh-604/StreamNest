@@ -39,11 +39,15 @@ export default function PostList({ channelId = "", owner }) {
         <div className=" max-w-7xl">
             <div className='flex justify-between'>
                 <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Posts</h1>
-                <Link className="font-bold text-start text-lg my-auto me-10 inline-flex" to={"/post/new"}>
-                    New post 
-                    <Plus strokeWidth={2} absoluteStrokeWidth className="ms-2 my-auto" />
-                </Link>
-            
+                {
+                    id === currentUser._id ? (
+                        <Link className="font-bold text-start text-lg my-auto me-10 inline-flex" to={"/post/new"}>
+                            New post
+                            <Plus strokeWidth={2} absoluteStrokeWidth className="ms-2 my-auto" />
+                        </Link>
+                    ) : null
+                }
+
             </div>
             <div className="container mx-auto px-6">
                 <div className="flex flex-col items-center">

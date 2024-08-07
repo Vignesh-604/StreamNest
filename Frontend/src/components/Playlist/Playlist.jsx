@@ -3,18 +3,19 @@ import img from "../assets/noPlaylist.jpeg"
 import { useEffect, useState } from "react";
 import { parseDate, parseTime } from "../utility";
 import VideoItem from "../Video/VideoItem";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function Playlist() {
 
     const {id} = useParams()
+    const navigate = useNavigate()
     
     const [playlist, setPlaylist] = useState(null)
 
     useEffect(() => {
         axios.get(`/api/playlist/${id}`)
             .then(res => setPlaylist(res.data.data))
-            .catch(e => console.log(e))
+            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error))
     }, [])
 
     // Remove video from playlist broken

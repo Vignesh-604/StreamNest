@@ -6,11 +6,12 @@ import { useEffect, useState } from 'react';
 import { parseDate } from '../utility';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useOutletContext, useParams, useNavigate, Link } from "react-router-dom";
 
 export default function PostItem() {
     const { postId } = useParams()
     const navigate = useNavigate()
+    const currentUser = useOutletContext()
 
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
@@ -18,7 +19,7 @@ export default function PostItem() {
     useEffect(() => {
         axios.get(`/api/post/${postId}`)
             .then((res) => setPost(res.data.data))
-            .catch(error => console.log(error));
+            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error));
 
         axios.get(`/api/comment/post/${postId}`)
             .then((res) => setComments(res.data.data.docs))
@@ -80,36 +81,41 @@ export default function PostItem() {
                                 </div>
                             </div>
                             <div className='flex place-items-start'>
-                                <Menu>
-                                    <MenuButton className="">
-                                        <EllipsisVertical />
-                                    </MenuButton>
+                                {
+                                    post.owner[0]._id === currentUser._id ? (
+                                        <Menu>
+                                            <MenuButton className="">
+                                                <EllipsisVertical />
+                                            </MenuButton>
 
-                                    <MenuItems
-                                        transition
-                                        anchor="bottom end"
-                                        className="w-52 origin-top-right rounded-xl border border-white/20 bg-gray-800 p-1 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
-                                    >
-                                        <MenuItem>
-                                            <Link
-                                                className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
-                                                onClick={() => navigate(`/post/edit/${postId}`)}
+                                            <MenuItems
+                                                transition
+                                                anchor="bottom end"
+                                                className="w-52 origin-top-right rounded-xl border border-white/20 bg-gray-800 p-1 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
                                             >
-                                                <PencilIcon className="size-4 fill-white/30" />
-                                                Edit
-                                            </Link>
-                                        </MenuItem>
-                                        <MenuItem>
-                                            <a
-                                                className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
-                                                onClick={deletePost}
-                                            >
-                                                <TrashIcon className="size-4 fill-white/30" />
-                                                Delete
-                                            </a>
-                                        </MenuItem>
-                                    </MenuItems>
-                                </Menu>
+                                                <MenuItem>
+                                                    <Link
+                                                        className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
+                                                        onClick={() => navigate(`/post/edit/${postId}`)}
+                                                    >
+                                                        <PencilIcon className="size-4 fill-white/30" />
+                                                        Edit
+                                                    </Link>
+                                                </MenuItem>
+                                                <MenuItem>
+                                                    <a
+                                                        className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
+                                                        onClick={deletePost}
+                                                    >
+                                                        <TrashIcon className="size-4 fill-white/30" />
+                                                        Delete
+                                                    </a>
+                                                </MenuItem>
+                                            </MenuItems>
+                                        </Menu>
+
+                                    ) : null
+                                }
                             </div>
                         </div>
                         <div className="mb-4 whitespace-pre-line">{post.content}</div>

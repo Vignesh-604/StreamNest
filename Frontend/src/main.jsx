@@ -36,7 +36,7 @@ const router = createBrowserRouter(         // For web applications
             <Route path='/playlist' element={<Playlists />} />
             <Route path='/playlist/:id' element={<Playlist />} />
 
-            <Route path='/post' element={<PostList />} />
+            {/* <Route path='/post' element={<PostList />} /> */}
             <Route path='/post/:postId' element={<Post />} />
             <Route path='/post/new' element={<PostConfig />} />
             <Route path='/post/edit/:postId' element={<PostConfig />} />

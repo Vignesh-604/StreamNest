@@ -162,6 +162,7 @@ const getPostById = asyncHandler(async (req, res) => {
                 likes: 1,
                 isLiked: 1,
                 owner: {
+                    _id :1,
                     username: 1,
                     fullname: 1,
                     avatar: 1
