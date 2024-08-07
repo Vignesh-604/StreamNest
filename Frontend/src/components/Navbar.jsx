@@ -37,10 +37,10 @@ export default function Navbar() {
             <nav aria-label="Global" className="mx-auto -m-5 flex max-w-7xl items-center justify-between p-4 lg:px-8">
                 <div className="flex items-center space-x-6 lg:flex-1">
                     {/* Logo */}
-                    <a href="#" className="-m-1.5 p-1.5">
+                    <NavLink to={"/"} className="-m-1.5 p-1.5" title='Home'>
                         <span className="sr-only">StreamNest</span>
                         <img src={logo} alt="Logo" className="h-28 w-auto" />
-                    </a>
+                    </NavLink>
 
                     {/* SearchBar */}
                     <div className="flex flex-grow items-center justify-center">
@@ -88,7 +88,7 @@ export default function Navbar() {
                                 className="absolute right-0 z-10 mt-2 w-56 bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                             >
                                 <div className="p-3 font-semibold text-white">
-                                    <NavLink className="block rounded-lg py-2 px-3 transition hover:bg-white/5" to={"/"}>
+                                    <NavLink className="block rounded-lg py-2 px-3 transition hover:bg-white/5" to={"/profile"}>
                                         <div className="flex items-center gap-2">
                                             <UserCircleIcon className="h-5 w-5 text-white/30" />
                                             View Profile
@@ -165,7 +165,7 @@ export default function Navbar() {
                     <div className="mt-6 flow-root">
                         <div className="-my-6 divide-y divide-gray-500/10">
                             <div className="py-6">
-                                <NavLink to={"/"}
+                                <NavLink to={"/profile"}
                                     className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
                                     <UserCircleIcon className='h-6 me-2' />View Profile

@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from "date-fns"
+
 export function parseTime(seconds) {
     seconds = Math.round(seconds)
     const hours = Math.floor(seconds / 3600);
@@ -35,3 +37,8 @@ export function parseDate(date) {
 
     return dateString
 }
+export function timeAgo(date) {
+    return (formatDistanceToNow(date, { addSuffix: true }));
+}
+
+// timeAgo("2024-07-25T09:59:37.326Z")

@@ -14,12 +14,14 @@ import PostList from './components/Post/PostList.jsx'
 import Subscriptions from './components/Subscription/Subsciptions.jsx'
 import SignIn from './components/Account/SignIn.jsx'
 import Register from './components/Account/Register.jsx'
+import Home from './components/Home.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
         <Route path='/' element={<App />}>
 
-            <Route index element={<Profile />} />
+            <Route index element={<Home />} />
+            <Route path='/profile' element={<Profile />} />
             
             <Route path='/signin' element={<SignIn />} />
             <Route path='/register' element={<Register />} />

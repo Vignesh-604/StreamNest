@@ -177,6 +177,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     const pipeline = []
 
+    // Search query
     if (query) {
         pipeline.push({
             $match: {                   // runs a text search on string fields like title, desc, etc
@@ -187,6 +188,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
         })
     }
 
+    // Search by user id
     if (userId) {
         if (!isValidObjectId(userId)) throw new ApiError(401, "UserId incorrect")
 
@@ -197,6 +199,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
         })
     }
 
+    // Sorting by field in asc/desc order
     const sortCategory = {}
     if (sortBy && (sortType === "asc" || "desc")) {
         sortCategory[sortBy] = sortType === "asc" ? 1 : -1
@@ -205,6 +208,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     }
     pipeline.push({ $sort: sortCategory })
 
+    // Pagination
     pipeline.push({
         $skip: (page - 1) * limit
     })
@@ -213,6 +217,22 @@ const getAllVideos = asyncHandler(async (req, res) => {
         $limit: limit
     })
 
+    pipeline.push({
+        $lookup: {
+            from: "users",
+            localField: "owner",
+            foreignField: "_id",
+            as: "owner",
+            pipeline: [
+                {
+                    $project: {
+                        fullname: 1, username: 1, avatar: 1
+                    }
+                }
+            ]
+        }
+    })
+    
     const videos = await Video.aggregate(pipeline)
 
     if (!videos || !videos.length) res.status(200).json(new ApiResponse(200, [], "No videos available"))
