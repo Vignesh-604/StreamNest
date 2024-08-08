@@ -15,6 +15,7 @@ export default function PostItem() {
 
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
+    const [content, setContent] = useState()
 
     useEffect(() => {
         axios.get(`/api/post/${postId}`)
@@ -59,6 +60,31 @@ export default function PostItem() {
         axios.delete(`/api/post/${postId}`)
             .then((res) => navigate(-1))
             .catch(error => console.log(error))
+    }
+
+    const addComment = () => {
+        if (content && content.trim()) {
+
+            axios.post(`/api/comment/post/${postId}`, { content })
+                .then((res) => {
+                    setComments([...comments, {
+                        ...res.data.data, 
+                        likes: 0,
+                        owner: {
+                            username: currentUser.username,
+                            fullname: currentUser.fullname,
+                            avatar: currentUser.avatar,
+                        }
+                    }])
+                    setContent("")
+                })
+                .catch(error => console.log(error))
+        }
+    }
+    const deleteComment = (id) => {
+        axios.delete(`/api/comment/c/${id}`)
+        .then((res) => setComments(comments => comments.filter(com => com._id !== id)))
+        .catch(error => console.log(error))
     }
 
     return (
@@ -140,6 +166,39 @@ export default function PostItem() {
             }
             <div className='container flex flex-col'>
                 <h1 className='text-xl font-semibold'>{comments.length} Comments</h1>
+
+                {/* Add comment section */}
+                <div className='flex items-start mt-4 w-full'>
+                    <img
+                        src={currentUser.avatar}
+                        alt={`${currentUser.name} avatar`}
+                        onError={e => e.target.src = img}
+                        className="h-10 w-10 rounded-full object-cover mr-3"
+                    />
+
+                    <textarea
+                        className="mb-4 w-full p-2 me-4 bg-gray-900 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
+                        rows="2"
+                        placeholder="Write your comment..."
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                    />
+                </div>
+                <div className='flex justify-end space-x-4 mr-2 mb-4 text-slate-400'>
+                    <button
+                        onClick={() => setContent("")}
+                        className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
+                    >
+                        Cancel
+                    </button>
+                    <Link
+                        onClick={addComment}
+                        className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
+                    >
+                        Comment
+                    </Link>
+                </div>
+
                 <div className='flex flex-col'>
                     {
                         comments.length ? (
@@ -155,6 +214,7 @@ export default function PostItem() {
                                     username={comment.owner.username}
                                     avatar={comment.owner.avatar}
                                     toggleLike={toggleCommentLike}
+                                    deleteComment={deleteComment}
                                 />
                             ))
                         ) : (
