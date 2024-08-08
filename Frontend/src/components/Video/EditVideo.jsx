@@ -1,0 +1,145 @@
+import axios from "axios";
+import img from "../assets/thumbnail.jpeg";
+import { useEffect, useState } from "react";
+import { parseDate, parseTime } from "../utility";
+import { useNavigate, useParams, useOutletContext, useLocation } from "react-router-dom";
+
+export default function EditVideo() {
+
+    const user = useOutletContext();
+    const navigate = useNavigate();
+
+    let location = useLocation();
+    let editMode = location.pathname.includes("/video/edit");
+    console.log(editMode);
+
+    const [video, setVideo] = useState(null);
+    const [content, setContent] = useState({
+        title: "",
+        description: "",
+    });
+    const [currContent, setCurrContent] = useState({
+        title: "",
+        description: "",
+    });
+    const [thumbnail, setThumbnail] = useState(null);
+
+    const { videoId } = useParams();
+    console.log(video);
+
+    useEffect(() => {
+        if (editMode) {
+            axios.get(`/api/video/v/${videoId}`)
+                .then((res) => {
+                    const videoDetails = res.data.data[0];
+                    // Uncomment the line below if you need to ensure the user is the owner of the video
+                    if (videoDetails.owner.username !== user.username) navigate(-1);
+
+                    setVideo(videoDetails);
+                    setContent({
+                        title: videoDetails.title,
+                        description: videoDetails.description,
+                    });
+                    setCurrContent({
+                        title: videoDetails.title,
+                        description: videoDetails.description,
+                    });
+                    setThumbnail(videoDetails.thumbnail)
+                })
+                .catch(error => console.log(error));
+        }
+    }, []);
+
+    const handleThumbnailChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setThumbnail(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+        setContent({...content, thumbnail: file})
+    };
+    console.log(thumbnail);
+    console.log("Current:", currContent);
+    console.log("newCurrent:", content);
+
+
+    const handleSaveChanges = () => {
+        const formData = new FormData()
+
+        if (content.title !== currContent.title) {
+            formData.append("title", content.title)
+        }
+        if (content.description !== currContent.description) {
+            formData.append("description", content.description)
+        }
+        if (content.thumbnail) formData.append("thumbnail", content.thumbnail)
+
+        axios.patch(`/api/video/v/${videoId}`, formData)
+            .then((res) => {
+                // alert("Video details updated successfully!");
+                console.log(res.data.data);
+
+            })
+            .catch(error => console.log(error.response.data));
+
+    };
+
+    return (
+        <>
+            {
+                video ? (
+                    <div className="flex flex-col items-center p-5 rounded-lg bg-gray-800">
+                        <div className="relative">
+                            <img
+                                src={thumbnail || img}
+                                alt="Thumbnail"
+                                onError={e => e.target.src = img}
+                                className="h-56 rounded-lg border border-gray-600 px-3 py-1 object-cover w-full my-auto"
+                            />
+                            <label className="absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded-md cursor-pointer">
+                                New
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleThumbnailChange}
+                                />
+                            </label>
+                        </div>
+
+                        <div className="items-center py-4 w-full max-w-lg lg:w-[350px] space-y-2">
+                            <input
+                                className="mb-4 w-full text-2xl p-2 bg-gray-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
+                                value={content.title}
+                                onChange={(e) => setContent({ ...content, title: e.target.value })}
+                            />
+
+                            <textarea
+                                className="mb-4 w-full p-3 bg-gray-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
+                                rows="7"
+                                placeholder="Write your post..."
+                                value={content.description}
+                                onChange={(e) => setContent({ ...content, description: e.target.value })}
+                            />
+                            <hr className="ms-2 lg:me-10" />
+
+                            <div className="flex flex-col space-y-2 ">
+                                <button
+                                    className="bg-gray-400 text-black font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+                                    onClick={handleSaveChanges}
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <h1>Loading...</h1>
+                )
+            }
+        </>
+    );
+}

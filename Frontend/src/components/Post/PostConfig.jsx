@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import profile from "../assets/profile.webp";
 import axios from 'axios';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid';
-import { EllipsisVertical, PenBoxIcon, Plus, ThumbsUp, X } from 'lucide-react';
+import { PenBoxIcon, Plus, X } from 'lucide-react';
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { parseDate } from '../utility';
 

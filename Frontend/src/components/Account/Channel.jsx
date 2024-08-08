@@ -13,14 +13,14 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
     const {channelId} = useParams()
     const navigate = useNavigate()
 
-    const [user, setUser] = useState(currentUser)
-    const id = !channelId ? user._id : channelId  
-
+    const [user, setUser] = useState([])
+    
     const [userStats, setUserStats] = useState({})
-
+    
     const [toggle, setToggle] = useState("")
-
+    
     useEffect(() => {
+        const id = !channelId ? currentUser._id : channelId  
         axios.get(`/api/users/channel/${id}`)
             .then(res => setUser(res.data.data))
             .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error))

@@ -15,13 +15,6 @@ export default function ChannelVideos({ channelId = ""}) {
             .catch(error => console.log(error));
     }, []);
 
-    const toggleLike = (id) => {
-        // axios.post(`/api/like/v/${id}`)
-        //     .then((res) => {
-        //         setVideos(videos.filter(vid => vid._id !== id));
-        //     })
-        //     .catch(error => console.log(error));
-    }
 
     return (
         <div className="flex flex-col px-4 min-w-[36rem]">
@@ -35,11 +28,10 @@ export default function ChannelVideos({ channelId = ""}) {
                                 id={vid._id}
                                 title={vid.title}
                                 description={vid.description}
-                                owner={vid.owner[0].username}
+                                owner={vid.owner[0]}
                                 views={vid.views}
                                 thumbnail={vid.thumbnail}
                                 duration={parseTime(vid.duration)}
-                                toggleLike={toggleLike}
                             />
                         ))
                     ) : (

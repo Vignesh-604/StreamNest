@@ -15,6 +15,7 @@ import SignIn from './components/Account/SignIn.jsx'
 import Register from './components/Account/Register.jsx'
 import Home from './components/Home.jsx'
 import PostConfig from './components/Post/PostConfig.jsx'
+import EditVideo from './components/Video/EditVideo.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -28,6 +29,8 @@ const router = createBrowserRouter(         // For web applications
 
             <Route path='/channel' element={<Channel />} />
             <Route path='/channel/:channelId' element={<Channel />} />
+
+            <Route path='/video/edit/:videoId' element={<EditVideo />} />
             
             <Route path='/liked' element={<LikedVideos />} />
             <Route path='/subscriptions' element={<Subscriptions />} />
