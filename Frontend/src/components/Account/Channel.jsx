@@ -113,7 +113,7 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
             </div>
             {toggle == "playlists" ? <Playlists channelId={channelId}/> : null}
             {toggle == "subs" ? <Subscribers  channelId={channelId}/> : null}
-            {toggle == "videos" ? <ChannelVideos channelId={channelId}/> : null}
+            {toggle == "videos" ? <ChannelVideos owner={user}/> : null}
             {toggle == "posts" ? <PostList channelId={channelId} owner={user}/> : null}
         </>
     );
