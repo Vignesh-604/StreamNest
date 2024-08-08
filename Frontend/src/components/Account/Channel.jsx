@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { parseDate } from "./utility";
-import img from "./assets/profile.webp"
+import { parseDate } from "../utility";
+import img from "../assets/profile.webp"
 import axios from "axios";
-import Playlists from "./Playlist/Playlists"
-import Subscribers from "./Subscription/Subscribers";
-import ChannelVideos from "./Video/ChannelVideos";
-import PostList from "./Post/PostList";
+import Playlists from "../Playlist/Playlists"
+import Subscribers from "../Subscription/Subscribers";
+import ChannelVideos from "../Video/ChannelVideos";
+import PostList from "../Post/PostList";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 export default function Channel() {//66afcbb1791f57ba50bea9cb

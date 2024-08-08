@@ -3,7 +3,7 @@ import React from 'react'
 import logo from "./assets/SNlogo.png"
 import { useNavigate } from 'react-router-dom'
 
-export function ErrorPage() {
+export default function ErrorPage() {
 
     const navigate = useNavigate()
 

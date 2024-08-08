@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Cookies from "js-cookie";
-import { parseDate } from "./utility";
+import { parseDate } from "../utility";
 import axios from "axios";
 import { PencilLine, PencilOff, Save } from "lucide-react";
 
 export default function Profile() {
-    // const [user, setUser] = useState(JSON.parse(Cookies.get("user")));   // FOR TESTING
+
     const [user, setUser] = useState({});
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({})
@@ -15,7 +14,6 @@ export default function Profile() {
     useEffect(() => {
         axios.get("/api/users/current_user")
             .then(res => {
-                // console.log("User data:",res.data.data);
                 setUser(res.data.data)
                 setFormData({...formData,
                     fullname: res.data.data.fullname,
