@@ -10,22 +10,22 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import ReactLoading from 'react-loading';
 
 export default function Channel() {//66afcbb1791f57ba50bea9cb
-    const currentUser = useOutletContext()   
-    const {channelId} = useParams()
+    const currentUser = useOutletContext()
+    const { channelId } = useParams()
     const navigate = useNavigate()
 
     const [user, setUser] = useState({})
     const [userStats, setUserStats] = useState({})
-    
+
     const [toggle, setToggle] = useState("")
 
     const [loading, setLoading] = useState(true);  // Add loading state
-    
+
     useEffect(() => {
-        const id = !channelId ? currentUser._id : channelId  
+        const id = !channelId ? currentUser._id : channelId
 
         axios.get(`/api/users/channel/${id}`)
-            .then(res => {setUser(res.data.data)})
+            .then(res => setUser(res.data.data))
             .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error.response.data))
 
         axios.get(`/api/dashboard/stats/${id}`)
@@ -34,8 +34,16 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
                 setLoading(false)
             })
             .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error.response.data));
-            
     }, [])
+
+    const toggleSub = () => {
+        axios.post(`/api/subscription/channel/${user._id}`)
+            .then(res => {
+                setUser({...user, isSubscribed: !user.isSubscribed})
+                setUserStats({...userStats, totalSubscribers:( res.data.data == null ? --userStats.totalSubscribers : ++userStats.totalSubscribers)})
+            })
+            .catch(e => console.log(e.response.data))
+    }
 
     // Toggle which section to load
     const toggleState = (e) => toggle === e.currentTarget.id ? setToggle("") : setToggle(e.currentTarget.id)
@@ -51,13 +59,13 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
 
     return (
         <>
-            <div className="flex flex-col xl:flex-row place-items-center pb-12 rounded-md" 
-                  style={user.coverImage ? {
+            <div className="flex flex-col xl:flex-row place-items-center pb-12 rounded-md"
+                style={user.coverImage ? {
                     backgroundImage: `url(${user.coverImage})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
-                  } : null}
+                } : null}
             >
                 <div className="flex">
                     <div className="flex space-x-5 ps-5">
@@ -65,7 +73,7 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
                             src={user.avatar}
                             alt="User avatar"
                             onError={e => e.target.src = img}
-                            className="h-56 rounded-full mb-4 border object-cover w-56"
+                            className="h-56 rounded-full mb-4 md:mt-4 border object-cover w-56"
                         />
 
                         <div className="items-center py-4 lg:w-[450px]">
@@ -79,24 +87,37 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
                             <h2 className="text-lg text-gray-400 m-2">
                                 Channel created at: {parseDate(user.createdAt)}
                             </h2>
-                            <div className="flex flex-col ms-2 lg:me-10 max-lg:space-y-2 lg:flex-row lg:space-x-2">
-                                {userStats.totalVideos == 0 ? (
-                                    <div>
-                                        <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
-                                            User does not have a channel
-                                        </div>
+                            {userStats.totalVideos == 0 ? (
+                                <div>
+                                    <div className="flex w-fit font-semibold border rounded-lg p-2 bg-slate-300 text-black">
+                                        User does not have a channel
                                     </div>
-                                ) : (
-                                    <>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex flex-col ms-2 lg:me-10 max-lg:space-y-2 lg:flex-row lg:space-x-2">
                                         <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
                                             Total Views: {userStats.totalViews}
                                         </div>
                                         <div className="flex w-full font-semibold border rounded-lg p-2 bg-slate-300 text-black">
                                             Total Likes: {userStats.totalLikes}
                                         </div>
-                                    </>
-                                )}
-                            </div>
+                                    </div>
+                                    <div onClick={toggleSub}>
+                                        {
+                                            user.isSubscribed ? (
+                                                <button className="subscribe-button border w-64 bg-red-700 mt-5 ms-2 -mb-6 rounded-lg text-xl px-3 py-1.5">
+                                                    Subscribed
+                                                </button>
+                                            ) : (
+                                                <button className="subscribe-button border w-64 bg-gray-700 mt-5 ms-2 -mb-6 rounded-lg text-xl px-3 py-1.5">
+                                                    Subscribe
+                                                </button>
+                                            )
+                                        }
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -120,11 +141,11 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
                     </div>
                 </div>
             </div>
-            
-            {toggle == "playlists" ? <Playlists channelId={channelId}/> : null}
-            {toggle == "subs" ? <Subscribers  channelId={channelId}/> : null}
-            {toggle == "videos" ? <ChannelVideos owner={user}/> : null}
-            {toggle == "posts" ? <PostList channelId={channelId} owner={user}/> : null}
+
+            {toggle == "playlists" ? <Playlists channelId={channelId} /> : null}
+            {toggle == "subs" ? <Subscribers channelId={channelId} /> : null}
+            {toggle == "videos" ? <ChannelVideos owner={user} /> : null}
+            {toggle == "posts" ? <PostList channelId={channelId} owner={user} /> : null}
         </>
     );
 }

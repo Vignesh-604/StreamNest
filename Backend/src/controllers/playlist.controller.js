@@ -84,7 +84,7 @@ const getUserPlaylists = asyncHandler( async (req, res) => {
 
 const getPlaylistById = asyncHandler( async (req, res) => {
     const {playlistId} = req.params
-    if (!playlistId) throw new ApiError(402, "No playlist ID found")
+    if (!playlistId) throw new ApiError(404, "No playlist ID found")
 
     // const playlist = await Playlist.findById(playlistId)
     const playlist = await Playlist.aggregate([
@@ -153,6 +153,8 @@ const getPlaylistById = asyncHandler( async (req, res) => {
             }
         }
     ]);
+    if (!playlist.length) throw new ApiError(404, "Couldn't aggregate or playlist missing.")
+
     res.status(200).json( new ApiResponse(200, playlist[0], "Playlist fetched"))
 })
 
