@@ -8,7 +8,7 @@ import mongoose, { isValidObjectId } from "mongoose";
 const publishVideo = asyncHandler(async (req, res) => {
 
     let { title, description } = req.body
-    if (!description) throw new ApiError(401, "Please put description")
+    if (!description) throw new ApiError(400, "Please put description")
 
     if (!title) title = req.files?.videoFile[0]?.originalname?.split(".")[0]
 

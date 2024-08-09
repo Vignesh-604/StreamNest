@@ -1,5 +1,5 @@
 import React from "react";
-import thumbnailAlt from "../assets/thumbnail.jpeg"
+import thumbnailAlt from "../assets/thumbnail.jpg"
 import { useNavigate, useOutletContext } from "react-router-dom"
 
 export default function VideoItem({ title, description, owner, views, thumbnail, duration }) {

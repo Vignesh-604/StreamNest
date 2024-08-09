@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import img from "./assets/thumbnail.jpeg"
+import img from "./assets/thumbnail.jpg"
 import axios from 'axios';
 import { timeAgo } from './utility';
 import { useNavigate, useOutletContext } from 'react-router-dom';
