@@ -7,11 +7,14 @@ import { parseDate } from '../utility';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
 import { useOutletContext, useParams, useNavigate, Link } from "react-router-dom";
+import Loading from '../Loading';
 
 export default function PostItem() {
     const { postId } = useParams()
     const navigate = useNavigate()
     const currentUser = useOutletContext()
+
+    const [loading, setLoading] = useState(true)
 
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
@@ -19,7 +22,10 @@ export default function PostItem() {
 
     useEffect(() => {
         axios.get(`/api/post/${postId}`)
-            .then((res) => setPost(res.data.data))
+            .then((res) => {
+                setPost(res.data.data)
+                setLoading(false)
+            })
             .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error));
 
         axios.get(`/api/comment/post/${postId}`)
@@ -87,11 +93,13 @@ export default function PostItem() {
         .catch(error => console.log(error))
     }
 
+    if (loading) return <Loading />
+
     return (
         <div className="container mx-auto p-4">
             {
                 post ? (
-                    <div className="bg-gray-800 lg:w-[1000px] text-white p-4 rounded-lg mb-4 shadow-md">
+                    <div className="bg-gray-800 max-sm:w-[400px] md:w-[700px] lg:w-[1000px] w-full text-white p-4 rounded-lg mb-4 shadow-md">
                         <div className="flex items-center mb-4 justify-between">
                             <div className='flex items-center'>
                                 <img

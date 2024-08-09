@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import Loading from "../Loading";
 
 export default function Subscriptions() {
     
     const currentUser = useOutletContext()
     const [subs, setSubs] = useState([])
     const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         axios.get(`/api/subscription`)
-            .then(res => setSubs(res.data.data))
+            .then(res => {
+                setSubs(res.data.data)
+                setLoading(false)
+            })
             .catch(e => console.log(e))
     }, [])
     // console.log(subs);
@@ -19,11 +24,13 @@ export default function Subscriptions() {
         e.stopPropagation()
         axios.post(`/api/subscription/channel/${id}`)
             .then(res => {
-                console.log(res.data);
+                //alert
                 setSubs(subs => subs.filter(sub => sub.subscribedTo._id !== id))
             })
             .catch(e => console.log(e))
     }
+    
+    if (loading) return <Loading />
 
     return (
         <div className="flex flex-col items-center px-4 ">

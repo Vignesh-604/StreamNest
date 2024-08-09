@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import { parseDate } from "../utility";
 import axios from "axios";
 import { PencilLine, PencilOff, Save } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import Loading from "../Loading";
 
 export default function Profile() {
+
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
 
     const [user, setUser] = useState({});
     const [isEditing, setIsEditing] = useState(false);
@@ -15,11 +20,13 @@ export default function Profile() {
         axios.get("/api/users/current_user")
             .then(res => {
                 setUser(res.data.data)
-                setFormData({...formData,
+                setFormData({
+                    ...formData,
                     fullname: res.data.data.fullname,
                     email: res.data.data.email,
                 }
                 )
+                setLoading(false)
             })
             .catch(e => console.log(e))
     }, [])
@@ -41,7 +48,7 @@ export default function Profile() {
                 email: formData.email
             })
                 .then(res => setUser(user => ({
-                    ...user, 
+                    ...user,
                     email: res.data.data.email,
                     fullname: res.data.data.fullname,
                 })))
@@ -54,7 +61,7 @@ export default function Profile() {
                 oldPassword: formData.oldPassword,
                 newPassword: formData.newPassword
             })
-                .then(res => console.log("Password changed: ",res))
+                .then(res => console.log("Password changed: ", res))
                 .catch(e => console.log(e))
         }
 
@@ -66,7 +73,7 @@ export default function Profile() {
             axios.patchForm("/api/users/update_avatar", {
                 "avatar": avatarFile
             })
-                .then(res => setUser(user => ({...user, avatar: res.data.data.avatar})))
+                .then(res => setUser(user => ({ ...user, avatar: res.data.data.avatar })))
                 .catch(e => console.log(e))
         }
 
@@ -78,12 +85,13 @@ export default function Profile() {
             axios.patchForm("/api/users/update_cover_image", {
                 "coverImage": covImgFile
             })
-                .then(res => setUser(user => ({...user, coverImage: res.data.data.coverImage})))
+                .then(res => setUser(user => ({ ...user, coverImage: res.data.data.coverImage })))
                 .catch(e => console.log(e))
         }
 
         // clear passwords fields
-        setFormData({...formData,
+        setFormData({
+            ...formData,
             oldPassword: "",
             newPassword: "",
         })
@@ -93,10 +101,12 @@ export default function Profile() {
     };
 
     const stats = [
-        { label: "Liked Videos", value: user.likedVidCount },
-        { label: "Playlists", value: user.playlists },
-        { label: "Subscriptions", value: user.subscriptions },
+        { label: "Liked Videos", value: user.likedVidCount, link: "/liked" },
+        { label: "Playlists", value: user.playlists, link: "/playlist" },
+        { label: "Subscriptions", value: user.subscriptions, link: "/subscriptions" },
     ];
+
+    if (loading) return <Loading />
 
     return (
         <div>
@@ -129,10 +139,10 @@ export default function Profile() {
                                 onClick={() => setIsEditing(!isEditing)}
                             >
                                 {isEditing ? (
-                                     <>
-                                     <PencilOff className="h-5 me-1" />
-                                     Cancel
-                                 </>
+                                    <>
+                                        <PencilOff className="h-5 me-1" />
+                                        Cancel
+                                    </>
                                 ) : (
                                     <>
                                         <PencilLine className="h-5 me-1" />
@@ -230,8 +240,11 @@ export default function Profile() {
                         <h2 className="text-xl font-semibold mb-4">Your details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {stats.map((stat, index) => (
-                                <div key={index} className="bg-gray-800 p-4 rounded-lg shadow-md">
-                                    <div className="text-sm text-gray-400">{stat.label}</div>
+                                <div
+                                    key={index}
+                                    onClick={() => navigate(stat.link)}
+                                    className="bg-gray-800 p-4 rounded-lg shadow-md group hover:bg-gray-400 hover:text-black">
+                                    <div className="text-gray-400 group-hover:text-black">{stat.label}</div>
                                     <div className="text-3xl font-bold">{stat.value}</div>
                                 </div>
                             ))}

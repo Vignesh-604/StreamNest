@@ -3,13 +3,18 @@ import axios from "axios";
 import VideoItem from "./VideoItem";
 import { parseTime } from "../utility";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import Loading from "../Loading";
 
 export default function LikedVideos() {
     const [videos, setVideos] = useState([]);
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         axios.get("/api/like/likedVideos")
-            .then((res) => setVideos(res.data.data))
+            .then((res) => {
+                setVideos(res.data.data)
+                setLoading(false)
+            })
             .catch(error => console.log(error));
     }, []);
 
@@ -20,7 +25,8 @@ export default function LikedVideos() {
             })
             .catch(error => console.log(error));
     }
-console.log(videos);
+
+    if (loading) return <Loading />
 
     return (
         <div className="flex flex-col items-center px-4 min-w-[36rem]">

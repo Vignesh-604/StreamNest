@@ -1,31 +1,32 @@
 import axios from "axios";
 import img from "../assets/thumbnail.jpeg";
 import { useEffect, useState } from "react";
-import { parseDate, parseTime } from "../utility";
 import { useNavigate, useParams, useOutletContext, useLocation } from "react-router-dom";
+import Loading from "../Loading";
 
 export default function EditVideo() {
 
     const user = useOutletContext();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true)
 
     let location = useLocation();
     let editMode = location.pathname.includes("/video/edit");
-    console.log(editMode);
 
     const [video, setVideo] = useState(null);
     const [content, setContent] = useState({
         title: "",
         description: "",
     });
+
     const [currContent, setCurrContent] = useState({
         title: "",
         description: "",
     });
+    
     const [thumbnail, setThumbnail] = useState(null);
 
     const { videoId } = useParams();
-    console.log(video);
 
     useEffect(() => {
         if (editMode) {
@@ -45,10 +46,13 @@ export default function EditVideo() {
                         description: videoDetails.description,
                     });
                     setThumbnail(videoDetails.thumbnail)
+                    
+                    setLoading(false)
                 })
                 .catch(error => console.log(error));
         }
     }, []);
+
 
     const handleThumbnailChange = (e) => {
         const file = e.target.files[0];
@@ -61,9 +65,6 @@ export default function EditVideo() {
         }
         setContent({...content, thumbnail: file})
     };
-    console.log(thumbnail);
-    console.log("Current:", currContent);
-    console.log("newCurrent:", content);
 
 
     const handleSaveChanges = () => {
@@ -77,21 +78,29 @@ export default function EditVideo() {
         }
         if (content.thumbnail) formData.append("thumbnail", content.thumbnail)
 
-        axios.patch(`/api/video/v/${videoId}`, formData)
+        let data = Array.from(formData.keys())                      // Converts the formData.key iterator to Array and checks if anything has been updated       
+
+        if (data) {
+            axios.patch(`/api/video/v/${videoId}`, formData)
             .then((res) => {
-                // alert("Video details updated successfully!");
-                console.log(res.data.data);
+                navigate(-1)
+                setTimeout(() => {
+                    alert("Video details updated successfully!");
+                }, 200);
 
             })
             .catch(error => console.log(error.response.data));
-
+        }
+        else navigate(-1)
     };
+
+    if (loading) return <Loading />
 
     return (
         <>
             {
                 video ? (
-                    <div className="flex flex-col items-center p-5 rounded-lg bg-gray-800">
+                    <div className="flex flex-col items-center p-5 pb-2 rounded-lg bg-gray-800">
                         <div className="relative">
                             <img
                                 src={thumbnail || img}
@@ -124,11 +133,11 @@ export default function EditVideo() {
                                 value={content.description}
                                 onChange={(e) => setContent({ ...content, description: e.target.value })}
                             />
-                            <hr className="ms-2 lg:me-10" />
+                            <hr className="" />
 
                             <div className="flex flex-col space-y-2 ">
                                 <button
-                                    className="bg-gray-400 text-black font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+                                    className="bg-gray-950 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
                                     onClick={handleSaveChanges}
                                 >
                                     Save Changes

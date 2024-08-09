@@ -4,71 +4,83 @@ import axios from 'axios';
 import { PenBoxIcon, Plus, X } from 'lucide-react';
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { parseDate } from '../utility';
+import Loading from '../Loading';
 
 export default function PostConfig() {
 
-    const user = useOutletContext()
-    const navigate = useNavigate()
+    const user = useOutletContext();
+    const navigate = useNavigate();
 
-    let location = useLocation()
-    let editMode = (location.pathname).includes("/post/edit")
+    const location = useLocation();
+    const editMode = location.pathname.includes("/post/edit");
 
+    const [loading, setLoading] = useState(true);  // Add loading state
 
-    const [post, setPost] = useState(null)
-    const [content, setContent] = useState("")
-    const [currContent, setCurrContent] = useState("")
-    const { postId } = useParams()
+    const [post, setPost] = useState(null);
+    const [content, setContent] = useState("");
+    const [currContent, setCurrContent] = useState("");
+    const { postId } = useParams();
+
     useEffect(() => {
         if (editMode) {
-
-            axios.get(`/api/post/${postId}`)
+            axios.get(`/api/post/${postId}`)  // To edit post
                 .then((res) => {
-                    const postDetails = res.data.data
-                    if (postDetails.owner[0]?._id !== user._id) navigate(-1)
-
-                    setPost(postDetails)
-                    setContent(postDetails.content)
-                    setCurrContent(postDetails.content)
+                    const postDetails = res.data.data;
+                    if (postDetails.owner[0]?._id !== user._id) {
+                        navigate(-1);
+                    } else {
+                        setPost(postDetails);
+                        setContent(postDetails.content);
+                        setCurrContent(postDetails.content);
+                    }
+                    setLoading(false);  // Set loading to false after data is fetched
                 })
-                .catch(error => console.log(error));
+                .catch(error => {
+                    console.log(error);
+                    setLoading(false);  // Set loading to false on error as well
+                });
         }
 
-        else {
+        else {                                  // For new post
             setPost({
                 owner: [{
                     avatar: user.avatar,
                     fullname: user.fullname,
                     username: user.username,
                 }]
-            })
+            });
+            setLoading(false);  // Set loading to false for new post
         }
-    }, [])
+    }, []);
 
     const config = () => {
         if (editMode) {
             if (content !== currContent) {
                 axios.post(`/api/post/${postId}`, { content })
                     .then(res => {
-                        console.log(res)
-                        navigate(-1)
+                        console.log(res);
+                        navigate(-1);
                     })
                     .catch(error => console.log(error));
+            } else {
+                navigate(-1);
             }
-            else navigate(-1)
         }
+
         else {
             if (!content || content.trim()) {
                 axios.post(`/api/post/new`, { content })
                     .then(res => {
-                        console.log(res)
-                        navigate(-1)
+                        console.log(res);
+                        navigate(-1);
                     })
                     .catch(error => console.log(error.response.data));
             }
-
         }
-    }
-    // console.log(post);
+    };
+
+    // Handle loading state
+    if (loading) return <Loading />;
 
     return (
         <>
@@ -80,7 +92,7 @@ export default function PostConfig() {
                                 <img
                                     src={post.owner[0].avatar ? post.owner[0].avatar : profile}
                                     alt="Profile"
-                                    onError={e => e.target.src = img}
+                                    onError={e => e.target.src = profile}
                                     className="h-12 w-12 rounded-full object-cover mr-4"
                                 />
                                 <div>
@@ -117,8 +129,8 @@ export default function PostConfig() {
                                     Cancel
                                 </button>
                                 <button
-
-                                    className="flex items-center text-gray-400 hover:text-white" onClick={config}
+                                    className="flex items-center text-gray-400 hover:text-white"
+                                    onClick={config}
                                 >
                                     {editMode ? (
                                         <>
@@ -136,7 +148,7 @@ export default function PostConfig() {
                         </div>
                     </div>
                 ) : (
-                    <h1>Loading...</h1>
+                    <h1>No Post Found</h1>  // This block handles the case where there's no post data
                 )
             }
         </>
