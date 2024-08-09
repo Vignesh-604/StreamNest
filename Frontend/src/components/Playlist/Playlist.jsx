@@ -5,6 +5,7 @@ import { parseDate, parseTime } from "../utility";
 import VideoItem from "../Video/VideoItem";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Loading from "../Loading";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function Playlist() {
 
@@ -34,10 +35,12 @@ export default function Playlist() {
             .catch(error => error.response.status == 404 ? navigate(-1) : console.log(error));
     }, []);
 
-    const removeVideo = (plstId, vidId) => {
-        axios.delete(`/api/playlist/video/${plstId}/${vidId}`)
-            .then(res => console.log(res))
-            .catch(e => console.log(e));
+    const removeVideo = (vidId) => {
+        axios.delete(`/api/playlist/video/${vidId}/${id}`)
+            .then(res => {
+                setPlaylist({...playlist, videos: playlist.videos.filter(vid => vid._id != vidId)})
+            })
+            .catch(e => console.log(e.response.data));
     };
 
     const deletePlaylist = () => {
@@ -54,7 +57,7 @@ export default function Playlist() {
                 setPlaylist({...playlist, title: res.data.data.title, description: res.data.data.description});
                 setEditMode(false);
             })
-            .catch(e => console.log(e));
+            .catch(e => console.log(e.response.data));
     };
 
     if (loading) return <Loading />;
@@ -63,7 +66,7 @@ export default function Playlist() {
         <div className="flex flex-col xl:flex-row place-items-center pb-12">
             {
                 playlist ? (
-                    <div className="flex flex-col md:flex-row max-md:w-full md:space-x-4">
+                    <div className="flex flex-col lg:flex-row max-md:w-full md:space-x-4">
                         <div className="flex flex-col items-center p-5 rounded-lg bg-gray-800">
                             <img
                                 src={playlist.videos[0] ? playlist.videos[0]?.thumbnail : img}
@@ -103,6 +106,9 @@ export default function Playlist() {
                                 <hr className="" />
                                 <h2 className="text-lg text-gray-400 m-2">
                                     Playlist updated at: {parseDate(playlist.updatedAt)}
+                                </h2>
+                                <h2 className="text-lg text-gray-400 m-2">
+                                    Videos: {playlist.videos.length}
                                 </h2>
 
                                 <div className="flex flex-col space-y-2 ">
@@ -158,17 +164,26 @@ export default function Playlist() {
                             {
                                 playlist.videos.length ? (
                                     playlist.videos.map(vid => (
-                                        <div key={vid._id} className="">
+                                        <div className="flex justify-between key={vid._id}" key={vid._id}>
                                             <VideoItem key={vid._id}
                                                 id={vid._id}
                                                 title={vid.title}
                                                 description={vid.description}
-                                                owner={vid.owner.username}
+                                                owner={vid.owner}
                                                 views={vid.views}
                                                 thumbnail={vid.thumbnail}
                                                 duration={parseTime(vid.duration)}
-                                                toggleLike={() => removeVideo(playlist._id, vid._id)}
                                             />
+                                            <div className="flex items-start mt-6">
+                                                <button
+                                                    onClick={() => removeVideo(vid._id)}
+                                                    className="flex justify-center md:items-center"
+                                                    title="Remove video"
+                                                >
+                                                    <XMarkIcon className="m-2 h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
+                                                </button>
+                                            </div>
+
                                         </div>
                                     ))
                                 ) : (

@@ -110,6 +110,9 @@ export default function Playlists({ channelId = "" }) {
                                         <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[12px] font-bold text-gray-900">
                                             Last updated at: {parseDate(plst.updatedAt)}
                                         </span>
+                                        <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[12px] font-bold text-gray-900">
+                                           Videos: {plst.videos.length}
+                                        </span>
                                     </div>
                                     <button
                                         type="button"

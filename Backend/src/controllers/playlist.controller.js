@@ -60,13 +60,15 @@ const addVideo = asyncHandler( async (req, res) => {
 
 const removeVideo = asyncHandler( async (req, res) => {
     const {videoId, playlistId} = req.params
-    if (!(videoId && playlistId)) throw new ApiError(402, "Parameters missing")
+    if (!(videoId && playlistId)) throw new ApiError(404, "Parameters missing")
 
     const playlist = await Playlist.findById(playlistId)
+    if (!playlist) throw new ApiError(404, "Playlist not found")
+
     playlist.videos = playlist.videos.filter(item => item._id != videoId)
     const updatedPlaylist= await playlist.save({ validateBeforeSave: false })
     
-    res.status(202).json( new ApiResponse(202, updatePlaylist, "Removed video"))
+    res.status(202).json( new ApiResponse(202, updatedPlaylist, "Removed video"))
 })
 
 const getUserPlaylists = asyncHandler( async (req, res) => {
@@ -119,6 +121,7 @@ const getPlaylistById = asyncHandler( async (req, res) => {
                             views: 1,
                             duration: 1,
                             owner: {
+                                _id : 1,
                                 fullname: 1,
                                 username: 1,
                                 avatar: 1
