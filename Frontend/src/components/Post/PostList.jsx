@@ -4,18 +4,24 @@ import axios from 'axios';
 import { MessageSquareText, Plus, ThumbsUp } from 'lucide-react';
 import { parseDate } from '../utility';
 import { useOutletContext, useNavigate, Link } from "react-router-dom";
+import Loading from '../Loading';
 
 export default function PostList({ channelId = "", owner }) {
 
     const currentUser = useOutletContext()
     const navigate = useNavigate()
 
+    const [loading, setLoading] = useState(true);  // Add loading state
+
     const [posts, setPosts] = useState([]);
     const id = channelId === "" ? currentUser._id : channelId;
 
     useEffect(() => {
         axios.get(`/api/post/user/${id}`)
-            .then((res) => setPosts(res.data.data))
+            .then((res) => {
+                setPosts(res.data.data)
+                setLoading(false)
+            })
             .catch(error => console.log(error));
     }, []);
 
@@ -34,6 +40,8 @@ export default function PostList({ channelId = "", owner }) {
             ))
             .catch(error => console.log(error));
     }
+
+    if (loading) return <Loading />
 
     return (
         <div className=" max-w-7xl">

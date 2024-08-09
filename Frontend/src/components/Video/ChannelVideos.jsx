@@ -6,16 +6,22 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
 import { useOutletContext, useNavigate, Link } from "react-router-dom";
 import { EllipsisVertical } from "lucide-react";
+import Loading from "../Loading";
 
 export default function ChannelVideos({ owner }) {
     const navigate = useNavigate()
     const currentUser = useOutletContext()
 
+    const [loading, setLoading] = useState(true);  // Add loading state
+
     const [videos, setVideos] = useState([]);
 
     useEffect(() => {
         axios.get(`/api/dashboard/videos/${owner._id}`)
-            .then((res) => setVideos(res.data.data))
+            .then((res) =>{
+                 setVideos(res.data.data)
+                 setLoading(false);                 // Set loading to false after data is fetched
+                })
             .catch(error => console.log(error));
     }, []);
     
@@ -26,6 +32,7 @@ export default function ChannelVideos({ owner }) {
             .catch(error => console.log(error))
     }
 
+    if (loading) return <Loading />;
 
     return (
         <div className="flex flex-col px-4 min-w-[36rem]">

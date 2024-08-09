@@ -7,27 +7,34 @@ import Subscribers from "../Subscription/Subscribers";
 import ChannelVideos from "../Video/ChannelVideos";
 import PostList from "../Post/PostList";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import ReactLoading from 'react-loading';
 
 export default function Channel() {//66afcbb1791f57ba50bea9cb
     const currentUser = useOutletContext()   
     const {channelId} = useParams()
     const navigate = useNavigate()
 
-    const [user, setUser] = useState([])
-    
+    const [user, setUser] = useState({})
     const [userStats, setUserStats] = useState({})
     
     const [toggle, setToggle] = useState("")
+
+    const [loading, setLoading] = useState(true);  // Add loading state
     
     useEffect(() => {
         const id = !channelId ? currentUser._id : channelId  
+
         axios.get(`/api/users/channel/${id}`)
-            .then(res => setUser(res.data.data))
-            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error))
+            .then(res => {setUser(res.data.data)})
+            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error.response.data))
 
         axios.get(`/api/dashboard/stats/${id}`)
-            .then(res => setUserStats(res.data.data))
-            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error))
+            .then(res => {
+                setUserStats(res.data.data)
+                setLoading(false)
+            })
+            .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error.response.data));
+            
     }, [])
 
     // Toggle which section to load
@@ -39,6 +46,8 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
         { label: "Total Posts", value: userStats.totalPosts || 0, id: "posts" },
         { label: "Total Subscribers", value: userStats.totalSubscribers || 0, id: "subs" },
     ];
+
+    if (loading) return <ReactLoading type={'spin'} />;
 
     return (
         <>
@@ -111,6 +120,7 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
                     </div>
                 </div>
             </div>
+            
             {toggle == "playlists" ? <Playlists channelId={channelId}/> : null}
             {toggle == "subs" ? <Subscribers  channelId={channelId}/> : null}
             {toggle == "videos" ? <ChannelVideos owner={user}/> : null}

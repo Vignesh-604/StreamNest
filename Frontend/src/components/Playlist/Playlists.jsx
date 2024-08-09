@@ -4,6 +4,7 @@ import { parseDate } from "../utility"
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import img from "../assets/noPlaylist.jpeg"
 import { useOutletContext, useNavigate } from "react-router-dom";
+import Loading from "../Loading";
 
 export default function Playlists({ channelId = "" }) {
 
@@ -11,6 +12,7 @@ export default function Playlists({ channelId = "" }) {
     const navigate = useNavigate()
 
     const [playlists, setPlaylists] = useState([]);
+    const [loading, setLoading] = useState(true)
 
     const userId = channelId === "" ? currentUser._id : channelId
 
@@ -19,7 +21,10 @@ export default function Playlists({ channelId = "" }) {
 
     useEffect(() => {
         axios.get(`/api/playlist/user/${userId}`)
-            .then((res) => setPlaylists(res.data.data))
+            .then((res) => {
+                setPlaylists(res.data.data)
+                setLoading(false)
+            })
             .catch(error => console.log(error));
     }, []);
     // console.log("Playlist:",playlists);    
@@ -44,6 +49,8 @@ export default function Playlists({ channelId = "" }) {
             })
             .catch(e => console.log(e))
     }
+
+    if (loading) return <Loading />
 
     return (
         <div className="flex flex-col px-4 min-w-[36rem]">

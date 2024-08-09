@@ -1,22 +1,28 @@
 import img from "../assets/profile.webp"
-import Cookies from "js-cookie"
 import axios from "axios"
 import { useState, useEffect } from "react"
-import { useOutletContext, useNavigate, NavLink } from "react-router-dom";
+import { useOutletContext, NavLink } from "react-router-dom";
+import Loading from "../Loading";
 
 export default function Subscribers({ channelId = "" }) {
 
     const currentUser = useOutletContext()
-    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
 
     const id = channelId === "" ? currentUser._id : channelId
     const [subscribers, setSubscribers] = useState([])
 
     useEffect(() => {
         axios.get(`/api/subscription/channel/${id}`)
-            .then(res => setSubscribers(res.data.data))
+            .then(res => {
+                setSubscribers(res.data.data)
+                setLoading(false)
+
+            })
             .catch(e => console.log(e))
     }, [])
+
+    if (loading) return <Loading />
 
     return (
         <div className="bg-gray-900 text-white px-4">

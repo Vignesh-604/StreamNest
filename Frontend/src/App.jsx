@@ -6,19 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 
 function App() {
-  // axios.post("/api/users/login",{
-  //     username: "bobo",
-  //     email: "bobo@gmail.com",
-  //     password: "12345678"
-  //   }
-  //   )
-  // .then((res) => {
-  //   let userDetails = res.data.data.user
-  //   Cookies.set("user", JSON.stringify(userDetails))  
-  //   // console.log("User",userDetails);
-  // })
-  // .catch(error => console.log(error))
-
   const navigate = useNavigate()
 
   const user = Cookies.get("user") ? true : false
