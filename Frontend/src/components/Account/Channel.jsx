@@ -7,7 +7,7 @@ import Subscribers from "../Subscription/Subscribers";
 import ChannelVideos from "../Video/ChannelVideos";
 import PostList from "../Post/PostList";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import ReactLoading from 'react-loading';
+import Loading from '../AppComponents/Loading';
 
 export default function Channel() {//66afcbb1791f57ba50bea9cb
     const currentUser = useOutletContext()
@@ -55,7 +55,7 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
         { label: "Total Subscribers", value: userStats.totalSubscribers || 0, id: "subs" },
     ];
 
-    if (loading) return <ReactLoading type={'spin'} />;
+    if (loading) return <Loading />;
 
     return (
         <>

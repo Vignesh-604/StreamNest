@@ -1,6 +1,6 @@
 import { ArrowLeft, HomeIcon } from 'lucide-react'
 import React from 'react'
-import logo from "./assets/SNlogo.png"
+import logo from "../assets/SNlogo.png"
 import { useNavigate } from 'react-router-dom'
 
 export default function ErrorPage() {

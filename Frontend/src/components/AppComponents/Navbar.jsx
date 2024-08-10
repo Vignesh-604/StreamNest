@@ -12,8 +12,8 @@ import {
     UserCircleIcon,
     BanknotesIcon
 } from '@heroicons/react/24/outline'
-import logo from "./assets/SNlogo.png"
-import profile from "./assets/profile.webp"
+import logo from "../assets/SNlogo.png"
+import profile from "../assets/profile.webp"
 import Cookies from "js-cookie"
 import axios from "axios"
 import { NavLink, useParams, useNavigate } from 'react-router-dom'

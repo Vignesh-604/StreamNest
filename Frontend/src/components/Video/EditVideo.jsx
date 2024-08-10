@@ -2,7 +2,7 @@ import axios from "axios";
 import img from "../assets/thumbnail.jpg";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useOutletContext, useLocation } from "react-router-dom";
-import Loading from "../Loading";
+import Loading from '../AppComponents/Loading';
 
 export default function EditVideo() {
 

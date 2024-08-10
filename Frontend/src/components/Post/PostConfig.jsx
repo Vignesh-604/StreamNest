@@ -4,7 +4,7 @@ import axios from 'axios';
 import { PenBoxIcon, Plus, X } from 'lucide-react';
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { parseDate } from '../utility';
-import Loading from '../Loading';
+import Loading from '../AppComponents/Loading';
 
 export default function PostConfig() {
 

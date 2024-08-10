@@ -4,7 +4,7 @@ import axios from 'axios';
 import { MessageSquareText, Plus, ThumbsUp } from 'lucide-react';
 import { parseDate } from '../utility';
 import { useOutletContext, useNavigate, Link } from "react-router-dom";
-import Loading from '../Loading';
+import Loading from '../AppComponents/Loading';
 
 export default function PostList({ channelId = "", owner }) {
 

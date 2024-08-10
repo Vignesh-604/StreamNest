@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import Loading from "../Loading";
+import Loading from '../AppComponents/Loading';
 
 export default function Subscriptions() {
     

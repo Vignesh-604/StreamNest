@@ -9,7 +9,7 @@ import Post from "./components/Post/Post"
 import Playlist from './components/Playlist/Playlist'
 import LikedVideos from "./components/Video/LikedVideos"
 import Playlists from './components/Playlist/Playlists.jsx'
-import ErrorPage from './components/ErrorPage.jsx'
+import ErrorPage from './components/AppComponents/ErrorPage.jsx'
 import Subscriptions from './components/Subscription/Subsciptions.jsx'
 import SignIn from './components/Account/SignIn.jsx'
 import Register from './components/Account/Register.jsx'

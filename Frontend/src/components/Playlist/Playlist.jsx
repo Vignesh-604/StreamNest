@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { parseDate, parseTime } from "../utility";
 import VideoItem from "../Video/VideoItem";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import Loading from "../Loading";
+import Loading from '../AppComponents/Loading';
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function Playlist() {

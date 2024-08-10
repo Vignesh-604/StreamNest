@@ -1,5 +1,5 @@
-import Navbar from './components/Navbar'
-import axios from 'axios'
+import Navbar from './components/AppComponents/Navbar'
+
 import Cookies from "js-cookie"
 import { Outlet } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'

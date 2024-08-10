@@ -7,7 +7,7 @@ import { parseDate } from '../utility';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
 import { useOutletContext, useParams, useNavigate, Link } from "react-router-dom";
-import Loading from '../Loading';
+import Loading from '../AppComponents/Loading';
 
 export default function PostItem() {
     const { postId } = useParams()

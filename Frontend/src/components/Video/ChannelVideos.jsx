@@ -5,8 +5,8 @@ import { parseTime } from "../utility";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
 import { useOutletContext, useNavigate, Link } from "react-router-dom";
-import { EllipsisVertical } from "lucide-react";
-import Loading from "../Loading";
+import { EllipsisVertical, Plus } from "lucide-react";
+import Loading from "../AppComponents/Loading";
 
 export default function ChannelVideos({ owner }) {
     const navigate = useNavigate()
@@ -36,7 +36,18 @@ export default function ChannelVideos({ owner }) {
 
     return (
         <div className="flex flex-col px-4 min-w-[36rem]">
-            <h1 className="font-bold text-start text-5xl mt-7 mb-10">Videos</h1>
+            <div className='flex justify-between'>
+                <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Videos</h1>
+                {
+                    owner._id === currentUser._id ? (
+                        <Link className="font-bold text-start text-lg my-auto me-10 inline-flex" to={"/video/new"}>
+                            New Video
+                            <Plus strokeWidth={2} absoluteStrokeWidth className="ms-2 my-auto" />
+                        </Link>
+                    ) : null
+                }
+
+            </div>
             <div className="grid gap-2 lg:grid-cols-2">
                 {
                     videos.length ?

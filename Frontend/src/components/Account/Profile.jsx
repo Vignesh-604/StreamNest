@@ -3,7 +3,7 @@ import { parseDate } from "../utility";
 import axios from "axios";
 import { PencilLine, PencilOff, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Loading from "../Loading";
+import Loading from '../AppComponents/Loading';
 
 export default function Profile() {
 

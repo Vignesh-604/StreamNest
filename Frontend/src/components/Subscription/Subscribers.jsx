@@ -2,7 +2,7 @@ import img from "../assets/profile.webp"
 import axios from "axios"
 import { useState, useEffect } from "react"
 import { useOutletContext, NavLink } from "react-router-dom";
-import Loading from "../Loading";
+import Loading from '../AppComponents/Loading';
 
 export default function Subscribers({ channelId = "" }) {
 

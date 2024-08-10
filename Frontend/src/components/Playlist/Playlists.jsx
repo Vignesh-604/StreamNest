@@ -4,7 +4,7 @@ import { parseDate } from "../utility"
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import img from "../assets/noPlaylist.jpeg"
 import { useOutletContext, useNavigate } from "react-router-dom";
-import Loading from "../Loading";
+import Loading from '../AppComponents/Loading';
 
 export default function Playlists({ channelId = "" }) {
 

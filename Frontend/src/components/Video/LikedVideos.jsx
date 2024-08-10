@@ -3,7 +3,7 @@ import axios from "axios";
 import VideoItem from "./VideoItem";
 import { parseTime } from "../utility";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import Loading from "../Loading";
+import Loading from '../AppComponents/Loading';
 
 export default function LikedVideos() {
     const [videos, setVideos] = useState([]);
