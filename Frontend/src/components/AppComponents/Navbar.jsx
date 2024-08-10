@@ -17,6 +17,7 @@ import profile from "../assets/profile.webp"
 import Cookies from "js-cookie"
 import axios from "axios"
 import { NavLink, useParams, useNavigate } from 'react-router-dom'
+import Search from './Search'
 
 export default function Navbar() {
 
@@ -43,18 +44,7 @@ export default function Navbar() {
                     </NavLink>
 
                     {/* SearchBar */}
-                    <div className="flex flex-grow items-center justify-center">
-                        <div className="flex items-center rounded-full bg-gray-900 p-2 w-full max-w-md mx-6">
-                            <input
-                                type="text"
-                                className="flex-grow bg-transparent px-4 py-2 text-white outline-none placeholder-gray-500"
-                                placeholder="Search"
-                            />
-                            <button className="flex items-center justify-center h-10 w-10 bg-gray-800 rounded-full">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-white" />
-                            </button>
-                        </div>
-                    </div>
+                    <Search />
 
                     {/* NavItems */}
                     <div className="hidden lg:flex items-center space-x-6">
@@ -200,16 +190,8 @@ export default function Navbar() {
                                 >
                                     <ArrowLeftOnRectangleIcon className='h-6 me-2' />Log out
                                 </NavLink>
-                                <div className="flex items-center rounded-full bg-gray-900 p-2 mt-5">
-                                    <input
-                                        type="text"
-                                        className="flex-grow w-full bg-transparent px-4 py-2 text-white outline-none placeholder-gray-500"
-                                        placeholder="Search"
-                                    />
-                                    <button className="flex items-center justify-center h-10 w-10 bg-gray-800 rounded-full">
-                                        <MagnifyingGlassIcon className="h-5 w-5 text-white" />
-                                    </button>
-                                </div>
+
+                                <Search />
                             </div>
                         </div>
                     </div>

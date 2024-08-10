@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Video } from "../models/video.models.js"
+import { User } from "../models/user.models.js"
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import mongoose, { isValidObjectId } from "mongoose";
 
@@ -167,7 +168,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 
 const getAllVideos = asyncHandler(async (req, res) => {
 
-    let { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    let { page = 1, limit = 12, query, sortBy, sortType, name } = req.query
 
     page = parseInt(page, 10)
     limit = parseInt(limit, 10)
@@ -189,15 +190,20 @@ const getAllVideos = asyncHandler(async (req, res) => {
     }
 
     // Search by user id
-    if (userId) {
-        if (!isValidObjectId(userId)) throw new ApiError(401, "UserId incorrect")
+    if (name) {
+        if (!(typeof name === "string")) throw new ApiError(401, "UserId incorrect")
 
+        const userId = await User.findOne({ $or: [{username: name}, {fullname: name}]})
+        
         pipeline.push({
             $match: {
-                owner: new mongoose.Types.ObjectId(userId)
+                owner: new mongoose.Types.ObjectId(userId._id)
             }
         })
     }
+
+    // Clone the pipeline to use for total count calculation
+    const totalCountPipeline = [...pipeline];
 
     // Sorting by field in asc/desc order
     const sortCategory = {}
@@ -235,9 +241,13 @@ const getAllVideos = asyncHandler(async (req, res) => {
     
     const videos = await Video.aggregate(pipeline)
 
+    // Get total count
+    totalCountPipeline.push({ $count: "total" })
+    const total = await Video.aggregate(totalCountPipeline)
+
     if (!videos || !videos.length) res.status(200).json(new ApiResponse(200, [], "No videos available"))
 
-    else res.status(200).json( new ApiResponse(200, videos, "Videos fetched"))
+    else res.status(200).json( new ApiResponse(200, {videos, total}, "Videos fetched"))
 })
 
 export {

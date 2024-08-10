@@ -18,7 +18,6 @@ const videoSchema = new Schema({
     description: {
         type: String,
         required: true,
-        index:"text"
     },
     duration: {
         type: Number,               // cloudinary url
@@ -40,6 +39,8 @@ const videoSchema = new Schema({
 },{
     timestamps: true
 });
+
+// videoSchema.index({ title: 'text', description: 'text' });
 videoSchema.index({createdAt: true, updatedAt: true})
 videoSchema.plugin(mongooseAggregatePaginate)
 
