@@ -1,14 +1,23 @@
 import {Router} from "express"
-import { changePassword, getCurrentUser, getUserChannelProfile, getWatchHistory, loginUser, logoutUser, refreshAccessToken, registerUser, updateAvatar, updateCoverImage, updateDetails } from "../controllers/user.controller.js"
+import { 
+    changePassword, 
+    getCurrentUser, 
+    getUserChannelProfile,
+    loginUser, 
+    logoutUser, 
+    refreshAccessToken, 
+    registerUser, 
+    updateAvatar, 
+    updateCoverImage, 
+    updateDetails 
+} from "../controllers/user.controller.js"
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
-const router = Router()         // Sets up an express router
+const router = Router()
 
-// It defines a POST route at /register which calls the registerUser controller function.
-// Test by sending an API req to http://localhost:8000/users/register using Postman or thunder client
 router.route("/register").post(
-    upload.fields([                         // Multiple files upload with specific names and count                   
+    upload.fields([                
         {name: "avatar", maxCount: 1},
         {name: "coverImage", maxCount: 1}
     ]),
@@ -33,7 +42,5 @@ router.route("/update_avatar").patch(verifyJWT, upload.single("avatar"), updateA
 router.route("/update_cover_image").patch(verifyJWT, upload.single("coverImage"), updateCoverImage)
 
 router.route("/channel/:userId").get(verifyJWT, getUserChannelProfile)
-
-router.route("/watch-history").get(verifyJWT, getWatchHistory)
 
 export default router
