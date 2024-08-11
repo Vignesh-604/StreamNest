@@ -47,7 +47,7 @@ const deleteVideoFromHistory = asyncHandler(async (req, res) => {
 
 
 const getUserWatchHistory = asyncHandler(async (req, res) => {
-    const {userId } = req.params
+    const userId = req.user?._id
     if (!userId) throw ApiError(404, "userId not found")
 
     // const userHistory = await WatchHistory.find({ user: userId })
@@ -93,7 +93,8 @@ const getUserWatchHistory = asyncHandler(async (req, res) => {
                 }
             ]
             }
-        }
+        },
+        { $sort: { watchedAt: -1 } },  // Sort by 'watchedAt' in descending order (most recent first)
     ])
     if (!userHistory) throw new ApiError(400, "Couldn't find user's watch history")
 
@@ -102,7 +103,7 @@ const getUserWatchHistory = asyncHandler(async (req, res) => {
 
 
 const clearUserWatchHistory = asyncHandler(async (req, res) => {
-    const {userId } = req.params
+    const userId = req.user?._id
     if (!userId) throw ApiError(404, "userId not found")
 
     const userHistory = await WatchHistory.deleteMany({ user: userId })

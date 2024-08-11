@@ -96,7 +96,7 @@ export default function Navbar() {
                                             Liked Videos
                                         </div>
                                     </NavLink>
-                                    <NavLink className="block rounded-lg py-2 px-3 transition hover:bg-white/5" to>
+                                    <NavLink className="block rounded-lg py-2 px-3 transition hover:bg-white/5" to={"history"}>
                                         <div className="flex items-center gap-2">
                                             <ClockIcon className="h-5 w-5 text-white/30" />
                                             Watch History
@@ -170,12 +170,12 @@ export default function Navbar() {
                                 >
                                     <HandThumbUpIcon className='h-6 me-2' />Liked Videos
                                 </NavLink>
-                                <NavLink to={""}
+                                <NavLink to={"history"}
                                     className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
                                     <ClockIcon className='h-6 me-2' />Watch History
                                 </NavLink>
-                                <NavLink to={""}
+                                <NavLink to={"/subscriptions"}
                                     className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
                                     <BanknotesIcon className='h-6 me-2' />Subscriptions

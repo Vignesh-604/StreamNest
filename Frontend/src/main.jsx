@@ -17,6 +17,7 @@ import Home from './components/Home.jsx'
 import PostConfig from './components/Post/PostConfig.jsx'
 import EditVideo from './components/Video/EditVideo.jsx'
 import NewVideo from './components/Video/NewVideo.jsx'
+import WatchHistory from './components/Video/WatchHistory.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -36,6 +37,7 @@ const router = createBrowserRouter(         // For web applications
             
             <Route path='/liked' element={<LikedVideos />} />
             <Route path='/subscriptions' element={<Subscriptions />} />
+            <Route path='/history' element={<WatchHistory />} />
 
             <Route path='/playlist' element={<Playlists />} />
             <Route path='/playlist/:id' element={<Playlist />} />

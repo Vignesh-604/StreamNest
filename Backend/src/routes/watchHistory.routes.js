@@ -15,6 +15,6 @@ router.route("/track/:video").post(trackWatchHistory)
 
 router.route("/remove/:historyId").delete(deleteVideoFromHistory)
 
-router.route("/:userId").get(getUserWatchHistory).delete(clearUserWatchHistory)
+router.route("/").get(getUserWatchHistory).delete(clearUserWatchHistory)
 
 export default router
