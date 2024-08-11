@@ -14,7 +14,7 @@ export default function Playlists({ channelId = "" }) {
     const [playlists, setPlaylists] = useState([]);
     const [loading, setLoading] = useState(true)
 
-    const userId = channelId === "" ? currentUser._id : channelId
+    const userId = channelId === "" ? currentUser?._id : channelId
 
     let [name, setName] = useState("")
     let [desc, setDesc] = useState("")
@@ -54,14 +54,13 @@ export default function Playlists({ channelId = "" }) {
 
     return (
         <div className="flex flex-col px-4 min-w-[36rem]">
-            <h1 className="font-bold text-start text-5xl mt-7 mb-10">
-                Playlists
-            </h1>
+            <h1 className="font-bold text-start text-5xl mt-7 mb-10">Playlists</h1>
+            <hr className="w-full"/>
 
             {/* Create new playlist - only if playlist belongs to current user */}
             {
                 userId === currentUser._id ? (
-                    <form className="flex flex-row mb-6 mx-auto shadow-2xl p-2 border-white text-lg" onSubmit={newPlaylist}>
+                    <form className="flex flex-row mb-6 mx-auto shadow-2xl p-2 mt-2 border-white text-lg" onSubmit={newPlaylist}>
                         <h1 className=" my-auto me-4 font-semibold">
                             Create new playlist:
                         </h1>
@@ -79,57 +78,60 @@ export default function Playlists({ channelId = "" }) {
                             value={desc}
                             onChange={(e) => setDesc(e.target.value)}
                         />
-                        <button type="submit" title="Create playlist">
-                            <PencilSquareIcon className="w-10 h-10 mx-2 rounded-lg hover:text-green-400" />
+                        <button type="submit" title="Create playlist" className="inline-flex items-center pe-2 rounded-lg font-semibold hover:bg-slate-800 hover:text-green-400">
+                            <PencilSquareIcon className="w-7 h-7 mx-2 rounded-lg" />Create
                         </button>
                     </form>
                 ) : null
             }
 
-            <div className="grid max-md:place-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {
-                    playlists.length ?
-                        playlists.map(plst => (
-                            <div key={plst._id}
-                                onClick={() => navigate(`/playlist/${plst._id}`)}
-                                className=" rounded-md border p-3 flex-col items-start hover:bg-slate-800 max-md:w-[420px]"
-                            >
-                                <img
-                                    src={plst.poster ? plst.poster?.thumbnail : img}
-                                    onError={(e) => e.target.src = { img }}
-                                    className="h-[200px] w-full rounded-t-md object-cover"
-                                />
-                                <div className="p-4">
-                                    <h1 className="inline-flex items-center text-lg font-semibold">
-                                        {plst.name}
-                                    </h1>
-                                    <p className="mt-2 text-gray-400 line-clamp-2">
-                                        {plst.description}
-                                    </p>
-                                    <div className="mt-4">
-                                        <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[12px] font-bold text-gray-900">
-                                            Last updated at: {parseDate(plst.updatedAt)}
-                                        </span>
-                                        <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[12px] font-bold text-gray-900">
-                                           Videos: {plst.videos.length}
-                                        </span>
+            {
+                playlists.length ? (
+                    <div className="grid max-md:place-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {
+                             playlists.map(plst => (
+                                <div key={plst._id}
+                                    onClick={() => navigate(`/playlist/${plst._id}`)}
+                                    className=" rounded-md border p-3 flex-col items-start hover:bg-slate-800 max-md:w-[420px]"
+                                >
+                                    <img
+                                        src={plst.poster ? plst.poster?.thumbnail : img}
+                                        onError={(e) => e.target.src = { img }}
+                                        className="h-[200px] w-full rounded-t-md object-cover"
+                                    />
+                                    <div className="p-4">
+                                        <h1 className="inline-flex items-center text-lg font-semibold">
+                                            {plst.name}
+                                        </h1>
+                                        <p className="mt-2 text-gray-400 line-clamp-2">
+                                            {plst.description}
+                                        </p>
+                                        <div className="mt-4">
+                                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[12px] font-bold text-gray-900">
+                                                Last updated at: {parseDate(plst.updatedAt)}
+                                            </span>
+                                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[12px] font-bold text-gray-900">
+                                               Videos: {plst.videos.length}
+                                            </span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            className="flex items-center gap-2 transition mt-4 w-full rounded-sm bg-red-700 px-2 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                                            onClick={(e) => deletePlaylist(e, plst._id)}
+                                        >
+                                            <TrashIcon className="h-5 w-5 text-white" />
+                                            Delete Playlist
+                                        </button>
                                     </div>
-                                    <button
-                                        type="button"
-                                        className="flex items-center gap-2 transition mt-4 w-full rounded-sm bg-red-700 px-2 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                                        onClick={(e) => deletePlaylist(e, plst._id)}
-                                    >
-                                        <TrashIcon className="h-5 w-5 text-white" />
-                                        Delete Playlist
-                                    </button>
                                 </div>
-                            </div>
-                        )) :
-                        (
-                            <h1 className="font-bold text-start text-5xl mt-7 mb-10">No Playlists available</h1>
-                        )
-                }
-            </div>
+                            ))
+                        }
+                    </div>
+                ) :
+                    (
+                        <h1 className="flex justify-center font-bold text-start text-4xl mt-7 mb-10">No Playlists available</h1>
+                    )
+            }
         </div>
     );
 }

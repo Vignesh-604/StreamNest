@@ -50,7 +50,8 @@ export default function WatchHistory() {
 
     return (
         <div className="flex flex-col items-center px-4 min-w-[36rem]">
-            <h1 className="font-bold text-start text-5xl mt-7 mb-10">Watch History</h1>
+            <h1 className="font-bold text-start text-5xl mt-5 mb-8">Watch History</h1>
+            <hr className="w-full"/>
 
             {history.length ? (
                 history.map((dateGroup) => (
@@ -82,7 +83,7 @@ export default function WatchHistory() {
                     </div>
                 ))
             ) : (
-                <h1 className="flex place-content-center font-bold text-5xl my-7">No Watch History</h1>
+                <h1 className="flex place-content-center font-bold text-4xl my-7">No Watch History</h1>
             )}
         </div>
     );

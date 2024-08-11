@@ -115,16 +115,16 @@ export default function Profile() {
                     <img
                         src={user.avatar}
                         alt=""
-                        className="h-56 rounded-full mb-4 border object-cover w-56"
+                        className="h-56 w-80 rounded-full mb-4 md:mt-4 border object-cover"
                     />
                     <div className="items-center py-4 w-full">
                         <h1 className="text-4xl font-semibold m-2">
                             {user.fullname}
                         </h1>
                         <h2 className="text-xl text-gray-400 m-2">
-                            {user.username}
+                            @{user.username}
                         </h2>
-                        <hr className="ms-2 md:me-10" />
+                        <hr className=" md:me-10" />
                         <h2 className="text-lg text-gray-400 m-2">
                             Email: {user.email}
                         </h2>
@@ -132,7 +132,7 @@ export default function Profile() {
                             Created at: {parseDate(user.createdAt)}
                         </h2>
 
-                        <div className="flex flex-row space-x-2">
+                        <div className="flex flex-row space-x-2 ml-2">
                             <button
                                 type="button"
                                 className="inline-flex items-center rounded-md bg-gray-700 shadow-lg mt-1 px-3 py-2 text-md font-semibold text-white hover:bg-black/80"

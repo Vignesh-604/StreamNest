@@ -9,7 +9,7 @@ import PostList from "../Post/PostList";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 
-export default function Channel() {//66afcbb1791f57ba50bea9cb
+export default function Channel() {
     const currentUser = useOutletContext()
     const { channelId } = useParams()
     const navigate = useNavigate()
@@ -39,8 +39,8 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
     const toggleSub = () => {
         axios.post(`/api/subscription/channel/${user._id}`)
             .then(res => {
-                setUser({...user, isSubscribed: !user.isSubscribed})
-                setUserStats({...userStats, totalSubscribers:( res.data.data == null ? --userStats.totalSubscribers : ++userStats.totalSubscribers)})
+                setUser({ ...user, isSubscribed: !user.isSubscribed })
+                setUserStats({ ...userStats, totalSubscribers: (res.data.data == null ? --userStats.totalSubscribers : ++userStats.totalSubscribers) })
             })
             .catch(e => console.log(e.response.data))
     }
@@ -83,15 +83,13 @@ export default function Channel() {//66afcbb1791f57ba50bea9cb
                             <h2 className="text-xl text-gray-400 m-2">
                                 @{user.username}
                             </h2>
-                            <hr className="ms-2 lg:me-10" />
+                            <hr className=" lg:me-10" />
                             <h2 className="text-lg text-gray-400 m-2">
                                 Channel created at: {parseDate(user.createdAt)}
                             </h2>
                             {userStats.totalVideos == 0 ? (
-                                <div>
-                                    <div className="flex w-fit font-semibold border rounded-lg p-2 bg-slate-300 text-black">
-                                        User does not have a channel
-                                    </div>
+                                <div className="flex ml-2 w-fit font-semibold border rounded-lg p-2 bg-slate-300 text-black">
+                                    User does not have a channel
                                 </div>
                             ) : (
                                 <>

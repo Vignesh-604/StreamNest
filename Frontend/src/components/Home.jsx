@@ -9,18 +9,18 @@ export default function Home() {
 
     const currentUser = useOutletContext()
     const [videos, setVideos] = useState([])
-    
+
     const [total, setTotal] = useState([])
-    let pageLimit = Math.ceil(total/12)
+    let pageLimit = Math.ceil(total / 12)
     let [page, setPage] = useState(1)
-    
+
     const navigate = useNavigate()
     const { search } = useLocation()
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         axios.get(`/api/video/${search ? `${search}&` : "?"}page=${page}`)      // search query then /?query=abc&page=1 else /?page=1
-            .then(res => {               
+            .then(res => {
                 setVideos(res.data.data.videos)
                 setTotal(res.data.data.total[0].total)
                 setLoading(false)
@@ -45,14 +45,13 @@ export default function Home() {
                         />
 
                         <div className="flex flex-row space-x-2 p-3">
-                            <div>
-                                <img
-                                    title={video.owner[0].fullname}
-                                    src={video.owner[0].avatar}
-                                    className="rounded-full object-cover w-12 h-12 min-w-[12px] mt-1 cursor-pointer"
-                                    onClick={() => navigate(video.owner[0]._id !== currentUser._id ? `/channel/${video.owner[0]._id}` : "/channel")}
-                                />
-                            </div>
+
+                            <img
+                                title={video.owner[0].fullname}
+                                src={video.owner[0].avatar}
+                                className="rounded-full object-cover w-12 h-12 min-w-[12px] mt-1 cursor-pointer"
+                                onClick={() => navigate(video.owner[0]._id !== currentUser._id ? `/channel/${video.owner[0]._id}` : "/channel")}
+                            />
 
                             <div className='flex-col w-[220px]'>
                                 <h3 className="text-white text-lg font-semibold line-clamp-2 " title={video.title}>
@@ -66,7 +65,6 @@ export default function Home() {
                                 >
                                     {video.owner[0].fullname} · @{video.owner[0].username}
                                 </p>
-
                                 <p className="text-gray-400">{video.views} views · {timeAgo(video.createdAt)}</p>
                             </div>
                         </div>
@@ -78,8 +76,8 @@ export default function Home() {
                 <div className="mt-2 flex items-center justify-between">
                     <div>
                         <p>
-                            showing <strong>{1 + ((page-1) * 12)}</strong> to <strong>{page*12 > total ? total : page*12}</strong> of <strong>{total}</strong> results
-                            
+                            showing <strong>{1 + ((page - 1) * 12)}</strong> to <strong>{page * 12 > total ? total : page * 12}</strong> of <strong>{total}</strong> results
+
                         </p>
                     </div>
                     <div className="inline-flex items-center space-x-2">

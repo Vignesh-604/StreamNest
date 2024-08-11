@@ -35,12 +35,12 @@ export default function Navbar() {
 
     return (
         <header className="fixed top-0 w-full shadow-2xl p-2 border-b-2 bg-gray-950 border-y-slate-700 z-50">
-            <nav aria-label="Global" className="mx-auto -m-5 flex max-w-7xl items-center justify-between p-4 lg:px-8">
-                <div className="flex items-center space-x-6 lg:flex-1">
+            <nav aria-label="Global" className="mx-auto h-36 -m-5 flex max-w-7xl items-center justify-between p-4 lg:px-8">
+                <div className="flex items-center lg:flex-1">
                     {/* Logo */}
                     <NavLink to={"/"} className="-m-1.5 p-1.5" title='Home'>
                         <span className="sr-only">StreamNest</span>
-                        <img src={logo} alt="Logo" className="h-28 w-auto" />
+                        <img src={logo} alt="Logo" className="h-28 w-auto max-sm:hidden" />
                     </NavLink>
 
                     {/* SearchBar */}
@@ -71,7 +71,7 @@ export default function Navbar() {
                                     title={user.username}
                                     alt="Profile"
                                     onError={(e) => e.target.src = profile}
-                                    className="h-14 w-auto rounded-full border-emerald-500 border-2" />
+                                    className="h-14 w-14 object-cover rounded-full border-emerald-500 border-2" />
                             </PopoverButton>
                             <PopoverPanel
                                 transition
@@ -127,12 +127,14 @@ export default function Navbar() {
                 </div>
             </nav>
             <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
-                <div className="fixed inset-0 z-10 bg-gray-800 bg-opacity-75" />
-                <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-gray-800 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                {/* The background overlay */}
+                <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-75" />
+                {/* DialogPanel with a higher z-index */}
+                <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gray-800 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="flex items-center justify-between">
                         <div className='flex'>
-                            <NavLink href="#" className="-m-1.5 p-1.5">
-                                <span className="sr-only">Your Company</span>
+                            <NavLink to={"/"} className="-m-1.5 p-1.5">
+                                <span className="sr-only">StreamNest</span>
                                 <img
                                     src={logo}
                                     alt="Logo"
@@ -165,12 +167,12 @@ export default function Navbar() {
                                 >
                                     <ListBulletIcon className='h-6 me-2' />Playlists
                                 </NavLink>
-                                <NavLink to={"liked"}
+                                <NavLink to={"/liked"}
                                     className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
                                     <HandThumbUpIcon className='h-6 me-2' />Liked Videos
                                 </NavLink>
-                                <NavLink to={"history"}
+                                <NavLink to={"/history"}
                                     className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                                 >
                                     <ClockIcon className='h-6 me-2' />Watch History
@@ -185,18 +187,20 @@ export default function Navbar() {
                                 >
                                     <IdentificationIcon className='h-6 me-2' />My Channel
                                 </NavLink>
-                                <NavLink onClick={logout}
-                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700"
-                                >
-                                    <ArrowLeftOnRectangleIcon className='h-6 me-2' />Log out
-                                </NavLink>
-
-                                <Search />
+                            </div>
+                            <div className="py-6">
+                                <a
+                                    onClick={logout}
+                                    className="flex items-center -mx-3  rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-700 cursor-pointer">
+                                    <ArrowLeftOnRectangleIcon className="h-6 me-2" />
+                                    Log out
+                                </a>
                             </div>
                         </div>
                     </div>
                 </DialogPanel>
             </Dialog>
+
         </header>
     )
 }
