@@ -40,6 +40,7 @@ export default function LikedVideos() {
                                 videos.map((vid) => (
                                     <div className="flex justify-between key={vid._id}" key={vid._id}>
                                         <VideoItem
+                                            id={vid.videos[0]?._id}
                                             title={vid.videos[0]?.title}
                                             description={vid.videos[0]?.description}
                                             owner={vid.videos[0]?.owner[0]}

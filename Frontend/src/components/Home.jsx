@@ -35,7 +35,11 @@ export default function Home() {
         <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-start mb-10">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-screen-xl">
                 {videos.map(video => (
-                    <div key={video._id} className="bg-gray-800 h-[330px] w-[300px] rounded-lg overflow-hidden transform hover:scale-105 transition-transform cursor-pointer">
+                    <div 
+                    key={video._id} 
+                    className="bg-gray-800 h-[330px] w-[300px] rounded-lg overflow-hidden transform hover:scale-105 transition-transform cursor-pointer"
+                    onClick={() => navigate(`/video/watch/${video._id}`)}
+                    >
 
                         <img
                             src={video.thumbnail ? video.thumbnail : img}
