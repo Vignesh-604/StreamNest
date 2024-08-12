@@ -83,7 +83,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 
     const video = await Video.aggregate([
         {
-            $match: { _id: new mongoose.Types.ObjectId(videoId)}
+            $match: { _id: new mongoose.Types.ObjectId(videoId) }
         },
         {
             $lookup: {
@@ -102,20 +102,38 @@ const getVideoById = asyncHandler(async (req, res) => {
             }
         },
         {
+            $lookup: {
+                from: "subscriptions",
+                localField: "owner._id",
+                foreignField: "channel",
+                as: "subscribers"
+            }
+        },
+        {
             $addFields: {
-                likes: { 
+                likes: {
                     $size: "$likes"
                 },
                 isLiked: {
                     $cond: {
-                        if: {$in: [req.user?._id, "$likes.likedBy"]},
+                        if: { $in: [req.user?._id, "$likes.likedBy"] },
                         then: true,
                         else: false
                     }
                 },
+                subscribers: {
+                    $size: "$subscribers"
+                },
                 owner: {
                     $first: "$owner"
-                }
+                },
+                isSubscribed: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                        then: true,
+                        else: false
+                    }
+                },
             },
         },
         {
@@ -130,7 +148,10 @@ const getVideoById = asyncHandler(async (req, res) => {
                 isPublished: 1,
                 likes: 1,
                 isLiked: 1,
+                subscribers: 1,
+                isSubscribed: 1,
                 owner: {
+                    _id: 1,
                     fullname: 1,
                     username: 1,
                     avatar: 1
@@ -143,10 +164,10 @@ const getVideoById = asyncHandler(async (req, res) => {
     // Increments views value 
     await Video.findByIdAndUpdate(
         videoId,
-        { $inc: {views: 1}},
-        {new: true}
+        { $inc: { views: 1 } },
+        { new: true }
     ).select("views")
-    
+
     res.status(201).json(new ApiResponse(201, video, "Video fetched successfully"))
 })
 
@@ -193,8 +214,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
     if (name) {
         if (!(typeof name === "string")) throw new ApiError(401, "UserId incorrect")
 
-        const userId = await User.findOne({ $or: [{username: name}, {fullname: name}]})
-        
+        const userId = await User.findOne({ $or: [{ username: name }, { fullname: name }] })
+
         pipeline.push({
             $match: {
                 owner: new mongoose.Types.ObjectId(userId._id)
@@ -238,7 +259,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
             ]
         }
     })
-    
+
     const videos = await Video.aggregate(pipeline)
 
     // Get total count
@@ -247,7 +268,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     if (!videos || !videos.length) res.status(200).json(new ApiResponse(200, [], "No videos available"))
 
-    else res.status(200).json( new ApiResponse(200, {videos, total}, "Videos fetched"))
+    else res.status(200).json(new ApiResponse(200, { videos, total }, "Videos fetched"))
 })
 
 export {

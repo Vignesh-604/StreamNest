@@ -18,6 +18,7 @@ import PostConfig from './components/Post/PostConfig.jsx'
 import EditVideo from './components/Video/EditVideo.jsx'
 import NewVideo from './components/Video/NewVideo.jsx'
 import WatchHistory from './components/Video/WatchHistory.jsx'
+import VideoPlayer from './components/Video/VideoPlayer.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -34,6 +35,7 @@ const router = createBrowserRouter(         // For web applications
 
             <Route path='/video/edit/:videoId' element={<EditVideo />} />
             <Route path='/video/new' element={<NewVideo />} />
+            <Route path='/video/watch/:videoId' element={<VideoPlayer />} />
             
             <Route path='/liked' element={<LikedVideos />} />
             <Route path='/subscriptions' element={<Subscriptions />} />
