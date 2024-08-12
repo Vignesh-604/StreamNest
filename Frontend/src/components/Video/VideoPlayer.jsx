@@ -1,8 +1,8 @@
-import React from 'react';
 import axios from "axios";
 import profile from "../assets/profile.webp";
+import img from "../assets/thumbnail.jpg";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, useOutletContext} from "react-router-dom";
+import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 import { parseDate } from '../utility';
 import { CalendarArrowDown, Eye, List, ThumbsUp } from 'lucide-react';
@@ -11,13 +11,14 @@ import Comment from '../Post/Comment';
 function VideoPage() {
     const currentUser = useOutletContext();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
 
-    const {videoId} = useParams()
+    const { videoId } = useParams();
     const [video, setVideo] = useState(null);
-    const [comments, setComments] = useState([])
-    console.log(comments);
+    const [comments, setComments] = useState([]);
+    const [content, setContent] = useState()
 
+    // Load Video and comments
     useEffect(() => {
         axios.get(`/api/video/v/${videoId}`)
             .then((res) => {
@@ -25,21 +26,32 @@ function VideoPage() {
                 setVideo(videoDetails);
                 setLoading(false)
             })
-            .catch(error => console.log(error));
+            .catch(error => console.log(error.response.data));
 
         axios.get(`/api/comment/video/${videoId}`)
             .then((res) => setComments(res.data.data.docs))
-            .catch(error => console.log(error));
-    }, []);
+            .catch(error => console.log(error.response.data));
 
+        axios.post(`/api/watchHistory/track/${videoId}`)
+        .catch(error => console.log(error.response.data));
+
+    }, [videoId])
+
+
+    // Subscribe/ unsubscribe
     const toggleSub = () => {
         axios.post(`/api/subscription/channel/${video.owner._id}`)
             .then(res => {
-                setVideo({ ...video, isSubscribed: !video.isSubscribed, subscribers: (res.data.data == null ? --video.subscribers : ++video.subscribers) })
+                setVideo({ 
+                    ...video, 
+                    isSubscribed: !video.isSubscribed, 
+                    subscribers: res.data.data == null ? --video.subscribers : ++video.subscribers 
+                })
             })
             .catch(e => console.log(e.response.data))
     }
 
+    // Like / unlike video
     const toggleVideoLike = () => {
         axios.post(`/api/like/v/${videoId}`)
             .then((res) => setVideo(
@@ -52,21 +64,71 @@ function VideoPage() {
             .catch(error => console.log(error));
     }
 
+    // Add comment
+    const addComment = () => {
+        if (content && content.trim()) {
+
+            axios.post(`/api/comment/video/${videoId}`, { content })
+                .then((res) => {
+                    setComments([...comments, {
+                        ...res.data.data, 
+                        likes: 0,
+                        owner: {
+                            username: currentUser.username,
+                            fullname: currentUser.fullname,
+                            avatar: currentUser.avatar,
+                        }
+                    }])
+                    setContent("")
+                })
+                .catch(error => console.log(error))
+        }
+    }
+
+    // Delete comment
+    const deleteComment = (id) => {
+        axios.delete(`/api/comment/c/${id}`)
+        .then((res) => setComments(comments => comments.filter(com => com._id !== id)))
+        .catch(error => console.log(error))
+    }
+
+    // Toggle comment like
+    const toggleCommentLike = (commentId) => {
+        axios.post(`/api/like/c/${commentId}`)
+            .then((res) => setComments(
+                comments => comments.map(comment =>
+                    comment._id === commentId ? {
+                        ...comment,
+                        isLiked: !comment.isLiked,
+                        likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
+                    } : comment
+                )
+            ))
+            .catch(error => console.log(error));
+    }
+
     if (loading) return <Loading />
 
     return (
-        <div>
-            <div className="h-[580px] text-white flex max-lg:flex-col mx-14 max-lg:items-center">
+        <div className="flex flex-col mx-14 max-w-screen-2xl">
+            <div className=" text-white flex flex-col xl:flex-row max-xl:items-start">
                 {/* Video Player Section */}
-                <div className="w-[70%] h-[586px] max-lg:w-full flex mt-5 justify-center items-center rounded-lg bg-black">
-                    <video className="w-[1400px] h-auto max-h-full object-contain rounded-lg" controls>
+                <div className="w-[70%] max-h-[580px] max-xl:w-full flex mt-5 justify-center items-center rounded-lg bg-black">
+                    <video
+                        className="w-[1400px] h-auto max-h-full object-contain rounded-lg"
+                        controls
+                        controlsList="nodownload"
+                        poster={video.thumbnail ? video.thumbnail : img}
+                        autoPlay muted
+                        onError={e => e.target.poster = img}
+                    >
                         <source src={video.videoFile} type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
                 </div>
 
                 {/* Video Details Section */}
-                <div className="lg:w-[30%] p-4 flex flex-col justify-between">
+                <div className="xl:w-[30%] w-full p-4 flex flex-col">
                     <div>
                         <h1 className="text-2xl font-semibold mb-4 lg:line-clamp-3">
                             {video.title}
@@ -81,7 +143,7 @@ function VideoPage() {
                                 <img
                                     src={video.owner.avatar ? video.owner.avatar : profile}
                                     alt="Channel Logo"
-                                    className="h-12 w-12 rounded-full mr-4"
+                                    className="h-12 w-12 object-cover rounded-full mr-4"
                                 />
                                 <div>
                                     <p className="text-white">{video.owner.fullname}</p>
@@ -102,7 +164,6 @@ function VideoPage() {
                                 }
                             </div>
                         </div>
-
 
                         <div className='flex flex-row items-center gap-x-8  w-full text-gray-400'>
                             <span className="inline-flex items-center mr-2 cursor-pointer" title='Likes' onClick={toggleVideoLike}>
@@ -141,6 +202,67 @@ function VideoPage() {
 
                         <p className="mt-4 line-clamp-6 text-gray-400 mb-4" title='video.description'>{video.description}</p>
                     </div>
+                </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className='flex flex-col overflow-auto mt-4 ps-3'>
+                <h1 className='text-xl font-semibold'>{comments.length} Comments</h1>
+
+
+                <div name="ADD-COMMENT" className='flex items-start mt-4 w-full'>
+                    <img
+                        src={currentUser.avatar}
+                        alt={`${currentUser.name} avatar`}
+                        onError={e => e.target.src = img}
+                        className="h-10 w-10 rounded-full object-cover mr-3"
+                    />
+
+                    <textarea
+                        className="mb-4 w-full p-2 me-4 bg-gray-900 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
+                        rows="2"
+                        placeholder="Write your comment..."
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                    />
+                </div>
+                <div className='flex justify-end space-x-4 mr-2 mb-4 text-slate-400'>
+                    <button
+                        onClick={() => setContent("")}
+                        className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={addComment}
+                        className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
+                    >
+                        Comment
+                    </button>
+                </div>
+
+                <div className='flex flex-col'>
+                    {
+                        comments.length ? (
+                            comments.map(comment => (
+                                <Comment
+                                    key={comment._id}
+                                    id={comment._id}
+                                    content={comment.content}
+                                    updatedAt={parseDate(comment.updatedAt)}
+                                    likes={comment.likes}
+                                    isLiked={comment.isLiked}
+                                    fullname={comment.owner.fullname}
+                                    username={comment.owner.username}
+                                    avatar={comment.owner.avatar}
+                                    toggleLike={toggleCommentLike}
+                                    deleteComment={deleteComment}
+                                />
+                            ))
+                        ) : (
+                            null
+                        )
+                    }
                 </div>
             </div>
         </div>

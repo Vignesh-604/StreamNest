@@ -30,11 +30,13 @@ export default function EditVideo() {
 
     useEffect(() => {
         if (editMode) {
-            axios.get(`/api/video/v/${videoId}`)
+            axios.get(`/api/video/details/${videoId}`)
                 .then((res) => {
-                    const videoDetails = res.data.data[0];
+                    const videoDetails = res.data.data;
+                    console.log(videoDetails);
+                    
                     // Uncomment the line below if you need to ensure the user is the owner of the video
-                    if (videoDetails.owner.username !== user.username) navigate(-1);
+                    if (videoDetails.owner!== user._id) navigate(-1);
 
                     setVideo(videoDetails);
                     setContent({
@@ -106,7 +108,7 @@ export default function EditVideo() {
                                 src={thumbnail || img}
                                 alt="Thumbnail"
                                 onError={e => e.target.src = img}
-                                className="h-56 rounded-lg border border-gray-600 px-3 py-1 object-cover w-full my-auto"
+                                className="h-40 rounded-lg border border-gray-600 p-2 object-cover w-72 my-auto"
                             />
                             <label className="absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded-md cursor-pointer">
                                 New
@@ -120,7 +122,7 @@ export default function EditVideo() {
                         </div>
 
                         <div className="items-center py-4 w-full max-w-lg lg:w-[350px] space-y-2">
-                            <input
+                            <textarea
                                 className="mb-4 w-full text-2xl p-2 bg-gray-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
                                 value={content.title}
                                 onChange={(e) => setContent({ ...content, title: e.target.value })}

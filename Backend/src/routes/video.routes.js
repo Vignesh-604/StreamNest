@@ -3,6 +3,7 @@ import {
     publishVideo,
     updateVideo,
     deleteVideo,
+    getEditDetails,
     getVideoById,
     getAllVideos,
     togglePublishStatus
@@ -24,6 +25,8 @@ router.route("/new").post(
 
 router.route("/v/:videoId").patch(upload.single("thumbnail"), updateVideo)
 .get(getVideoById).delete(deleteVideo)
+
+router.route("/details/:videoId").get(getEditDetails)
 
 router.route("/").get(getAllVideos)
 

@@ -77,6 +77,17 @@ const deleteVideo = asyncHandler(async (req, res) => {
     res.status(203).json(new ApiResponse(201, { deleteVidFromCloud, deleteThumbnailFromCloud }, "video deleted successfully"))
 })
 
+const getEditDetails = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+    if (!isValidObjectId(videoId)) throw new ApiError(400, "Video id required")
+
+    const details = await Video.findById(videoId).select("title description thumbnail owner")
+    if (!details) throw new ApiError(501, "Couldn't get details")
+
+    return res.status(200).json(new ApiResponse(200, details, "Details fetched"))
+
+})
+
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     if (!isValidObjectId(videoId)) throw new ApiError(400, "Video id required")
@@ -275,6 +286,7 @@ export {
     publishVideo,
     updateVideo,
     deleteVideo,
+    getEditDetails,
     getVideoById,
     getAllVideos,
     togglePublishStatus
