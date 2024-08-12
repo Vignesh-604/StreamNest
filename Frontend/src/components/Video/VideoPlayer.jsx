@@ -7,16 +7,18 @@ import Loading from '../AppComponents/Loading';
 import { parseDate } from '../utility';
 import { CalendarArrowDown, Eye, List, ThumbsUp } from 'lucide-react';
 import Comment from '../Post/Comment';
+import { XMarkIcon } from "@heroicons/react/16/solid";
 
 function VideoPage() {
     const currentUser = useOutletContext();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-
     const { videoId } = useParams();
     const [video, setVideo] = useState(null);
     const [comments, setComments] = useState([]);
-    const [content, setContent] = useState()
+    const [content, setContent] = useState("")
+    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+    const [playlists, setPlaylists] = useState([]); // State to store playlists
 
     // Load Video and comments
     useEffect(() => {
@@ -33,19 +35,18 @@ function VideoPage() {
             .catch(error => console.log(error.response.data));
 
         axios.post(`/api/watchHistory/track/${videoId}`)
-        .catch(error => console.log(error.response.data));
+            .catch(error => console.log(error.response.data));
 
     }, [videoId])
-
 
     // Subscribe/ unsubscribe
     const toggleSub = () => {
         axios.post(`/api/subscription/channel/${video.owner._id}`)
             .then(res => {
-                setVideo({ 
-                    ...video, 
-                    isSubscribed: !video.isSubscribed, 
-                    subscribers: res.data.data == null ? --video.subscribers : ++video.subscribers 
+                setVideo({
+                    ...video,
+                    isSubscribed: !video.isSubscribed,
+                    subscribers: res.data.data == null ? --video.subscribers : ++video.subscribers
                 })
             })
             .catch(e => console.log(e.response.data))
@@ -71,7 +72,7 @@ function VideoPage() {
             axios.post(`/api/comment/video/${videoId}`, { content })
                 .then((res) => {
                     setComments([...comments, {
-                        ...res.data.data, 
+                        ...res.data.data,
                         likes: 0,
                         owner: {
                             username: currentUser.username,
@@ -88,8 +89,8 @@ function VideoPage() {
     // Delete comment
     const deleteComment = (id) => {
         axios.delete(`/api/comment/c/${id}`)
-        .then((res) => setComments(comments => comments.filter(com => com._id !== id)))
-        .catch(error => console.log(error))
+            .then((res) => setComments(comments => comments.filter(com => com._id !== id)))
+            .catch(error => console.log(error))
     }
 
     // Toggle comment like
@@ -105,9 +106,31 @@ function VideoPage() {
                 )
             ))
             .catch(error => console.log(error));
+    };
+
+    // Toggle modal visibility
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+        if (!isModalOpen) {
+            // Fetch playlists only when opening the modal
+            axios.get(`/api/playlist/user/${currentUser._id}`)
+                .then((res) => setPlaylists(res.data.data))
+                .catch(error => console.log(error.response.data));
+        }
     }
 
-    if (loading) return <Loading />
+
+    // Add video to selected playlist
+    const addToPlaylist = (playlistId) => {
+        axios.post(`/api/playlist/video/${videoId}/${playlistId}`,)
+            .then(res => {
+                console.log('Video added to playlist');
+                setIsModalOpen(false);  // Close the modal after adding
+            })
+            .catch(error => console.log(error.response.data));
+    };
+
+    if (loading) return <Loading />;
 
     return (
         <div className="flex flex-col mx-14 max-w-screen-2xl">
@@ -190,7 +213,11 @@ function VideoPage() {
                                 />
                                 {parseDate(video.createdAt)}
                             </span>
-                            <span className="inline-flex items-center mr-2 cursor-pointer" title='Add to playlist'>
+                            <span
+                                className="inline-flex items-center mr-2 cursor-pointer"
+                                title='Add to playlist'
+                                onClick={toggleModal} // Open the modal when clicked
+                            >
                                 <List
                                     strokeWidth={3}
                                     absoluteStrokeWidth
@@ -208,7 +235,6 @@ function VideoPage() {
             {/* Comments Section */}
             <div className='flex flex-col overflow-auto mt-4 ps-3'>
                 <h1 className='text-xl font-semibold'>{comments.length} Comments</h1>
-
 
                 <div name="ADD-COMMENT" className='flex items-start mt-4 w-full'>
                     <img
@@ -235,7 +261,6 @@ function VideoPage() {
                     </button>
                     <button
                         onClick={addComment}
-                        className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
                     >
                         Comment
                     </button>
@@ -265,6 +290,37 @@ function VideoPage() {
                     }
                 </div>
             </div>
+
+            {/* Modal for selecting a playlist */}
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-gray-900 text-white rounded-lg p-6 w-1/3 max-[800px]:w-full">
+                        <div className="flex justify-between items-center">
+
+                            <h2 className="text-xl font-semibold mb-4">Select a Playlist</h2>
+                            <button
+                                className=" px-4 py-2 text-white rounded-lg"
+                                onClick={toggleModal}
+                            >
+                                <XMarkIcon className="h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
+
+                            </button>
+
+                        </div>
+                        <ul className="rounded-lg shadow-inner shadow-slate-800">
+                            {playlists.map(playlist => (
+                                <li
+                                    key={playlist._id}
+                                    className="p-2 hover:bg-gray-700 rounded cursor-pointer"
+                                    onClick={() => addToPlaylist(playlist._id)}
+                                >
+                                    {playlist.name}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
