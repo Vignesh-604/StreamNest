@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from "date-fns"
+import Swal from 'sweetalert2';
 
 export function parseTime(seconds) {
     seconds = Math.round(seconds)
@@ -41,4 +42,18 @@ export function timeAgo(date) {
     return (formatDistanceToNow(date, { addSuffix: true }));
 }
 
-// timeAgo("2024-07-25T09:59:37.326Z")
+
+export function showCustomAlert(title, text) {
+    Swal.fire({
+        title,
+        // text,
+        timer: 800,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#4f46e5', // Button color
+        background: '#1a1a2e', // Background color of the modal
+        width: '400px', // Custom width
+        heightAuto: false, // Disable automatic height adjustment
+        color: "white"
+    });
+}

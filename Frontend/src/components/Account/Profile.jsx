@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { parseDate } from "../utility";
 import axios from "axios";
+import loader from "../assets/loader.gif"
 import { PencilLine, PencilOff, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
@@ -15,6 +16,7 @@ export default function Profile() {
     const [formData, setFormData] = useState({})
     const [avatarFile, setAvatarFile] = useState("")
     const [covImgFile, setCovImgFile] = useState("")
+    const avatarRef = useRef()
 
     useEffect(() => {
         axios.get("/api/users/current_user")
@@ -67,6 +69,7 @@ export default function Profile() {
 
         // Check and update avatar
         if (avatarFile) {
+            avatarRef.current.src = loader
             const form = new FormData()
             form.append("avatar", avatarFile)
 
@@ -114,8 +117,9 @@ export default function Profile() {
                 <div className="flex space-x-5 px-5 lg:w-[800px]">
                     <img
                         src={user.avatar}
+                        ref = {avatarRef}
                         alt=""
-                        className="h-56 w-80 rounded-full mb-4 md:mt-4 border object-cover"
+                        className="h-56 min-w-56 rounded-full mb-4 md:mt-4 border object-cover"
                     />
                     <div className="items-center py-4 w-full">
                         <h1 className="text-4xl font-semibold m-2">
@@ -224,7 +228,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-gray-400">Avatar URL</label>
+                                    <label className="block text-gray-400">Cover Image URL</label>
                                     <input
                                         type="file"
                                         onChange={e => setCovImgFile(e.target.files[0])}
