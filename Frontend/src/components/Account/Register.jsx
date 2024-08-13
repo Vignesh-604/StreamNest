@@ -132,7 +132,7 @@ export default function Register() {
                                     </div>
                                 </div>
 
-                                <div id='password'>
+                                <div id='PASSWORD'>
                                     <div className="flex items-center justify-between">
                                         <label htmlFor="password" className="text-base font-medium text-gray-300">
                                             {' '}
@@ -155,7 +155,7 @@ export default function Register() {
                             {/* Row 3 */}
                             <div className='flex w-fit flex-row max-sm:space-x-5 sm:space-x-20'>
 
-                                <div id='FULLNAME'>
+                                <div id='AVATAR'>
                                     <div className="flex items-center justify-between">
                                         <label htmlFor="avatar" className="text-base font-medium text-gray-300">
                                             {' '}
@@ -171,7 +171,7 @@ export default function Register() {
                                     </div>
                                 </div>
 
-                                <div id='USERNAME'>
+                                <div id='COVER-IMAGE'>
                                     <div className="flex items-center justify-between">
                                         <label htmlFor="Cover Image" className="text-base font-medium text-gray-300">
                                             {' '}
