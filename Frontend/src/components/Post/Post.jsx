@@ -8,6 +8,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
 import { useOutletContext, useParams, useNavigate, Link } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
+import { showCustomAlert } from "../utility";
 
 export default function PostItem() {
     const { postId } = useParams()
@@ -64,7 +65,12 @@ export default function PostItem() {
     const deletePost = () => {
 
         axios.delete(`/api/post/${postId}`)
-            .then((res) => navigate(-1))
+            .then((res) => {
+                navigate(-1)
+                setTimeout(() => {
+                    showCustomAlert('Post Deleted')
+                }, 500)
+            })
             .catch(error => console.log(error))
     }
 

@@ -44,7 +44,7 @@ const updatePlaylist = asyncHandler( async (req, res) => {
         },
         { new: true}
     )
-    res.status(202).json( new ApiResponse(202, updatePlaylist, "Playlist updated"))
+    res.status(200).json( new ApiResponse(200, updatedPlaylist, "Playlist updated"))
 })
 
 const addVideo = asyncHandler( async (req, res) => {
@@ -55,7 +55,7 @@ const addVideo = asyncHandler( async (req, res) => {
     playlist.videos.push(new mongoose.Types.ObjectId(videoId))
     const updatedPlaylist= await playlist.save({ validateBeforeSave: false })
 
-    res.status(201).json( new ApiResponse(201, updatePlaylist, "Added video"))
+    res.status(200).json( new ApiResponse(200, updatedPlaylist, "Added video"))
 })
 
 const removeVideo = asyncHandler( async (req, res) => {

@@ -47,7 +47,7 @@ export function showCustomAlert(title, text) {
     Swal.fire({
         title,
         // text,
-        timer: 800,
+        timer: 1000,
         icon: 'success',
         confirmButtonText: 'OK',
         confirmButtonColor: '#4f46e5', // Button color

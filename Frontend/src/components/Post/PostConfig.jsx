@@ -5,6 +5,7 @@ import { PenBoxIcon, Plus, X } from 'lucide-react';
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { parseDate } from '../utility';
 import Loading from '../AppComponents/Loading';
+import { showCustomAlert } from "../utility";
 
 export default function PostConfig() {
 
@@ -58,7 +59,9 @@ export default function PostConfig() {
             if (content !== currContent) {
                 axios.post(`/api/post/${postId}`, { content })
                     .then(res => {
-                        console.log(res);
+                        setTimeout(() => {
+                            showCustomAlert("Post edited");
+                        }, 500);
                         navigate(-1);
                     })
                     .catch(error => console.log(error));
@@ -71,7 +74,9 @@ export default function PostConfig() {
             if (!content || content.trim()) {
                 axios.post(`/api/post/new`, { content })
                     .then(res => {
-                        console.log(res);
+                        setTimeout(() => {
+                            showCustomAlert("Post created");
+                        }, 500);
                         navigate(-1);
                     })
                     .catch(error => console.log(error.response.data));

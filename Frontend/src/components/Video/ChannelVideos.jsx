@@ -7,6 +7,8 @@ import { PencilIcon, TrashIcon } from '@heroicons/react/16/solid'
 import { useOutletContext, useNavigate, Link } from "react-router-dom";
 import { EllipsisVertical, Plus } from "lucide-react";
 import Loading from "../AppComponents/Loading";
+import { showCustomAlert } from "../utility";
+
 
 export default function ChannelVideos({ owner }) {
     const navigate = useNavigate()
@@ -26,10 +28,14 @@ export default function ChannelVideos({ owner }) {
     }, []);
     
     const deleteVideo = (vidId) => {
-
-        axios.delete(`/api/video/${vidId}`)
-            .then((res) => console.log(res.data.data))  // doesn't log anything because page gets re-rendered
-            .catch(error => console.log(error))
+        axios.delete(`/api/video/v/${vidId}`)
+            .then((res) => {
+                setVideos(videos => videos.filter(vid => vid._id !== vidId))
+                setTimeout(() => {
+                    showCustomAlert('Video Deleted')
+                }, 500)
+            })
+            .catch(error => console.log(error.response.data))
     }
 
     if (loading) return <Loading />;
@@ -86,7 +92,7 @@ export default function ChannelVideos({ owner }) {
                                                             </Link>
                                                         </MenuItem>
                                                         <MenuItem>
-                                                            <Link reloadDocument
+                                                            <Link 
                                                                 className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
                                                                 onClick={() => deleteVideo(vid._id)}
                                                             >

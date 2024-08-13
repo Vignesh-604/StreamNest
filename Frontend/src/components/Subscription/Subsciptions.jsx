@@ -35,8 +35,6 @@ export default function Subscriptions() {
     return (
         <div className="flex flex-col items-center px-4 ">
             <h1 className="font-bold text-start text-5xl mt-7 mb-10">Subscriptions</h1>
-            <hr className="w-full" />
-
 
             {
                 subs.length !== 0 ? (

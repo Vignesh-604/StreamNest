@@ -3,6 +3,7 @@ import img from "../assets/thumbnail.jpg";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useOutletContext, useLocation } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
+import { showCustomAlert } from "../utility";
 
 export default function EditVideo() {
 
@@ -87,9 +88,9 @@ export default function EditVideo() {
             .then((res) => {
                 navigate(-1)
                 setTimeout(() => {
-                    alert("Video details updated successfully!");
-                }, 200);
-
+                    showCustomAlert("Video details updated successfully!");
+                }, 500);
+                
             })
             .catch(error => console.log(error.response.data));
         }

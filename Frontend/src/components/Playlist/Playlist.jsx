@@ -6,6 +6,7 @@ import VideoItem from "../Video/VideoItem";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { showCustomAlert } from "../utility";
 
 export default function Playlist() {
 
@@ -23,6 +24,7 @@ export default function Playlist() {
     const [newDescription, setNewDescription] = useState("");
 
     useEffect(() => {
+
         axios.get(`/api/playlist/${id}`)
             .then(res => {
                 const plst = res.data.data;
@@ -38,7 +40,7 @@ export default function Playlist() {
     const removeVideo = (vidId) => {
         axios.delete(`/api/playlist/video/${vidId}/${id}`)
             .then(res => {
-                setPlaylist({...playlist, videos: playlist.videos.filter(vid => vid._id != vidId)})
+                setPlaylist({ ...playlist, videos: playlist.videos.filter(vid => vid._id != vidId) })
             })
             .catch(e => console.log(e.response.data));
     };
@@ -47,14 +49,14 @@ export default function Playlist() {
         axios.delete(`/api/playlist/${playlist._id}`)
         navigate(-1)
         setTimeout(() => {
-            alert("Playlist deleted");
-        }, 200);
+            showCustomAlert('Playlist Deleted');
+        }, 500);
     };
 
     const saveChanges = () => {
         axios.post(`/api/playlist/${playlist._id}`, { name: newTitle, description: newDescription })
             .then(res => {
-                setPlaylist({...playlist, title: res.data.data.title, description: res.data.data.description});
+                setPlaylist({ ...playlist, title: res.data.data.name, description: res.data.data.description });
                 setEditMode(false);
             })
             .catch(e => console.log(e.response.data));
@@ -89,7 +91,7 @@ export default function Playlist() {
                                                 value={newDescription}
                                                 rows={4}
                                                 onChange={(e) => setNewDescription(e.target.value)}
-                                                className="w-full text-xl my-2 p-2 bg-gray-900 text-white rounded-lg line-clamp-3"
+                                                className="w-full text-xl my-2 p-2 bg-gray-900 text-white rounded-lg line-clamp-3 resize-none"
                                             />
                                         </>
                                     ) : (

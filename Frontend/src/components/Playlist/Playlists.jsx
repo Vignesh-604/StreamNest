@@ -55,7 +55,6 @@ export default function Playlists({ channelId = "" }) {
     return (
         <div className="flex flex-col px-4 min-w-[36rem]">
             <h1 className="font-bold text-start text-5xl mt-7 mb-10">Playlists</h1>
-            <hr className="w-full"/>
 
             {/* Create new playlist - only if playlist belongs to current user */}
             {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReactLoading from 'react-loading';
+import { showCustomAlert } from "../utility";
 
 export default function NewVideo() {
     const [title, setTitle] = useState('');
@@ -35,8 +36,9 @@ export default function NewVideo() {
 
         axios.post('/api/video/new', formData)
             .then((res) => {
-
-                setTimeout(() => {alert('Video uploaded successfully!')}, 500)
+                setTimeout(() => {
+                    showCustomAlert('Video uploaded')
+                }, 500)
                 navigate(-1);
             })
             .catch(error => {
@@ -47,7 +49,7 @@ export default function NewVideo() {
 
     if (uploading) return (
         <div className="flex flex-col items-center mt-5 space-y-4">
-            <ReactLoading type={'spinningBubbles'} height={120} width={120}/>
+            <ReactLoading type={'spinningBubbles'} height={120} width={120} />
             <h1 className='text-3xl'>Uploading Video...</h1>
         </div>
     )
@@ -76,7 +78,7 @@ export default function NewVideo() {
                             required
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full p-2 rounded-lg bg-gray-700 text-white"
+                            className="w-full p-2 rounded-lg bg-gray-700 text-white resize-none"
                             rows="6"
                             placeholder="Enter video description"
                         />
@@ -116,17 +118,17 @@ export default function NewVideo() {
             </div>
 
             {/* Upload and Cancel Buttons */}
-            <div className="flex space-x-4 mt-6">
-                <button type='submit'
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-                >
-                    Upload Video
-                </button>
+            <div className="flex space-x-4 mt-6 justify-end">
                 <button
                     onClick={() => navigate(-1)}
                     className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
                 >
                     Cancel
+                </button>
+                <button type='submit'
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+                >
+                    Upload Video
                 </button>
             </div>
         </form>
