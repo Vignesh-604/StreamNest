@@ -87,7 +87,9 @@ export default function Channel() {
                             <h2 className="text-lg text-gray-400 m-2">
                                 Channel created at: {parseDate(user.createdAt)}
                             </h2>
-                            {userStats.totalVideos == 0 ? (
+
+                            {
+                            (userStats.totalVideos == 0 && userStats.totalPosts == 0) && (user._id !== currentUser._id) ? (
                                 <div className="flex ml-2 w-fit font-semibold border rounded-lg p-2 bg-slate-300 text-black">
                                     User does not have a channel
                                 </div>
@@ -119,7 +121,7 @@ export default function Channel() {
                         </div>
                     </div>
                 </div>
-                <div className={userStats.totalVideos != 0 ? "flex-col max-lg:mt-4 w-[650px]" : "hidden"}>
+                <div className={(userStats.totalVideos == 0) && (user._id !== currentUser._id) ? "hidden" : "flex-col max-lg:mt-4 w-[650px]"}>
                     <div className=" text-white p-6 rounded-lg">
                         <h2 className="text-xl font-semibold mb-4">Your details</h2>
                         <div className="grid grid-cols-2 gap-6">

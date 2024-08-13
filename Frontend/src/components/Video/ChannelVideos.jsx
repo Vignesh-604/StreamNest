@@ -54,7 +54,7 @@ export default function ChannelVideos({ owner }) {
                 }
 
             </div>
-            <div className="grid gap-2 lg:grid-cols-2">
+            <div className={videos.length ? "grid gap-2 lg:grid-cols-2" : "flex justify-center"}>
                 {
                     videos.length ?
                         (
@@ -110,7 +110,7 @@ export default function ChannelVideos({ owner }) {
                                 </div>
                             ))
                         ) : (
-                            <h1 className="flex place-content-center font-bold text-5xl my-7">Channel has no Videos</h1>
+                            <h1 className="flex justify-center font-bold text-3xl my-7">Channel has no Videos</h1>
                         )
                 }
             </div>

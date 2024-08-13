@@ -28,7 +28,7 @@ export default function Subscribers({ channelId = "" }) {
         <div className="bg-gray-900 text-white px-4">
             <h1 className="font-bold text-start text-5xl mt-7 mb-10">Subscribers</h1>
             <div className="container mx-auto px-6">
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-6">
+                <div className={subscribers.length !== 0 ? "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-6" : "flex justify-center"}>
                     {
                         subscribers.length !== 0 ? (
                             subscribers.map(sub => (
