@@ -41,7 +41,7 @@ export default function SignIn() {
 
                 navigate("/")   // Redirect to home page
             })
-            .catch(error => setErrorMessage(error.response.data))
+            .catch(error => console.log(error))
     };
 
     return (
