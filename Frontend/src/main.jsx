@@ -19,16 +19,19 @@ import EditVideo from './components/Video/EditVideo.jsx'
 import NewVideo from './components/Video/NewVideo.jsx'
 import WatchHistory from './components/Video/WatchHistory.jsx'
 import VideoPlayer from './components/Video/VideoPlayer.jsx'
+import LandingPage from './components/Account/LandingPage.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
         <Route path='/' element={<App />}>
 
-            <Route index element={<Home />} />
+            <Route index element={<LandingPage />} />
+            <Route path='/home' element={<Home />} />
             <Route path='/profile' element={<Profile />} />
             
-            <Route path='/signin' element={<SignIn />} />
-            <Route path='/register' element={<Register />} />
+            {/* <Route path='/signin' element={<SignIn />} />
+            <Route path='/register' element={<Register />} /> */}
+            {/* <Route path='/landing' element={<LandingPage />} /> */}
 
             <Route path='/channel' element={<Channel />} />
             <Route path='/channel/:channelId' element={<Channel />} />

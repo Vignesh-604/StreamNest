@@ -29,7 +29,7 @@ export default function Navbar() {
 
     const logout = () => {
         axios.post("/api/users/logout")
-            .then(res => navigate("/signin"))
+            .then(res => navigate("/"))
             .catch(e => console.log(e))
     }
 
