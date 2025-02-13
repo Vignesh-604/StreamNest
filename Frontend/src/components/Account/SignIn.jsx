@@ -43,7 +43,7 @@ export default function SignIn({ onSwitchToRegister }) {
                 Cookies.set('user', JSON.stringify(userDetails));
                 navigate('/home');
             })
-            .catch(error => setErrorMessage(error.response?.data?.message || 'An error occurred'));
+            .catch(error => setErrorMessage(error.response?.data?.data || 'An error occurred'));
     };
 
     return (

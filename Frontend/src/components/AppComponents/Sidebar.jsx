@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useParams, useNavigate, Outlet } from 'react-router-dom';
-import { Menu, X, Home, UserCircle, ListVideo, ThumbsUp, Clock, CreditCard, UserSquare, LogOut, MonitorPlay, UserRoundCheck, NotepadText } from 'lucide-react';
+import { Menu, X, Home, UserCircle, ListVideo, ThumbsUp, Clock, Users, LogOut, MonitorPlay, UserRoundCheck, NotepadText } from 'lucide-react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import logo from "../assets/Streamnest.png";
@@ -79,7 +79,7 @@ export default function Sidebar() {
                                         }`
                                     }
                                 >
-                                    <CreditCard className="h-5 w-5 mr-3" />
+                                    <UserRoundCheck className="h-5 w-5 mr-3" />
                                     Subscriptions
                                 </NavLink>
                                 <NavLink
@@ -108,16 +108,6 @@ export default function Sidebar() {
                                 <label className="px-3 text-xs font-semibold uppercase text-gray-400">
                                     My Channel
                                 </label>
-                                <NavLink
-                                    to="/profile"
-                                    className={({ isActive }) =>
-                                        `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
-                                        }`
-                                    }
-                                >
-                                    <UserCircle className="h-5 w-5 mr-3" />
-                                    Profile
-                                </NavLink>
                                 <NavLink
                                     to="/playlist"
                                     className={({ isActive }) =>
@@ -155,7 +145,7 @@ export default function Sidebar() {
                                         }`
                                     }
                                 >
-                                    <UserRoundCheck className="h-5 w-5 mr-3" />
+                                    <Users className="h-5 w-5 mr-3" />
                                     Subscribers
                                 </NavLink>
                             </div>

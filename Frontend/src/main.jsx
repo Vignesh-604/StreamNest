@@ -23,6 +23,7 @@ import LandingPage from './components/Account/LandingPage.jsx'
 import Subscribers from './components/Subscription/Subscribers.jsx'
 import PostList from './components/Post/PostList.jsx'
 import ChannelVideos from './components/Video/ChannelVideos.jsx'
+import UserDetails from './components/Account/UserDetails.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -36,8 +37,8 @@ const router = createBrowserRouter(         // For web applications
             <Route path='/register' element={<Register />} /> */}
             {/* <Route path='/landing' element={<LandingPage />} /> */}
 
-            <Route path='/channel' element={<Channel />} />
-            <Route path='/channel/:channelId' element={<Channel />} />
+            <Route path='/channel' element={<UserDetails />} />
+            <Route path='/channel/:channelId' element={<UserDetails />} />
 
             <Route path='/videos' element={<ChannelVideos/>} />
             <Route path='/video/edit/:videoId' element={<EditVideo />} />
