@@ -20,6 +20,9 @@ import NewVideo from './components/Video/NewVideo.jsx'
 import WatchHistory from './components/Video/WatchHistory.jsx'
 import VideoPlayer from './components/Video/VideoPlayer.jsx'
 import LandingPage from './components/Account/LandingPage.jsx'
+import Subscribers from './components/Subscription/Subscribers.jsx'
+import PostList from './components/Post/PostList.jsx'
+import ChannelVideos from './components/Video/ChannelVideos.jsx'
 
 const router = createBrowserRouter(         // For web applications
     createRoutesFromElements(
@@ -36,13 +39,16 @@ const router = createBrowserRouter(         // For web applications
             <Route path='/channel' element={<Channel />} />
             <Route path='/channel/:channelId' element={<Channel />} />
 
+            <Route path='/videos' element={<ChannelVideos/>} />
             <Route path='/video/edit/:videoId' element={<EditVideo />} />
             <Route path='/video/new' element={<NewVideo />} />
             <Route path='/video/watch/:videoId' element={<VideoPlayer />} />
             
             <Route path='/liked' element={<LikedVideos />} />
             <Route path='/subscriptions' element={<Subscriptions />} />
+            <Route path='/subscribers' element={<Subscribers />} />
             <Route path='/history' element={<WatchHistory />} />
+            <Route path='/posts' element={<PostList />} />
 
             <Route path='/playlist' element={<Playlists />} />
             <Route path='/playlist/:id' element={<Playlist />} />

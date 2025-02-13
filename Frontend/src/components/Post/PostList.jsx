@@ -6,7 +6,7 @@ import { parseDate } from '../utility';
 import { useOutletContext, useNavigate, Link } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 
-export default function PostList({ channelId = "", owner }) {
+export default function PostList({ channelId = ""}) {
 
     const currentUser = useOutletContext()
     const navigate = useNavigate()
@@ -67,14 +67,14 @@ export default function PostList({ channelId = "", owner }) {
                                 >
                                     <div className="flex items-center mb-4">
                                         <img
-                                            src={owner.avatar}
-                                            alt={`${owner.fullname} avatar`}
+                                            src={currentUser.avatar}
+                                            alt={`${currentUser.fullname} avatar`}
                                             onError={e => e.target.src = img}
                                             className="h-10 w-10 rounded-full object-cover mr-3"
                                         />
                                         <div>
-                                            <span className="font-semibold">{owner.fullname}</span>
-                                            <span className="font-normal ms-2 text-gray-400">@{owner.username}</span>
+                                            <span className="font-semibold">{currentUser.fullname}</span>
+                                            <span className="font-normal ms-2 text-gray-400">@{currentUser.username}</span>
 
                                             <div className="text-sm text-gray-400">{parseDate(post.updatedAt)}</div>
                                         </div>

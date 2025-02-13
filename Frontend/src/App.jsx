@@ -4,6 +4,7 @@ import Cookies from "js-cookie"
 import { Outlet } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import Sidebar from './components/AppComponents/Sidebar'
 
 function App() {
   const navigate = useNavigate()
@@ -18,11 +19,11 @@ function App() {
   if (!user) return <Outlet />
 
   return (
-    <div className='flex justify-center'>
-      <Navbar />
-      <div className='mt-36'>
+    <div className=''>
+      <Sidebar />
+      {/* <div className='mt-36'>
         <Outlet context={JSON.parse(Cookies.get("user"))} />
-      </div>
+      </div> */}
     </div>
   )
 }

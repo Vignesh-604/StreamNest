@@ -37,7 +37,7 @@ export default function Home() {
     if (loading) return <Loading />;
 
     return (
-        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-start mb-10">
+        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-start p-4">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-screen-xl">
                 {videos.map(video => (
                     <div 

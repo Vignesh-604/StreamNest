@@ -19,7 +19,7 @@ export default function ChannelVideos({ owner }) {
     const [videos, setVideos] = useState([]);
 
     useEffect(() => {
-        axios.get(`/api/dashboard/videos/${owner._id}`)
+        axios.get(`/api/dashboard/videos/${currentUser._id}`)
             .then((res) =>{
                  setVideos(res.data.data)
                  setLoading(false);                 // Set loading to false after data is fetched
@@ -45,7 +45,7 @@ export default function ChannelVideos({ owner }) {
             <div className='flex justify-between'>
                 <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Videos</h1>
                 {
-                    owner._id === currentUser._id ? (
+                    currentUser._id === currentUser._id ? (
                         <Link className="font-bold text-start text-lg my-auto me-10 inline-flex" to={"/video/new"}>
                             New Video
                             <Plus strokeWidth={2} absoluteStrokeWidth className="ms-2 my-auto" />
@@ -64,14 +64,14 @@ export default function ChannelVideos({ owner }) {
                                         id={vid._id}
                                         title={vid.title}
                                         description={vid.description}
-                                        owner={owner}
+                                        owner={currentUser}
                                         views={vid.views}
                                         thumbnail={vid.thumbnail}
                                         duration={parseTime(vid.duration)}
                                     />
                                     <div className="flex items-start mt-10">
                                         {
-                                            owner._id === currentUser._id ? (
+                                            currentUser._id === currentUser._id ? (
                                                 <Menu>
                                                     <MenuButton className="">
                                                         <EllipsisVertical />
