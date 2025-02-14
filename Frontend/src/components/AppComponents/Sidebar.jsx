@@ -42,7 +42,7 @@ export default function Sidebar() {
                     </div>
 
                     {/* User Profile Section */}
-                    <NavLink to={"/channel"} className="flex items-center space-x-3 px-5 py-1 mb-6 shrink-0 hover: rounded-lg -my-5">
+                    <NavLink to={"/channel"} className="flex items-center space-x-3 px-5 py-1 mb-6 shrink-0 rounded-lg -my-5 border border-purple-950/30 mx-6 p-6 cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20">
                         <img
                             src={user.avatar}
                             alt={user.username}

@@ -57,3 +57,22 @@ export function showCustomAlert(title, text) {
         color: "white"
     });
 }
+
+export function showConfirmAlert(title, text, onConfirm) {
+    Swal.fire({
+        title,
+        text,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        confirmButtonColor: "#e63946",
+        cancelButtonColor: "#4f46e5",
+        background: "#1a1a2e",
+        color: "white",
+    }).then((result) => {
+        if (result.isConfirmed && onConfirm) {
+            onConfirm();
+        }
+    });
+}

@@ -57,16 +57,16 @@ export default function UserDetails() {
     if (loading) return <Loading />;
 
     return (
-        <div className="min-h-screen bg-[#1a1b26] text-white">
+        <div className="min-h-screen bg-[#0a0a26]/40 text-white">
             <div className="container mx-auto px-4 py-8">
                 {/* Profile Header */}
                 <div className="bg-[#24273a] rounded-lg p-8 mb-8">
                     <div className="flex flex-col md:flex-row items-center gap-8">
-                        <img src={user.avatar} alt="Profile" className="w-32 h-32 rounded-full object-cover border-4 border-[#7c3aed]" />
+                        <img src={user.avatar} alt="Profile" className="w-40 h-40 rounded-full object-cover border-4 border-[#7c3aed]" />
                         <div className="flex-1">
-                            <h1 className="text-3xl font-bold mb-2">{user.fullname}</h1>
-                            <p className="text-gray-400 mb-2">@{user.username}</p>
-                            <p className="text-gray-400 mb-4">Created: {parseDate(user.createdAt)}</p>
+                            <h1 className="text-4xl font-extrabold ">{user.fullname}</h1>
+                            <p className="text-gray-400 font-bold text-lg ">@{user.username}</p>
+                            <p className="text-gray-400 mt-2 mb-4">Joined: {parseDate(user.createdAt)}</p>
 
                             <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-colors">
                                 <PencilLine className="w-4 h-4" />
