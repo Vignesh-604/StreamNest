@@ -29,14 +29,14 @@ export default function Subscribers({ channelId = "" }) {
             <div className="bg-[#24273a] rounded-lg p-8 mb-8">
                 <h1 className="font-extrabold text-start text-4xl mb-10">Your Subscribers</h1>
                 <div className="container mx-auto px-6">
-                    <div className={subscribers.length !== 0 ? "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-6" : "flex justify-center"}>
+                    <div className={subscribers.length !== 0 ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-6" : "flex justify-center"}>
                         {subscribers.length !== 0 ? (
                             subscribers.map(sub => (
                                 <NavLink
                                     key={sub._id}
                                     to={sub.subscriber._id !== currentUser._id ? `/channel/${sub.subscriber._id}` : "/channel"}
                                     reloadDocument
-                                    className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-950/40 bg-gray-900/50 transition-all duration-200 cursor-pointer hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20"
+                                    className="flex flex-col items-center p-4 card"
                                 >
                                     <img
                                         className="rounded-full h-24 w-24 object-cover mb-4 border-2 border-[#8A3FFC]"

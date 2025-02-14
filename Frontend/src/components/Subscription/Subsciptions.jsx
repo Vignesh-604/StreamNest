@@ -47,7 +47,7 @@ export default function Subscriptions() {
                     {subs.map(sub => (
                         <div key={sub._id}
                             onClick={() => navigate(sub.subscribedTo._id !== currentUser._id ? `/channel/${sub.subscribedTo._id}` : "/channel")}
-                            className="flex flex-row items-center w-full p-4 rounded-lg cursor-pointer hover:bg-gray-950/65 bg-gray-900/60 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20"
+                            className="flex flex-row items-center w-full p-4 card"
                         >
                             <img
                                 src={sub.subscribedTo.avatar}

@@ -27,7 +27,7 @@ export default function LikedVideos() {
                 axios.delete(`/api/likes/remove/${id}`)
                     .then(() => {
                         showCustomAlert("Removed!", "Video has been removed from your liked videos.");
-                        setLikedVideos(likedVideos.filter(vid => vid._id !== id));
+                        setVideos(videos.filter(vid => vid._id !== id));
                     })
                     .catch(error => console.log(error));
             }
@@ -46,7 +46,7 @@ export default function LikedVideos() {
                             <div className="grid gap-6 lg:grid-cols-2">
                                 {
                                     videos.map((vid) => (
-                                        <div key={vid._id} className="flex justify-between rounded-lg hover:bg-gray-950/65 bg-gray-900/50 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
+                                        <div key={vid._id} className="flex justify-between card">
                                             <VideoItem
                                                 id={vid.videos[0]?._id}
                                                 title={vid.videos[0]?.title}

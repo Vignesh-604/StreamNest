@@ -49,12 +49,15 @@ const router = createBrowserRouter(         // For web applications
             <Route path='/subscriptions' element={<Subscriptions />} />
             <Route path='/subscribers' element={<Subscribers />} />
             <Route path='/history' element={<WatchHistory />} />
-            <Route path='/posts' element={<PostList />} />
 
             <Route path='/playlist' element={<Playlists />} />
             <Route path='/playlist/:id' element={<Playlist />} />
 
-            <Route path='/post/:postId' element={<Post />} />
+            <Route path='/posts' element={<PostList />} />
+            <Route path='/posts/:channelId' element={<PostList />} />
+            <Route path='/posts/:channelId/p/:postId' element={<PostList />} />
+
+            {/* <Route path='/post/:postId' element={<Post />} /> */}
             <Route path='/post/new' element={<PostConfig />} />
             <Route path='/post/edit/:postId' element={<PostConfig />} />
             
@@ -66,3 +69,9 @@ const router = createBrowserRouter(         // For web applications
 ReactDOM.createRoot(document.getElementById('root')).render(
     <RouterProvider router={router} />
 )
+
+/*
+           <Route path='/posts' element={<PostList />} />
+            <Route path='/posts/:username' element={<PostList />} />
+            <Route path='/posts/:username/p/:postId' element={<Post />} />
+*/

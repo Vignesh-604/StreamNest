@@ -1,4 +1,9 @@
 @import "tailwindcss";
+
+.card {
+  @apply hover:bg-gray-950/65 bg-gray-900/50 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 rounded-lg cursor-pointer;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -21,3 +26,52 @@
   filter: drop-shadow(0 0 2em #b678fdc2);
 }
 
+/* Controls how scrollbars appear across the entire website/application */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Styles the background track that the scrollbar thumb moves along */
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+/* Styles the draggable scrolling element/handle */
+::-webkit-scrollbar-thumb {
+  background: #7c3aed;
+  border-radius: 4px;
+}
+
+/* Changes the scrollbar thumb appearance when users hover over it */
+::-webkit-scrollbar-thumb:hover {
+  background: #9f67ff;
+}
+
+/* Specific scrollbar styling for elements with the .custom-scrollbar class */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track styling for elements with .custom-scrollbar class */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+/* Thumb styling for elements with .custom-scrollbar class */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #7c3aed;
+  border-radius: 4px;
+}
+
+/* Hover state for scrollbar thumb in elements with .custom-scrollbar class */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9f67ff;
+}
+
+/* Firefox-specific scrollbar styling - needed because Firefox uses a different scrollbar system */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed #1a1a2e;
+}
