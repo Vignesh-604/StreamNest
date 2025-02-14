@@ -80,8 +80,8 @@ export default function PostList() {
                         {
                             posts.length !== 0 ? (
                                 posts.map((post, index) => (
-                                    <div key={index} onClick={() => navigate(`/post/${post._id}`)}
-                                        className="card text-white p-4 mb-4 shadow-md w-full"
+                                    <div key={index} onClick={() => navigate(`p/${post._id}`)}
+                                        className="card text-white p-4 mb-6 shadow-md w-full"
                                     >
                                         <div className="flex items-center mb-4">
                                             <img
@@ -104,7 +104,7 @@ export default function PostList() {
                                                     <ThumbsUp
                                                         strokeWidth={3}
                                                         absoluteStrokeWidth
-                                                        className={post.isLiked ? "me-2 text-blue-600" : "me-2"}
+                                                        className={post.isLiked ? "me-2 text-purple-500" : "me-2"}
                                                     />
                                                     {post.likes}
                                                 </span>

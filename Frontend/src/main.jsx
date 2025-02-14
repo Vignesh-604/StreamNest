@@ -11,8 +11,6 @@ import LikedVideos from "./components/Video/LikedVideos"
 import Playlists from './components/Playlist/Playlists.jsx'
 import ErrorPage from './components/AppComponents/ErrorPage.jsx'
 import Subscriptions from './components/Subscription/Subsciptions.jsx'
-import SignIn from './components/Account/SignIn.jsx'
-import Register from './components/Account/Register.jsx'
 import Home from './components/Home.jsx'
 import PostConfig from './components/Post/PostConfig.jsx'
 import EditVideo from './components/Video/EditVideo.jsx'
@@ -25,17 +23,13 @@ import PostList from './components/Post/PostList.jsx'
 import ChannelVideos from './components/Video/ChannelVideos.jsx'
 import UserDetails from './components/Account/UserDetails.jsx'
 
-const router = createBrowserRouter(         // For web applications
+const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path='/' element={<App />}>
 
             <Route index element={<LandingPage />} />
             <Route path='/home' element={<Home />} />
             <Route path='/profile' element={<Profile />} />
-            
-            {/* <Route path='/signin' element={<SignIn />} />
-            <Route path='/register' element={<Register />} /> */}
-            {/* <Route path='/landing' element={<LandingPage />} /> */}
 
             <Route path='/channel' element={<UserDetails />} />
             <Route path='/channel/:channelId' element={<UserDetails />} />
@@ -55,9 +49,9 @@ const router = createBrowserRouter(         // For web applications
 
             <Route path='/posts' element={<PostList />} />
             <Route path='/posts/:channelId' element={<PostList />} />
-            <Route path='/posts/:channelId/p/:postId' element={<PostList />} />
+            <Route path='/posts/:channelId/p/:postId' element={<Post />} />
 
-            {/* <Route path='/post/:postId' element={<Post />} /> */}
+            <Route path='/posts/p/:postId' element={<Post />} />
             <Route path='/post/new' element={<PostConfig />} />
             <Route path='/post/edit/:postId' element={<PostConfig />} />
             
@@ -69,9 +63,3 @@ const router = createBrowserRouter(         // For web applications
 ReactDOM.createRoot(document.getElementById('root')).render(
     <RouterProvider router={router} />
 )
-
-/*
-           <Route path='/posts' element={<PostList />} />
-            <Route path='/posts/:username' element={<PostList />} />
-            <Route path='/posts/:username/p/:postId' element={<Post />} />
-*/

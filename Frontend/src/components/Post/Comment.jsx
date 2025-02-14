@@ -1,7 +1,7 @@
 import { ThumbsUp, EllipsisVertical, PencilLine } from 'lucide-react';
 import img from "../assets/profile.webp"
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { PencilIcon, TrashIcon, } from '@heroicons/react/16/solid'
+import { PencilIcon, TrashIcon, } from 'lucide-react'
 import { useOutletContext, Link } from "react-router-dom";
 import { useState } from 'react';
 import axios from 'axios';

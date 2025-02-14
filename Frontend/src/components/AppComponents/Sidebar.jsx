@@ -5,6 +5,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import logo from "../assets/Streamnest.png";
 import profile from "../assets/profile.webp";
+import Search from "./Search"
 
 export default function Sidebar() {
     const { channelId } = useParams();
@@ -23,7 +24,7 @@ export default function Sidebar() {
     };
 
     return (
-        <div className="flex max-h-screen w-screen overflow-hidden bg-gray-950">
+        <div className="flex max-h-screen w-screen overflow-hidden ">
             {/* Sidebar */}
             <aside
                 className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-950 border-r border-slate-700 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -36,22 +37,26 @@ export default function Sidebar() {
                             <span className="sr-only">StreamNest</span>
                             <img src={logo} alt="Logo" className="h-28 " />
                         </NavLink>
-                        <button className="text-white lg:hidden" onClick={toggleSidebar}>
+                        {/* <button className="text-white lg:hidden" onClick={toggleSidebar}>
                             <X size={24} />
-                        </button>
+                        </button> */}
                     </div>
 
                     {/* User Profile Section */}
-                    <NavLink to={"/channel"} className="flex items-center space-x-3 px-5 py-1 mb-6 shrink-0 rounded-lg -my-5 border border-purple-950/30 mx-6 p-6 cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20">
+                    <NavLink to={"/channel"} className="flex group items-center space-x-3 px-5 py-1 mb-6 shrink-0 rounded-lg -my-5 border border-purple-950/30 mx-6 p-6 cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/50">
                         <img
                             src={user.avatar}
                             alt={user.username}
                             onError={(e) => e.target.src = profile}
-                            className="h-12 w-12 rounded-full border-2 hover:border-emerald-500"
+                            className="h-12 w-12 rounded-full border-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
                         />
                         <div className="text-white">
-                            <p className="font-semibold">{user.fullname}</p>
-                            <p className="text-sm text-gray-400">@{user.username}</p>
+                            <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
+                                {user.fullname}
+                            </p>
+                            <p className="text-sm text-gray-400 transition-all duration-300 group-hover:text-emerald-300">
+                                @{user.username}
+                            </p>
                         </div>
                     </NavLink>
 
@@ -186,7 +191,7 @@ export default function Sidebar() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 overflow-y-auto bg-gray-950">
+                <div className="flex-1 overflow-y-auto bg-[#0a0a26]/40">
                     <Outlet context={JSON.parse(Cookies.get("user"))} />
                 </div>
             </div>
