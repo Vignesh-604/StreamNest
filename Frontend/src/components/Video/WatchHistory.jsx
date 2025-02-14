@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import VideoItem from "./VideoItem";
-import { parseDate, parseTime } from "../utility";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { parseDate, parseTime, showCustomAlert, showConfirmAlert } from "../utility";
+import { X } from "lucide-react"
 import Loading from '../AppComponents/Loading';
 
 export default function WatchHistory() {
@@ -19,15 +19,21 @@ export default function WatchHistory() {
     }, []);
 
     const remove = (id) => {
-        axios.delete(`/api/watchHistory/remove/${id}`)
-            .then(() => {
-                // Filter out the removed video from the history state
-                setHistory(history.map(dateGroup => ({
-                    date: dateGroup.date,
-                    videos: dateGroup.videos.filter(vid => vid._id !== id)
-                })).filter(dateGroup => dateGroup.videos.length > 0));
-            })
-            .catch(error => console.log(error));
+        showConfirmAlert(
+            "Remove Video?",
+            "Are you sure you want to remove this video from your watch history? This action cannot be undone.",
+            () => {
+                axios.delete(`/api/watchHistory/remove/${id}`)
+                    .then(() => {
+                        showCustomAlert("Removed!", "Video has been removed from your watch history.");
+                        setHistory(history.map(dateGroup => ({
+                            date: dateGroup.date,
+                            videos: dateGroup.videos.filter(vid => vid._id !== id)
+                        })).filter(dateGroup => dateGroup.videos.length > 0));
+                    })
+                    .catch(error => console.log(error));
+            }
+        );
     };
 
     const groupVideosByDate = (videos) => {
@@ -49,42 +55,44 @@ export default function WatchHistory() {
     if (loading) return <Loading />;
 
     return (
-        <div className="flex flex-col items-center px-4 min-w-[36rem]">
-            <h1 className="font-bold text-start text-5xl mt-5 mb-8">Watch History</h1>
-            <hr className="w-full"/>
+        <div className="flex flex-col items-center bg-[#0a0a26]/40 text-white px-6 py-8 min-h-screen">
+            <div className="bg-[#24273a] rounded-lg p-8 mb-8 w-full ">
+                <h1 className="font-extrabold text-start text-4xl mb-10">Watch History</h1>
 
-            {history.length ? (
-                history.map((dateGroup) => (
-                    <div key={dateGroup.date}>
-                        <h1 className="font-bold text-2xl mb-4">{dateGroup.date}</h1>
-                        <div className="grid gap-6 lg:grid-cols-2">
-                            {dateGroup.videos.map((vid) => (
-                                <div key={vid._id} className="flex justify-between">
-                                    <VideoItem
-                                        title={vid.video[0]?.title}
-                                        description={vid.video[0]?.description}
-                                        owner={vid.video[0]?.owner[0]}
-                                        views={vid.video[0]?.views}
-                                        thumbnail={vid.video[0]?.thumbnail}
-                                        duration={parseTime(vid.video[0]?.duration)}
-                                    />
-                                    <div className="flex items-start mt-6">
-                                        <button
-                                            onClick={() => remove(vid._id)}
-                                            className="flex justify-center md:items-center"
-                                            title="Remove video"
-                                        >
-                                            <XMarkIcon className="m-2 h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
-                                        </button>
+                {history.length ? (
+                    history.map((dateGroup) => (
+                        <div key={dateGroup.date}>
+                            <hr className="mb-1 mt-4 opacity-20" />
+                            <h1 className="font-bold text-2xl mb-4">{dateGroup.date}</h1>
+                            <div className="grid gap-6 lg:grid-cols-2">
+                                {dateGroup.videos.map((vid) => (
+                                    <div key={vid._id} className="flex justify-between rounded-lg hover:bg-gray-950/65 bg-gray-900/50 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
+                                        <VideoItem
+                                            title={vid.video[0]?.title}
+                                            description={vid.video[0]?.description}
+                                            owner={vid.video[0]?.owner[0]}
+                                            views={vid.video[0]?.views}
+                                            thumbnail={vid.video[0]?.thumbnail}
+                                            duration={parseTime(vid.video[0]?.duration)}
+                                        />
+                                        <div className="flex items-start mt-6">
+                                            <button
+                                                onClick={() => remove(vid._id)}
+                                                className="flex justify-center md:items-center transform hover:scale-120"
+                                                title="Remove video"
+                                            >
+                                                <X className="m-2 h-7 w-7 text-white hover:bg-gray-500/20 hover:bg-opacity-15 rounded-xl" />
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))
-            ) : (
-                <h1 className="flex place-content-center font-bold text-4xl my-7">No Watch History</h1>
-            )}
+                    ))
+                ) : (
+                    <h1 className="flex place-content-center font-bold text-4xl my-7">No Watch History</h1>
+                )}
+            </div>
         </div>
     );
 }

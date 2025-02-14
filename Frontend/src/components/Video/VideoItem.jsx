@@ -9,7 +9,7 @@ export default function VideoItem({ id, title, description, owner, views, thumbn
     return (
 
         <div
-            className="flex max-w-2xl p-3 items-start flex-row hover:bg-slate-800 rounded-md my-3 w-[600px] cursor-pointer"
+            className="flex max-w-2xl p-3 items-start flex-row rounded-md w-[600px] cursor-pointer"
             onClick={() => navigate(`/video/watch/${id}`)}
         >
             <div className="relative flex-shrink-0 my-auto w-56 me-4">
@@ -31,7 +31,7 @@ export default function VideoItem({ id, title, description, owner, views, thumbn
                             e.stopPropagation()
                             navigate(owner._id !== currentUser._id ? `/channel/${owner._id}` : "/channel")
                         }}>
-                            {owner.username}
+                            {owner?.username}
                         </span>
                         <span> · {views} views</span>
                     </h1>
