@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import img from "../assets/profile.webp";
 import axios from 'axios';
 import { MessageSquareText, Plus, ThumbsUp } from 'lucide-react';
-import { parseDate } from '../utility';
+import { parseDate } from '../Utils/utility';
 import { useOutletContext, useNavigate, useLocation, Link, useParams } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 

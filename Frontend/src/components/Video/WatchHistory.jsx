@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import VideoItem from "./VideoItem";
-import { parseDate, parseTime, showCustomAlert, showConfirmAlert } from "../utility";
+import { parseDate, parseTime, showCustomAlert, showConfirmAlert } from "../Utils/utility";
 import { X } from "lucide-react"
 import Loading from '../AppComponents/Loading';
 

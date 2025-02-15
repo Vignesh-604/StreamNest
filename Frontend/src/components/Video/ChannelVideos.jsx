@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import VideoItem from "./VideoItem";
-import { parseTime } from "../utility";
+import { parseTime, showCustomAlert } from "../Utils/utility";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from 'lucide-react'
 import { useOutletContext, useNavigate, Link, useParams, useLocation } from "react-router-dom";
 import { EllipsisVertical, Plus } from "lucide-react";
 import Loading from "../AppComponents/Loading";
-import { showCustomAlert } from "../utility";
-
 
 export default function ChannelVideos() {
     const navigate = useNavigate()

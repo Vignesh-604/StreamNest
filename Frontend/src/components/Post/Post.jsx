@@ -6,7 +6,7 @@ import axios from 'axios';
 import img from "../assets/profile.webp";
 import Comment from './Comment';
 import Loading from '../AppComponents/Loading';
-import { parseDate, showCustomAlert } from "../utility";
+import { parseDate, showCustomAlert } from "../Utils/utility";
 
 export default function PostItem() {
     const { postId } = useParams();

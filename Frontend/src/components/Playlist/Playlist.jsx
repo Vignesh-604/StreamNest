@@ -5,7 +5,7 @@ import axios from "axios";
 import img from "../assets/noPlaylist.jpeg";
 import VideoItem from "../Video/VideoItem";
 import Loading from '../AppComponents/Loading';
-import { parseDate, parseTime, showCustomAlert, showConfirmAlert } from "../utility";
+import { parseDate, parseTime, showCustomAlert, showConfirmAlert } from "../Utils/utility";
 
 export default function Playlist() {
     const currentUser = useOutletContext();
@@ -17,10 +17,9 @@ export default function Playlist() {
     const [newTitle, setNewTitle] = useState("");
     const [newDescription, setNewDescription] = useState("");
 
-    let owner = (currentUser._id === channelId) || (channelId == undefined)
+    let owner = (currentUser?._id === channelId) || (channelId == undefined)
 
     useEffect(() => {
-
         axios.get(`/api/playlist/${id}`)
             .then(res => {
                 const plst = res.data.data;
@@ -41,7 +40,7 @@ export default function Playlist() {
                     .then(res => {
                         setPlaylist({ 
                             ...playlist, 
-                            videos: playlist.videos.filter(vid => vid._id !== vidId) 
+                            videos: playlist.videos.filter(vid => vid?._id !== vidId) 
                         });
                         showCustomAlert("Removed!", "Video has been successfully removed from the playlist.");
                     })
@@ -55,7 +54,7 @@ export default function Playlist() {
             "Delete Playlist?",
             "Are you sure you want to delete this playlist? This action cannot be undone.",
             () => {
-                axios.delete(`/api/playlist/${playlist._id}`)
+                axios.delete(`/api/playlist/${playlist?._id}`)
                     .then(() => {
                         showCustomAlert("Deleted!", "Playlist has been successfully deleted.");
                         navigate(-1);
@@ -66,7 +65,7 @@ export default function Playlist() {
     };
 
     const saveChanges = () => {
-        axios.post(`/api/playlist/${playlist._id}`, { name: newTitle, description: newDescription })
+        axios.post(`/api/playlist/${playlist?._id}`, { name: newTitle, description: newDescription })
             .then(res => {
                 setPlaylist({ ...playlist, title: res.data.data.name, description: res.data.data.description });
                 setEditMode(false);
@@ -171,9 +170,9 @@ export default function Playlist() {
                         <div className="w-full h-full space-y-6 px-8 overflow-y-auto max-h-[calc(100vh-100px)]">
                             {playlist.videos.length ? (
                                 playlist.videos.map(vid => (
-                                    <div className="flex justify-between card" key={vid._id}>
+                                    <div className="flex justify-between card" key={vid?._id}>
                                         <VideoItem
-                                            id={vid._id}
+                                            id={vid?._id}
                                             title={vid.title}
                                             description={vid.description}
                                             owner={vid.owner}
@@ -185,7 +184,7 @@ export default function Playlist() {
                                             owner && (
                                                 <div className="flex items-start mt-6">
                                                     <button
-                                                        onClick={() => removeVideo(vid._id)}
+                                                        onClick={() => removeVideo(vid?._id)}
                                                         className="flex justify-center md:items-center transform hover:scale-120"
                                                         title="Remove video"
                                                     >

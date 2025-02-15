@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
-import { showCustomAlert, showConfirmAlert } from "../utility";
+import { showCustomAlert, showConfirmAlert } from "../Utils/utility";
 
 export default function Subscriptions() {
     const currentUser = useOutletContext();

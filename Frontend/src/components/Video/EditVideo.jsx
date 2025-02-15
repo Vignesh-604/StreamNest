@@ -3,7 +3,7 @@ import img from "../assets/thumbnail.jpg";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useOutletContext, useLocation } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
-import { showCustomAlert } from "../utility";
+import { showCustomAlert } from "../Utils/utility";
 import { Film } from 'lucide-react';
 
 export default function EditVideo() {

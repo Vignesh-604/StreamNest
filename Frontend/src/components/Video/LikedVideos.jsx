@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import VideoItem from "./VideoItem";
-import { parseTime } from "../utility";
 import { X } from "lucide-react";
 import Loading from '../AppComponents/Loading';
-import { showCustomAlert, showConfirmAlert } from "../utility";
+import { showCustomAlert, showConfirmAlert, parseTime } from "../Utils/utility";
 
 export default function LikedVideos() {
     const [videos, setVideos] = useState([]);

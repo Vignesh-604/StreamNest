@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { parseDate } from "../utility";
+import { parseDate, showCustomAlert, showConfirmAlert } from "../Utils/utility";
 import { TrashIcon, X, Plus } from "lucide-react";
 import img from "../assets/noPlaylist.jpeg";
 import { useOutletContext, useNavigate, useParams, useLocation } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
-import { showCustomAlert, showConfirmAlert } from "../utility";
 
 export default function Playlists() {
     let currentUser = useOutletContext();

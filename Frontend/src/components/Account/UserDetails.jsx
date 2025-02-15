@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { parseDate, showCustomAlert, showConfirmAlert } from "../utility";
+import { parseDate, showCustomAlert, showConfirmAlert } from "../Utils/utility";
 import axios from "axios";
 import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import Loading from "../AppComponents/Loading";

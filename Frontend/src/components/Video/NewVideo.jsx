@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReactLoading from 'react-loading';
 import { ArrowRight, Film } from 'lucide-react';
-import { showCustomAlert } from "../utility";
+import { showCustomAlert } from "../Utils/utility";
 
 export default function NewVideo() {
     const [title, setTitle] = useState('');

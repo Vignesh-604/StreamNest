@@ -3,9 +3,8 @@ import profile from "../assets/profile.webp";
 import axios from 'axios';
 import { PenBoxIcon, Plus, X } from 'lucide-react';
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { parseDate } from '../utility';
+import { parseDate, showCustomAlert } from '../Utils/utility';
 import Loading from '../AppComponents/Loading';
-import { showCustomAlert } from "../utility";
 
 export default function PostConfig() {
     const user = useOutletContext();
