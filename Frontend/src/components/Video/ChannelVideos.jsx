@@ -4,15 +4,21 @@ import VideoItem from "./VideoItem";
 import { parseTime } from "../utility";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { PencilIcon, TrashIcon } from 'lucide-react'
-import { useOutletContext, useNavigate, Link } from "react-router-dom";
+import { useOutletContext, useNavigate, Link, useParams, useLocation } from "react-router-dom";
 import { EllipsisVertical, Plus } from "lucide-react";
 import Loading from "../AppComponents/Loading";
 import { showCustomAlert } from "../utility";
 
 
-export default function ChannelVideos({ owner }) {
+export default function ChannelVideos() {
     const navigate = useNavigate()
-    const currentUser = useOutletContext()
+    let currentUser = useOutletContext()
+
+    let {channelId} = useParams()
+    let owner = (currentUser._id === channelId) || (channelId == undefined)
+
+    const {state} = useLocation()
+    currentUser = state !== null ? state : currentUser
 
     const [loading, setLoading] = useState(true);  // Add loading state
 
@@ -45,14 +51,16 @@ export default function ChannelVideos({ owner }) {
             <div className="bg-[#24273a] rounded-lg p-8 mb-8 w-full ">
                 <div className='flex justify-between mb-6'>
                     {/* <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Videos</h1> */}
-                    <h1 className="font-extrabold text-start text-4xl">Videos</h1>
+                    <h1 className="font-extrabold text-start text-4xl">{owner ? "Your " : `${currentUser.fullname}'s `}Videos</h1>
                     {
-                        currentUser._id === currentUser._id ? (
-                            <Link className="font-bold text-start text-lg my-auto me-10 inline-flex" to={"/video/new"}>
+                        owner && (
+                            <Link to={"/video/new"}
+                                className="flex items-center gap-2 font-semibold bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200"
+                            >
+                                <Plus className="w-5 h-5" />
                                 New Video
-                                <Plus strokeWidth={2} absoluteStrokeWidth className="ms-2 my-auto" />
                             </Link>
-                        ) : null
+                        )
                     }
 
                 </div>
@@ -73,7 +81,7 @@ export default function ChannelVideos({ owner }) {
                                         />
                                         <div className="flex items-start mt-10">
                                             {
-                                                currentUser._id === currentUser._id ? (
+                                                owner && (
                                                     <Menu>
                                                         <MenuButton className="flex justify-center md:items-center transform hover:scale-120">
                                                             <EllipsisVertical className="m-2 h-7 w-7 text-white hover:bg-gray-500/20 hover:bg-opacity-15 rounded-xl" />
@@ -105,7 +113,7 @@ export default function ChannelVideos({ owner }) {
                                                         </MenuItems>
                                                     </Menu>
 
-                                                ) : null
+                                                )
                                             }
                                         </div>
 

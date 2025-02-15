@@ -9,8 +9,7 @@ import { parseDate, parseTime, showCustomAlert, showConfirmAlert } from "../util
 
 export default function Playlist() {
     const currentUser = useOutletContext();
-    const [owner, setOwner] = useState(false);
-    const { id } = useParams();
+    const { channelId, id } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
@@ -18,13 +17,14 @@ export default function Playlist() {
     const [newTitle, setNewTitle] = useState("");
     const [newDescription, setNewDescription] = useState("");
 
+    let owner = (currentUser._id === channelId) || (channelId == undefined)
+
     useEffect(() => {
 
         axios.get(`/api/playlist/${id}`)
             .then(res => {
                 const plst = res.data.data;
                 setPlaylist(plst);
-                setOwner(plst.owner.username === currentUser.username);
                 setNewTitle(plst.name);
                 setNewDescription(plst.description);
                 setLoading(false);
@@ -33,12 +33,22 @@ export default function Playlist() {
     }, []);
 
     const removeVideo = (vidId) => {
-        axios.delete(`/api/playlist/video/${vidId}/${id}`)
-            .then(res => {
-                setPlaylist({ ...playlist, videos: playlist.videos.filter(vid => vid._id != vidId) })
-            })
-            .catch(e => console.log(e.response.data));
-    };
+        showConfirmAlert(
+            "Remove Video?",
+            "Are you sure you want to remove this video from the playlist?",
+            () => {
+                axios.delete(`/api/playlist/video/${vidId}/${id}`)
+                    .then(res => {
+                        setPlaylist({ 
+                            ...playlist, 
+                            videos: playlist.videos.filter(vid => vid._id !== vidId) 
+                        });
+                        showCustomAlert("Removed!", "Video has been successfully removed from the playlist.");
+                    })
+                    .catch(e => console.log(e.response.data));
+            }
+        );
+    };   
 
     const deletePlaylist = () => {
         showConfirmAlert(
@@ -54,7 +64,6 @@ export default function Playlist() {
             }
         );
     };
-
 
     const saveChanges = () => {
         axios.post(`/api/playlist/${playlist._id}`, { name: newTitle, description: newDescription })
@@ -172,15 +181,19 @@ export default function Playlist() {
                                             thumbnail={vid.thumbnail}
                                             duration={parseTime(vid.duration)}
                                         />
-                                        <div className="flex items-start mt-6">
-                                            <button
-                                                onClick={() => removeVideo(vid._id)}
-                                                className="flex justify-center md:items-center transform hover:scale-120"
-                                                title="Remove video"
-                                            >
-                                                <X className="m-2 h-7 w-7 text-white hover:bg-gray-500/20 hover:bg-opacity-15 rounded-xl" />
-                                            </button>
-                                        </div>
+                                        {
+                                            owner && (
+                                                <div className="flex items-start mt-6">
+                                                    <button
+                                                        onClick={() => removeVideo(vid._id)}
+                                                        className="flex justify-center md:items-center transform hover:scale-120"
+                                                        title="Remove video"
+                                                    >
+                                                        <X className="m-2 h-7 w-7 text-white hover:bg-gray-500/20 hover:bg-opacity-15 rounded-xl" />
+                                                    </button>
+                                                </div>
+                                            )
+                                        }
                                     </div>
                                 ))
                             ) : null}

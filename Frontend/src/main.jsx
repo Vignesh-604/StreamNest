@@ -35,23 +35,28 @@ const router = createBrowserRouter(
             <Route path='/channel/:channelId' element={<UserDetails />} />
 
             <Route path='/videos' element={<ChannelVideos/>} />
+            <Route path='/videos/:channelId' element={<ChannelVideos/>} />
             <Route path='/video/edit/:videoId' element={<EditVideo />} />
             <Route path='/video/new' element={<NewVideo />} />
             <Route path='/video/watch/:videoId' element={<VideoPlayer />} />
             
             <Route path='/liked' element={<LikedVideos />} />
-            <Route path='/subscriptions' element={<Subscriptions />} />
-            <Route path='/subscribers' element={<Subscribers />} />
             <Route path='/history' element={<WatchHistory />} />
 
-            <Route path='/playlist' element={<Playlists />} />
-            <Route path='/playlist/:id' element={<Playlist />} />
+            <Route path='/subscriptions' element={<Subscriptions />} />
+            <Route path='/subscribers' element={<Subscribers />} />
 
-            <Route path='/posts' element={<PostList />} />
-            <Route path='/posts/:channelId' element={<PostList />} />
-            <Route path='/posts/:channelId/p/:postId' element={<Post />} />
+            <Route path='/playlist/' element={<Playlists />} />
+            <Route path='/playlist/u/:channelId' element={<Playlists />} />
+            <Route path='/playlist/p/:id' element={<Playlist />} />
+            <Route path='/playlist/u/:channelId/p/:id' element={<Playlist />} />
 
-            <Route path='/posts/p/:postId' element={<Post />} />
+            <Route path='/post' element={<PostList />} />
+            <Route path='/post/u/:channelId' element={<PostList />} />
+
+            <Route path='/post/u/:channelId/p/:postId' element={<Post />} />
+            <Route path='/post/p/:postId' element={<Post />} />
+            
             <Route path='/post/new' element={<PostConfig />} />
             <Route path='/post/edit/:postId' element={<PostConfig />} />
             

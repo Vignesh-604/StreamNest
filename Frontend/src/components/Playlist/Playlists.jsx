@@ -3,17 +3,24 @@ import axios from "axios";
 import { parseDate } from "../utility";
 import { TrashIcon, X, Plus } from "lucide-react";
 import img from "../assets/noPlaylist.jpeg";
-import { useOutletContext, useNavigate } from "react-router-dom";
+import { useOutletContext, useNavigate, useParams, useLocation } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 import { showCustomAlert, showConfirmAlert } from "../utility";
 
-export default function Playlists({ channelId = "" }) {
-    const currentUser = useOutletContext();
+export default function Playlists() {
+    let currentUser = useOutletContext();
     const navigate = useNavigate();
+
+    let { channelId } = useParams()
+    let owner = (currentUser._id === channelId) || (channelId == undefined)
+
+    const { state } = useLocation()
+    currentUser = state !== null ? state : currentUser
+
     const [playlists, setPlaylists] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const userId = channelId === "" ? currentUser?._id : channelId;
+    const userId = !channelId ? currentUser?._id : channelId;
     const [name, setName] = useState("");
     const [desc, setDesc] = useState("");
 
@@ -28,7 +35,7 @@ export default function Playlists({ channelId = "" }) {
 
     const deletePlaylist = (e, id) => {
         e.stopPropagation();
-        
+
         showConfirmAlert(
             "Delete Playlist?",
             "Are you sure you want to delete this playlist? This action cannot be undone.",
@@ -107,24 +114,26 @@ export default function Playlists({ channelId = "" }) {
         <div className="flex flex-col items-center bg-[#0a0a26]/40 text-white px-6 py-8 min-h-screen">
             <div className="bg-[#24273a] rounded-lg p-8 mb-8 w-full">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="font-extrabold text-4xl">Playlists</h1>
-                    {userId === currentUser._id && (
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className="flex items-center gap-2 bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200"
-                        >
-                            <Plus className="w-5 h-5" />
-                            New Playlist
-                        </button>
-                    )}
+                    <h1 className="font-extrabold text-4xl">{owner ? "Your " : `${currentUser.fullname}'s `}Playlists</h1>
+                    {
+                        owner && (
+                            <button
+                                onClick={() => setShowModal(true)}
+                                className="flex items-center gap-2 bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200"
+                            >
+                                <Plus className="w-5 h-5" />
+                                New Playlist
+                            </button>
+                        )
+                    }
                 </div>
 
                 {playlists.length ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {playlists.map(plst => (
-                            <div 
+                            <div
                                 key={plst._id}
-                                onClick={() => navigate(`/playlist/${plst._id}`)}
+                                onClick={() => navigate(`p/${plst._id}`)}
                                 className=" flex flex-col card group"
                             >
                                 <img
@@ -147,14 +156,18 @@ export default function Playlists({ channelId = "" }) {
                                             Videos: {plst.videos.length}
                                         </span>
                                     </div>
-                                    <button
-                                        type="button"
-                                        className="mt-4 cursor-pointer flex items-center justify-center gap-2 w-full rounded-lg bg-[#8A3FFC] px-4 py-2 text-sm font-semibold text-white hover:bg-[#7B37E5] transition-all duration-200 hover:scale-105"
-                                        onClick={(e) => deletePlaylist(e, plst._id)}
-                                    >
-                                        <TrashIcon className="h-5 w-5" />
-                                        Delete Playlist
-                                    </button>
+                                    {
+                                        owner && (
+                                            <button
+                                                type="button"
+                                                className="mt-4 cursor-pointer flex items-center justify-center gap-2 w-full rounded-lg bg-[#8A3FFC] px-4 py-2 text-sm font-semibold text-white hover:bg-[#7B37E5] transition-all duration-200 hover:scale-105"
+                                                onClick={(e) => deletePlaylist(e, plst._id)}
+                                            >
+                                                <TrashIcon className="h-5 w-5" />
+                                                Delete Playlist
+                                            </button>
+                                        )
+                                    }
                                 </div>
                             </div>
                         ))}

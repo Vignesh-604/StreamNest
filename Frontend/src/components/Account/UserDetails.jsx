@@ -68,14 +68,14 @@ export default function UserDetails() {
 
     const channelStats = [
         { label: "Videos", value: userStats.totalVideos || 0, link: "/videos", icon: <MonitorPlay className="w-8 h-8" /> },
-        { label: "Posts", value: userStats.totalPosts || 0, link: "/posts", icon: <NotepadText className="w-8 h-8" /> },
+        { label: "Posts", value: userStats.totalPosts || 0, link: "/post", icon: <NotepadText className="w-8 h-8" /> },
         { label: "Subscribers", value: userStats.totalSubscribers || 0, link: "/subscribers", icon: <Users className="w-8 h-8" /> },
     ];
 
     const otherChannelStats = [
-        { label: "Videos", value: userStats.totalVideos || 0, link: "/videos", icon: <MonitorPlay className="w-8 h-8" /> },
-        { label: "Posts", value: userStats.totalPosts || 0, link: `/posts/${channelId}`, icon: <NotepadText className="w-8 h-8" /> },
-        { label: "Playlists", value: user.playlists || 0, link: "/playlist", icon: <ListVideo className="w-8 h-8" /> },
+        { label: "Videos", value: userStats.totalVideos || 0, link: `/videos/${channelId}`, icon: <MonitorPlay className="w-8 h-8" /> },
+        { label: "Posts", value: userStats.totalPosts || 0, link: `/post/u/${channelId}`, icon: <NotepadText className="w-8 h-8" /> },
+        { label: "Playlists", value: user.playlists || 0, link: `/playlist/u/${channelId}`, icon: <ListVideo className="w-8 h-8" /> },
     ];
 
     const CardContent = ({ icon, label, value }) => (

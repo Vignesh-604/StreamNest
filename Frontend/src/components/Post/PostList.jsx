@@ -11,6 +11,7 @@ export default function PostList() {
     let currentUser = useOutletContext()
 
     let {channelId} = useParams()
+    let owner = (currentUser._id === channelId) || (channelId == undefined)
 
     const {state} = useLocation()
     currentUser = state !== null ? state : currentUser
@@ -66,12 +67,14 @@ export default function PostList() {
                 <div className='flex justify-between mb-10'>
                     <h1 className="font-extrabold text-start text-4xl">Posts</h1>
                     {
-                        id === currentUser._id ? (
-                            <Link className="font-bold text-start text-lg my-auto inline-flex" to={"/post/new"}>
-                                New post
-                                <Plus strokeWidth={2} absoluteStrokeWidth className="ms-2 my-auto" />
+                        owner && (
+                            <Link to={"/post/new"}
+                                className="flex items-center gap-2 bg-[#8A3FFC] hover:bg-[#7B37E5] font-semibold px-4 py-2 rounded-lg transition-all duration-200"
+                            >
+                                <Plus className="w-5 h-5" />
+                                New Post
                             </Link>
-                        ) : null
+                        )
                     }
 
                 </div>
