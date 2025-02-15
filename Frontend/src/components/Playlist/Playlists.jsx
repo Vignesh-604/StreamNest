@@ -125,12 +125,12 @@ export default function Playlists({ channelId = "" }) {
                             <div 
                                 key={plst._id}
                                 onClick={() => navigate(`/playlist/${plst._id}`)}
-                                className=" flex flex-col rounded-lg hover:bg-gray-950/65 bg-gray-900/60 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20"
+                                className=" flex flex-col card group"
                             >
                                 <img
                                     src={plst.poster ? plst.poster?.thumbnail : img}
                                     onError={(e) => e.target.src = img}
-                                    className="h-[200px] w-full object-cover rounded-lg border border-gray-950/50"
+                                    className="h-[200px] w-full object-cover rounded-lg group-hover:scale-90 transition duration-200"
                                 />
                                 <div className="p-4 flex-1 flex flex-col">
                                     <h1 className="text-lg font-semibold text-white">

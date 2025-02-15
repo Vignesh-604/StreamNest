@@ -1,25 +1,20 @@
-import axios from "axios";
-import img from "../assets/noPlaylist.jpeg"
-import { useEffect, useState } from "react";
-import { parseDate, parseTime } from "../utility";
-import VideoItem from "../Video/VideoItem";
+import React, { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import axios from "axios";
+import img from "../assets/noPlaylist.jpeg";
+import VideoItem from "../Video/VideoItem";
 import Loading from '../AppComponents/Loading';
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { showCustomAlert } from "../utility";
+import { parseDate, parseTime, showCustomAlert, showConfirmAlert } from "../utility";
 
 export default function Playlist() {
-
     const currentUser = useOutletContext();
     const [owner, setOwner] = useState(false);
-
     const { id } = useParams();
     const navigate = useNavigate();
-
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const [playlist, setPlaylist] = useState(null);
-
     const [newTitle, setNewTitle] = useState("");
     const [newDescription, setNewDescription] = useState("");
 
@@ -46,12 +41,20 @@ export default function Playlist() {
     };
 
     const deletePlaylist = () => {
-        axios.delete(`/api/playlist/${playlist._id}`)
-        navigate(-1)
-        setTimeout(() => {
-            showCustomAlert('Playlist Deleted');
-        }, 500);
+        showConfirmAlert(
+            "Delete Playlist?",
+            "Are you sure you want to delete this playlist? This action cannot be undone.",
+            () => {
+                axios.delete(`/api/playlist/${playlist._id}`)
+                    .then(() => {
+                        showCustomAlert("Deleted!", "Playlist has been successfully deleted.");
+                        navigate(-1);
+                    })
+                    .catch(e => console.log(e));
+            }
+        );
     };
+
 
     const saveChanges = () => {
         axios.post(`/api/playlist/${playlist._id}`, { name: newTitle, description: newDescription })
@@ -65,139 +68,129 @@ export default function Playlist() {
     if (loading) return <Loading />;
 
     return (
-        <div className="flex flex-col xl:flex-row place-items-center pb-12">
-            {
-                playlist ? (
-                    <div className="flex flex-col lg:flex-row max-md:w-full md:space-x-4">
-                        <div className="flex flex-col items-center p-5 rounded-lg bg-gray-800">
-                            <img
-                                src={playlist.videos[0] ? playlist.videos[0]?.thumbnail : img}
-                                alt="Playlist thumbnail"
-                                onError={e => e.target.src = img}
-                                className="h-56 rounded-lg  border object-cover w-full my-auto"
-                            />
-
-                            <div className="items-center py-4 w-full max-w-lg lg:w-[350px]">
-                                {
-                                    editMode ? (
+        <div className="flex flex-col items-center bg-[#0a0a26]/40 text-white px- py- max-h-screen">
+            <div className="bg-transparent rounded-lg p-8 mb-8 w-full ">
+                {playlist ? (
+                    <div className="flex flex-col lg:flex-row max-md:w-full md:space-x-8 h-[calc(100vh-100px)]">
+                        <div className="flex flex-col items-center p-5 rounded-lg bg-gray-900 border border-purple-500/20 shadow-md lg:w-[420px] lg:sticky top-20 h-full">
+                            {/* Top Section: Image, Title, Description */}
+                            <div className="flex flex-col items-center w-full">
+                                <img
+                                    src={playlist.videos[0] ? playlist.videos[0]?.thumbnail : img}
+                                    alt="Playlist thumbnail"
+                                    onError={(e) => (e.target.src = img)}
+                                    className="h-56 rounded-lg border border-purple-500/30 object-cover w-full my-auto"
+                                />
+                                <div className="items-center py-4 w-full max-w-lg lg:w-full">
+                                    {editMode ? (
                                         <>
                                             <input
                                                 type="text"
                                                 value={newTitle}
                                                 onChange={(e) => setNewTitle(e.target.value)}
-                                                className="w-full text-2xl font-semibold my-2 p-2 bg-gray-900 text-white rounded-lg"
+                                                className="w-full text-2xl font-semibold my-2 p-2 bg-gray-800 text-white rounded-lg border border-purple-500/20 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
                                             />
                                             <textarea
                                                 value={newDescription}
                                                 rows={4}
                                                 onChange={(e) => setNewDescription(e.target.value)}
-                                                className="w-full text-xl my-2 p-2 bg-gray-900 text-white rounded-lg line-clamp-3 resize-none"
+                                                className="w-full text-xl my-2 p-2 bg-gray-800 text-white rounded-lg line-clamp-3 resize-none border border-purple-500/20 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
                                             />
                                         </>
                                     ) : (
-                                        <>
-                                            <h1 className="text-4xl font-semibold m-2">
+                                        <div className="text-start m-2">
+                                            <h1 className="text-3xl font-bold text-purple-100">
                                                 {playlist.name}
                                             </h1>
-                                            <h2 className="text-xl text-gray-400 m-2 line-clamp-3">
+                                            <h2 className="text-lg text-gray-400 line-clamp-6">
                                                 {playlist.description}
                                             </h2>
-                                        </>
-                                    )
-                                }
-                                <hr className="" />
-                                <h2 className="text-lg text-gray-400 m-2">
-                                    Playlist updated at: {parseDate(playlist.updatedAt)}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Spacer to push bottom section down */}
+                            <div className="flex-grow"></div>
+
+                            <div className="w-full">
+                                <hr className="border-purple-500/20 my-4" />
+                                <h2 className="text-lg text-gray-400/70 m-2">
+                                    Last updated at: {parseDate(playlist.updatedAt)}
                                 </h2>
-                                <h2 className="text-lg text-gray-400 m-2">
+                                <h2 className="text-lg text-gray-400/70 m-2">
                                     Videos: {playlist.videos.length}
                                 </h2>
 
-                                <div className="flex flex-col space-y-2 ">
-                                    <div className="flex flex-wrap w-full space-x-2 font-semibold border rounded-lg p-2 bg-slate-300 text-black">
-                                        <img
-                                            src={playlist.owner.avatar}
-                                            onError={e => e.target.src = img}
-                                            className="h-7 rounded" />
-                                        <span className="font-bold">{playlist.owner.fullname}</span>
-                                        <span>@{playlist.owner.username}</span>
-                                    </div>
-                                </div>
-
-                                {
-                                    owner ? (
-                                        editMode ? (
-                                            <div className="flex flex-row space-x-4 mt-2">
-                                                <button
-                                                    onClick={() => setEditMode(false)}
-                                                    className="bg-gray-950 w-full hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-                                                >
-                                                    Cancel
-                                                </button>
-
-                                                <button
-                                                    onClick={saveChanges}
-                                                    className="bg-green-600 w-full hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-                                                >
-                                                    Save changes
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-row space-x-4 mt-2">
-                                                <button onClick={() => setEditMode(true)}
-                                                    className="bg-gray-950 w-full hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-                                                >
-                                                    Edit
-                                                </button>
-
-                                                <button onClick={deletePlaylist}
-                                                    className="bg-red-600 w-full hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        )
-                                    ) : null
-                                }
-
+                                {owner && (
+                                    editMode ? (
+                                        <div className="flex flex-row space-x-4 mt-4">
+                                            <button
+                                                onClick={() => setEditMode(false)}
+                                                className="bg-gray-800 w-full hover:bg-purple-500/10 text-gray-400 hover:text-purple-300 font-bold py-2 px-4 rounded-lg transition-all duration-300 border border-purple-500/20"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={saveChanges}
+                                                className="bg-purple-500/10 w-full hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 font-bold py-2 px-4 rounded-lg transition-all duration-300 border border-purple-500/20"
+                                            >
+                                                Save changes
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-row space-x-4 mt-4 text-white">
+                                            <button
+                                                onClick={() => setEditMode(true)}
+                                                className=" w-full bg-[#7c3aed] hover:bg-[#6d28d9]/80 cursor-pointer hover:scale-95 font-bold py-2 px-4 rounded-lg transition-all duration-300 border border-purple-500/20"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={deletePlaylist}
+                                                className="bg-red-500 w-full hover:bg-red-500/60 cursor-pointer hover:scale-95 font-bold py-2 px-4 rounded-lg transition-all duration-300 border border-red-500/20"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    )
+                                )}
                             </div>
                         </div>
-                        <div className="">
-                            {
-                                playlist.videos.length ? (
-                                    playlist.videos.map(vid => (
-                                        <div className="flex justify-between key={vid._id}" key={vid._id}>
-                                            <VideoItem key={vid._id}
-                                                id={vid._id}
-                                                title={vid.title}
-                                                description={vid.description}
-                                                owner={vid.owner}
-                                                views={vid.views}
-                                                thumbnail={vid.thumbnail}
-                                                duration={parseTime(vid.duration)}
-                                            />
-                                            <div className="flex items-start mt-6">
-                                                <button
-                                                    onClick={() => removeVideo(vid._id)}
-                                                    className="flex justify-center md:items-center"
-                                                    title="Remove video"
-                                                >
-                                                    <XMarkIcon className="m-2 h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
-                                                </button>
-                                            </div>
 
+
+                        <div className="w-full h-full space-y-6 px-8 overflow-y-auto max-h-[calc(100vh-100px)]">
+                            {playlist.videos.length ? (
+                                playlist.videos.map(vid => (
+                                    <div className="flex justify-between card" key={vid._id}>
+                                        <VideoItem
+                                            id={vid._id}
+                                            title={vid.title}
+                                            description={vid.description}
+                                            owner={vid.owner}
+                                            views={vid.views}
+                                            thumbnail={vid.thumbnail}
+                                            duration={parseTime(vid.duration)}
+                                        />
+                                        <div className="flex items-start mt-6">
+                                            <button
+                                                onClick={() => removeVideo(vid._id)}
+                                                className="flex justify-center md:items-center transform hover:scale-120"
+                                                title="Remove video"
+                                            >
+                                                <X className="m-2 h-7 w-7 text-white hover:bg-gray-500/20 hover:bg-opacity-15 rounded-xl" />
+                                            </button>
                                         </div>
-                                    ))
-                                ) : (
-                                    null
-                                )
-                            }
+                                    </div>
+                                ))
+                            ) : null}
                         </div>
                     </div>
+
                 ) : (
-                    <h1>Loading</h1>
-                )
-            }
+                    <h1 className="text-xl font-semibold text-purple-100">Loading</h1>
+                )}
+            </div>
         </div>
-    )
+    );
 }

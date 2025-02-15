@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, useOutletContext, useLocation } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 import { showCustomAlert } from "../utility";
+import { Film } from 'lucide-react';
 
 export default function EditVideo() {
-
     const user = useOutletContext();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
 
     let location = useLocation();
     let editMode = location.pathname.includes("/video/edit");
@@ -36,8 +36,7 @@ export default function EditVideo() {
                     const videoDetails = res.data.data;
                     console.log(videoDetails);
                     
-                    // Uncomment the line below if you need to ensure the user is the owner of the video
-                    if (videoDetails.owner!== user._id) navigate(-1);
+                    if (videoDetails.owner !== user._id) navigate(-1);
 
                     setVideo(videoDetails);
                     setContent({
@@ -48,14 +47,13 @@ export default function EditVideo() {
                         title: videoDetails.title,
                         description: videoDetails.description,
                     });
-                    setThumbnail(videoDetails.thumbnail)
+                    setThumbnail(videoDetails.thumbnail);
                     
-                    setLoading(false)
+                    setLoading(false);
                 })
                 .catch(error => console.log(error));
         }
     }, []);
-
 
     const handleThumbnailChange = (e) => {
         const file = e.target.files[0];
@@ -66,92 +64,123 @@ export default function EditVideo() {
             };
             reader.readAsDataURL(file);
         }
-        setContent({...content, thumbnail: file})
+        setContent({...content, thumbnail: file});
     };
 
-
     const handleSaveChanges = () => {
-        const formData = new FormData()
+        const formData = new FormData();
 
         if (content.title !== currContent.title) {
-            formData.append("title", content.title)
+            formData.append("title", content.title);
         }
         if (content.description !== currContent.description) {
-            formData.append("description", content.description)
+            formData.append("description", content.description);
         }
-        if (content.thumbnail) formData.append("thumbnail", content.thumbnail)
+        if (content.thumbnail) formData.append("thumbnail", content.thumbnail);
 
-        let data = Array.from(formData.keys())                      // Converts the formData.key iterator to Array and checks if anything has been updated       
+        let data = Array.from(formData.keys());
 
         if (data) {
             axios.patch(`/api/video/v/${videoId}`, formData)
             .then((res) => {
-                navigate(-1)
+                navigate(-1);
                 setTimeout(() => {
                     showCustomAlert("Video details updated successfully!");
                 }, 500);
-                
             })
             .catch(error => console.log(error.response.data));
         }
-        else navigate(-1)
+        else navigate(-1);
     };
 
-    if (loading) return <Loading />
+    if (loading) return <Loading />;
 
     return (
-        <>
-            {
-                video ? (
-                    <div className="flex flex-col items-center p-5 pb-2 rounded-lg bg-gray-800">
-                        <div className="relative">
-                            <img
-                                src={thumbnail || img}
-                                alt="Thumbnail"
-                                onError={e => e.target.src = img}
-                                className="h-40 rounded-lg border border-gray-600 p-2 object-cover w-72 my-auto"
-                            />
-                            <label className="absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded-md cursor-pointer">
-                                New
+        <div className="flex items-center justify-center min-h-[calc(100vh-100px)]">
+            {video ? (
+                <div className="w-full max-w-4xl bg-white/5 p-8 rounded-2xl mx-auto">
+                    <div className="flex items-center mb-8">
+                        <div className="h-16 w-16 mr-4 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                            <Film size={32} className="text-purple-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-extrabold text-white">Edit Video</h2>
+                            <p className="mt-2 text-base text-gray-300">
+                                Update your video details
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-8">
+                        {/* Left Column */}
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-base font-semibold text-gray-300 mb-2">Title</label>
+                                <input
+                                    className="w-full rounded-lg border border-gray-600 bg-gray-900/50 px-4 py-3 text-base text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                    value={content.title}
+                                    onChange={(e) => setContent({ ...content, title: e.target.value })}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-base font-semibold text-gray-300 ">Description</label>
+                                <textarea
+                                    className="w-full rounded-lg border border-gray-600 bg-gray-900/50 px-4 py-3 text-base text-white focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                                    rows="5"
+                                    value={content.description}
+                                    onChange={(e) => setContent({ ...content, description: e.target.value })}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-base font-semibold text-gray-300 ">Thumbnail</label>
                                 <input
                                     type="file"
                                     accept="image/*"
-                                    className="hidden"
                                     onChange={handleThumbnailChange}
+                                    className="w-full rounded-lg border border-gray-600 bg-gray-900/50 px-4 py-3 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none"
                                 />
-                            </label>
+                            </div>
                         </div>
 
-                        <div className="items-center py-4 w-full max-w-lg lg:w-[350px] space-y-2">
-                            <textarea
-                                className="mb-4 w-full text-2xl p-2 bg-gray-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
-                                value={content.title}
-                                onChange={(e) => setContent({ ...content, title: e.target.value })}
-                            />
+                        {/* Right Column */}
+                        <div className="flex flex-col space-y-6">
 
-                            <textarea
-                                className="mb-4 w-full p-3 bg-gray-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
-                                rows="7"
-                                placeholder="Write your post..."
-                                value={content.description}
-                                onChange={(e) => setContent({ ...content, description: e.target.value })}
-                            />
-                            <hr className="" />
+                            <div className="flex-grow">
+                                <label className="block text-base font-semibold text-gray-300 ">Preview</label>
+                                <div className="max-h-64 p-2 w-full rounded-lg border border-gray-600 bg-gray-900/50 flex items-center justify-center overflow-hidden">
+                                    <img
+                                        src={thumbnail || img}
+                                        alt="Thumbnail"
+                                        onError={e => e.target.src = img}
+                                        className="h-full w-full object-cover"
+                                    />
+                                </div>
+                            </div>
 
-                            <div className="flex flex-col space-y-2 ">
+                            {/* Bottom Buttons */}
+                            <div className="flex justify-end w-full space-x-4">
                                 <button
-                                    className="bg-gray-950 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+                                    onClick={() => navigate(-1)}
+                                    type="button"
+                                    className="px-6 py-2 w-full rounded-lg bg-transparent border border-red-500 text-red-400 hover:bg-red-500 hover:text-white transition-colors hover:scale-105"
+                                >
+                                    Cancel
+                                </button>
+                                <button
                                     onClick={handleSaveChanges}
+                                    className="px-6 py-2 w-full rounded-lg bg-purple-500 text-white hover:bg-purple-600 transition-colors flex items-center justify-center hover:scale-105"
                                 >
                                     Save Changes
                                 </button>
                             </div>
                         </div>
                     </div>
-                ) : (
-                    <h1>Loading...</h1>
-                )
-            }
-        </>
+                </div>
+            ) : (
+                <h1>Loading...</h1>
+            )}
+        </div>
     );
 }
