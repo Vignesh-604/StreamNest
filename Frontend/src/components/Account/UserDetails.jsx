@@ -3,7 +3,7 @@ import { parseDate, showCustomAlert, showConfirmAlert } from "../Utils/utility";
 import axios from "axios";
 import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import Loading from "../AppComponents/Loading";
-import { PencilLine, Users, NotepadText, UserRoundCheck, MonitorPlay, ThumbsUp, ListVideo, BellRing } from "lucide-react";
+import { PencilLine, Users, NotepadText, UserRoundCheck, MonitorPlay, ThumbsUp, ListVideo, BellRing, UserPlus } from "lucide-react";
 import EditProfileDialog from "./EditProfile";
 
 export default function UserDetails() {
@@ -105,34 +105,31 @@ export default function UserDetails() {
 
                             {
                                 owner ? (
-                            <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-colors">
-                                <PencilLine className="w-4 h-4" />
-                                Edit Profile
-                            </button>
+                                    <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-colors">
+                                        <PencilLine className="w-4 h-4" />
+                                        Edit Profile
+                                    </button>
                                 ) : (
                                     <button
-                                    onClick={toggleSub}
-                                    className={`group relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${
-                                        user.isSubscribed 
-                                            ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white' 
-                                            : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
-                                    } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
-                                >
-                                    {user.isSubscribed ? (
-                                        <>
-                                            <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
-                                            <span className="transition-all">Subscribed</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Users className="w-5 h-5 transition-transform group-hover:scale-110" />
-                                            <span className="transition-all">Subscribe</span>
-                                        </>
-                                    )}
-                                    <div className={`absolute inset-0 rounded-xl transition-opacity duration-300 ${
-                                        user.isSubscribed ? 'bg-red-500' : 'bg-purple-500'
-                                    } opacity-0 group-hover:opacity-10`}></div>
-                                </button>
+                                        onClick={toggleSub}
+                                        className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
+                                            ${user.isSubscribed
+                                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                                                : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                                            } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
+                                    >
+                                        {user.isSubscribed ? (
+                                            <>
+                                                <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                                <span className="transition-all">Subscribed</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
+                                                <span className="transition-all text-xl">Subscribe</span>
+                                            </>
+                                        )}
+                                    </button>
                                 )
                             }
 

@@ -4,10 +4,10 @@ import img from "../assets/thumbnail.jpg";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
-import { parseDate } from '../utility';
-import { CalendarArrowDown, Eye, List, ThumbsUp } from 'lucide-react';
+import { parseDate } from '../Utils/utility';
+import { BellRing, CalendarArrowDown, Eye, List, ThumbsUp, UserPlus } from 'lucide-react';
 import Comment from '../Post/Comment';
-import { XMarkIcon } from "@heroicons/react/16/solid";
+import { X } from "lucide-react";
 
 function VideoPage() {
     const currentUser = useOutletContext();
@@ -17,8 +17,16 @@ function VideoPage() {
     const [video, setVideo] = useState(null);
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState("")
-    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
-    const [playlists, setPlaylists] = useState([]); // State to store playlists
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [playlists, setPlaylists] = useState([]);
+
+    // Dummy data for channel videos
+    const channelVideos = [
+        { id: 1, title: "Sample Video 1", views: "12K", timestamp: "2 days ago", thumbnail: img },
+        { id: 2, title: "Sample Video 2", views: "8K", timestamp: "4 days ago", thumbnail: img },
+        { id: 3, title: "Sample Video 3", views: "15K", timestamp: "1 week ago", thumbnail: img },
+        { id: 4, title: "Sample Video 4", views: "20K", timestamp: "2 weeks ago", thumbnail: img },
+    ];
 
     // Load Video and comments
     useEffect(() => {
@@ -120,7 +128,7 @@ function VideoPage() {
     }
 
 
-    // Add video to selected playlist
+    // Add video to selected playlist 
     const addToPlaylist = (playlistId) => {
         axios.post(`/api/playlist/video/${videoId}/${playlistId}`,)
             .then(res => {
@@ -134,160 +142,186 @@ function VideoPage() {
 
     return (
         <div className="flex flex-col mx-14 max-w-screen-2xl">
-            <div className=" text-white flex flex-col xl:flex-row max-xl:items-start">
-                {/* Video Player Section */}
-                <div className="w-[70%] max-h-[580px] max-xl:w-full flex mt-5 justify-center items-center rounded-lg bg-black">
-                    <video
-                        className="w-[1400px] h-auto max-h-full object-contain rounded-lg"
-                        controls
-                        controlsList="nodownload"
-                        poster={video.thumbnail ? video.thumbnail : img}
-                        autoPlay muted
-                        onError={e => e.target.poster = img}
-                    >
-                        <source src={video.videoFile} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
+            <div className="text-white flex gap-6 max-xl:items-start">
+                <div className="flex flex-col xl:w-[70%] w-full">
+                    {/* Video Player Section */}
+                    <div className="w-full max-h-[580px] flex mt-5 justify-center items-center rounded-lg bg-black">
+                        <video
+                            className="w-[1400px] h-auto max-h-full object-contain rounded-lg"
+                            controls
+                            controlsList="nodownload"
+                            poster={video.thumbnail ? video.thumbnail : img}
+                            autoPlay muted
+                            onError={e => e.target.poster = img}
+                        >
+                            <source src={video.videoFile} type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
 
-                {/* Video Details Section */}
-                <div className="xl:w-[30%] w-full p-4 flex flex-col">
-                    <div>
-                        <h1 className="text-2xl font-semibold mb-4 lg:line-clamp-3">
-                            {video.title}
-                        </h1>
+                    {/* Video Details Section */}
+                    <div className="w-full p-4 flex flex-col">
+                        <div>
+                            <h1 className="text-2xl font-semibold mb-4 lg:line-clamp-3">
+                                {video.title}
+                            </h1>
 
-                        <div className='flex flex-row justify-between max-[500px]:flex-col'>
-                            <div
-                                className="flex items-center text-sm text-gray-400 mb-4 cursor-pointer"
-                                title={video.owner.fullname}
-                                onClick={() => navigate(video.owner._id !== currentUser._id ? `/channel/${video.owner._id}` : "/channel")}
-                            >
-                                <img
-                                    src={video.owner.avatar ? video.owner.avatar : profile}
-                                    alt="Channel Logo"
-                                    className="h-12 w-12 object-cover rounded-full mr-4"
-                                />
-                                <div>
-                                    <p className="text-white">{video.owner.fullname}</p>
-                                    <p>{video.subscribers} subscribers</p>
+                            <div className='flex flex-row justify-between max-[500px]:flex-col mb-4'>
+                                <div
+                                    className="flex items-center text-sm text-gray-400 group cursor-pointer transition-all duration-200 hover:scale-110"
+                                    title={video.owner.fullname}
+                                    onClick={() => navigate(video.owner._id !== currentUser._id ? `/channel/${video.owner._id}` : "/channel")}
+                                >
+                                    <img
+                                        src={video.owner.avatar ? video.owner.avatar : profile}
+                                        alt="Channel Logo"
+                                        className="h-12 w-12 rounded-full border-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
+                                        />
+                                    <div>
+                                    <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
+                                    {video.owner.fullname}
+                                        </p>
+                                        <p className="text-sm text-gray-400 transition-all duration-300 group-hover:text-emerald-300">
+                                        {video.subscribers} subscribers
+                                        </p>
+                                    </div>
                                 </div>
+                                    <button
+                                        onClick={toggleSub}
+                                        className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
+                                            ${video.isSubscribed
+                                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                                                : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                                            } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
+                                    >
+                                        {video.isSubscribed ? (
+                                            <>
+                                                <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                                <span className="transition-all">Subscribed</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
+                                                <span className="transition-all text-xl">Subscribe</span>
+                                            </>
+                                        )}
+                                    </button>
                             </div>
-                            <div onClick={toggleSub} className='mr-3'>
-                                {
-                                    video.isSubscribed ? (
-                                        <button className="subscribe-button border bg-red-700 rounded-lg text-xl px-3 py-1.5">
-                                            Subscribed
-                                        </button>
-                                    ) : (
-                                        <button className="subscribe-button border w-full bg-gray-700 rounded-lg text-xl px-3 py-1.5">
-                                            Subscribe
-                                        </button>
-                                    )
-                                }
-                            </div>
-                        </div>
 
-                        <div className='flex flex-row items-center gap-x-8  w-full text-gray-400'>
-                            <span className="inline-flex items-center mr-2 cursor-pointer" title='Likes' onClick={toggleVideoLike}>
-                                <ThumbsUp
-                                    strokeWidth={3}
-                                    absoluteStrokeWidth
-                                    className={video.isLiked ? "me-2 text-blue-600" : "me-2"}
-                                />
-                                {video.likes}
-                            </span>
-                            <span className="inline-flex items-center mr-2" title='Views'>
-                                <Eye
-                                    strokeWidth={3}
-                                    absoluteStrokeWidth
-                                    className="me-2"
-                                />
-                                {video.views}
-                            </span>
-                            <span className="inline-flex items-center mr-2" title='Uploaded at'>
-                                <CalendarArrowDown
-                                    strokeWidth={3}
-                                    absoluteStrokeWidth
-                                    className="me-2"
-                                />
-                                {parseDate(video.createdAt)}
-                            </span>
-                            <span
-                                className="inline-flex items-center mr-2 cursor-pointer"
-                                title='Add to playlist'
-                                onClick={toggleModal} // Open the modal when clicked
+                            <div className='flex flex-row items-center gap-x-8 w-full text-gray-400'>
+                                <span className="inline-flex items-center mr-2 cursor-pointer" title='Likes' onClick={toggleVideoLike}>
+                                    <ThumbsUp
+                                        strokeWidth={3}
+                                        absoluteStrokeWidth
+                                        className={video.isLiked ? "me-2 text-blue-600" : "me-2"}
+                                    />
+                                    {video.likes}
+                                </span>
+                                <span className="inline-flex items-center mr-2" title='Views'>
+                                    <Eye
+                                        strokeWidth={3}
+                                        absoluteStrokeWidth
+                                        className="me-2"
+                                    />
+                                    {video.views}
+                                </span>
+                                <span className="inline-flex items-center mr-2" title='Uploaded at'>
+                                    <CalendarArrowDown
+                                        strokeWidth={3}
+                                        absoluteStrokeWidth
+                                        className="me-2"
+                                    />
+                                    {parseDate(video.createdAt)}
+                                </span>
+                                <span
+                                    className="inline-flex items-center mr-2 cursor-pointer"
+                                    title='Add to playlist'
+                                    onClick={toggleModal}
+                                >
+                                    <List
+                                        strokeWidth={3}
+                                        absoluteStrokeWidth
+                                        className="me-2"
+                                    />
+                                    Add
+                                </span>
+                            </div>
+
+                            <p className="mt-4 line-clamp-6 text-gray-400 mb-4" title='video.description'>{video.description}</p>
+                        </div>
+                    </div>
+
+                    {/* Comments Section */}
+                    <div className='flex flex-col overflow-auto mt-4 ps-3'>
+                        <h1 className='text-xl font-semibold'>{comments.length} Comments</h1>
+
+                        <div name="ADD-COMMENT" className='flex items-start mt-4 w-full'>
+                            <img
+                                src={currentUser.avatar}
+                                alt={`${currentUser.name} avatar`}
+                                onError={e => e.target.src = img}
+                                className="h-10 w-10 rounded-full object-cover mr-3"
+                            />
+
+                            <textarea
+                                className="mb-4 w-full p-2 me-4 bg-gray-900 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
+                                rows="2"
+                                placeholder="Write your comment..."
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                            />
+                        </div>
+                        <div className='flex justify-end space-x-4 mr-2 mb-4 text-slate-400'>
+                            <button
+                                onClick={() => setContent("")}
+                                className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
                             >
-                                <List
-                                    strokeWidth={3}
-                                    absoluteStrokeWidth
-                                    className="me-2"
-                                />
-                                Add
-                            </span>
+                                Cancel
+                            </button>
+                            <button onClick={addComment}>
+                                Comment
+                            </button>
                         </div>
 
-                        <p className="mt-4 line-clamp-6 text-gray-400 mb-4" title='video.description'>{video.description}</p>
+                        <div className='flex flex-col'>
+                            {comments.length ? (
+                                comments.map(comment => (
+                                    <Comment
+                                        key={comment._id}
+                                        id={comment._id}
+                                        content={comment.content}
+                                        updatedAt={parseDate(comment.updatedAt)}
+                                        likes={comment.likes}
+                                        isLiked={comment.isLiked}
+                                        fullname={comment.owner.fullname}
+                                        username={comment.owner.username}
+                                        avatar={comment.owner.avatar}
+                                        toggleLike={toggleCommentLike}
+                                        deleteComment={deleteComment}
+                                    />
+                                ))
+                            ) : null}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Comments Section */}
-            <div className='flex flex-col overflow-auto mt-4 ps-3'>
-                <h1 className='text-xl font-semibold'>{comments.length} Comments</h1>
-
-                <div name="ADD-COMMENT" className='flex items-start mt-4 w-full'>
-                    <img
-                        src={currentUser.avatar}
-                        alt={`${currentUser.name} avatar`}
-                        onError={e => e.target.src = img}
-                        className="h-10 w-10 rounded-full object-cover mr-3"
-                    />
-
-                    <textarea
-                        className="mb-4 w-full p-2 me-4 bg-gray-900 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 resize-none"
-                        rows="2"
-                        placeholder="Write your comment..."
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                    />
-                </div>
-                <div className='flex justify-end space-x-4 mr-2 mb-4 text-slate-400'>
-                    <button
-                        onClick={() => setContent("")}
-                        className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={addComment}
-                    >
-                        Comment
-                    </button>
-                </div>
-
-                <div className='flex flex-col'>
-                    {
-                        comments.length ? (
-                            comments.map(comment => (
-                                <Comment
-                                    key={comment._id}
-                                    id={comment._id}
-                                    content={comment.content}
-                                    updatedAt={parseDate(comment.updatedAt)}
-                                    likes={comment.likes}
-                                    isLiked={comment.isLiked}
-                                    fullname={comment.owner.fullname}
-                                    username={comment.owner.username}
-                                    avatar={comment.owner.avatar}
-                                    toggleLike={toggleCommentLike}
-                                    deleteComment={deleteComment}
-                                />
-                            ))
-                        ) : (
-                            null
-                        )
-                    }
+                {/* Channel Videos Section - Hidden on lg screens and below */}
+                <div className="hidden xl:flex flex-col w-[30%] mt-5 gap-4">
+                    <h2 className="text-xl font-semibold mb-2">More from this channel</h2>
+                    {channelVideos.map(video => (
+                        <div key={video.id} className="flex gap-2 cursor-pointer hover:bg-gray-800 rounded-lg p-2">
+                            <img 
+                                src={video.thumbnail} 
+                                alt={video.title}
+                                className="w-40 h-24 object-cover rounded-lg"
+                            />
+                            <div className="flex flex-col">
+                                <h3 className="font-medium line-clamp-2">{video.title}</h3>
+                                <p className="text-sm text-gray-400">{video.views} views</p>
+                                <p className="text-sm text-gray-400">{video.timestamp}</p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
@@ -296,16 +330,13 @@ function VideoPage() {
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="bg-gray-900 text-white rounded-lg p-6 w-1/3 max-[800px]:w-full">
                         <div className="flex justify-between items-center">
-
                             <h2 className="text-xl font-semibold mb-4">Select a Playlist</h2>
                             <button
-                                className=" px-4 py-2 text-white rounded-lg"
+                                className="px-4 py-2 text-white rounded-lg"
                                 onClick={toggleModal}
                             >
-                                <XMarkIcon className="h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
-
+                                <X className="h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
                             </button>
-
                         </div>
                         <ul className="rounded-lg shadow-inner shadow-slate-800">
                             {playlists.map(playlist => (

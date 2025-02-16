@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .card {
-  @apply hover:bg-gray-950/65 bg-gray-900/50 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 rounded-lg cursor-pointer;
+  @apply hover:bg-gray-950/65 bg-gray-900/50 transition-all overflow-hidden duration-200 hover:scale-105 ease-in-out hover:shadow-lg hover:shadow-purple-500/20 rounded-lg cursor-pointer;
 }
 
 :root {
