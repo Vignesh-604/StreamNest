@@ -8,7 +8,6 @@ import {
     refreshAccessToken, 
     registerUser, 
     updateAvatar, 
-    updateCoverImage, 
     updateDetails 
 } from "../controllers/user.controller.js"
 import {upload} from "../middlewares/multer.middleware.js"
@@ -38,8 +37,6 @@ router.route("/current_user").get(verifyJWT, getCurrentUser)
 router.route("/update_details").patch(verifyJWT, updateDetails)
 
 router.route("/update_avatar").patch(verifyJWT, upload.single("avatar"), updateAvatar)
-
-router.route("/update_cover_image").patch(verifyJWT, upload.single("coverImage"), updateCoverImage)
 
 router.route("/channel/:userId").get(verifyJWT, getUserChannelProfile)
 

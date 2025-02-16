@@ -6,7 +6,6 @@ import {
     getEditDetails,
     getVideoById,
     getAllVideos,
-    togglePublishStatus
 } from "../controllers/video.controller.js"
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js"
@@ -29,7 +28,5 @@ router.route("/v/:videoId").patch(upload.single("thumbnail"), updateVideo)
 router.route("/details/:videoId").get(getEditDetails)
 
 router.route("/").get(getAllVideos)
-
-router.route("/toggle/publish/:videoId").patch(togglePublishStatus)
 
 export default router

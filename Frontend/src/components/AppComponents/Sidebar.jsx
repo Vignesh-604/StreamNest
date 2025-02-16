@@ -134,7 +134,7 @@ export default function Sidebar() {
                                     Videos
                                 </NavLink>
                                 <NavLink
-                                    to="/posts"
+                                    to="/post"
                                     className={({ isActive }) =>
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
@@ -173,21 +173,29 @@ export default function Sidebar() {
             {/* Overlay for Mobile */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black opacity-50 lg:hidden z-20"
+                    className="fixed inset-0 bg-black opacity-50 lg:hidden z-40"
                     onClick={toggleSidebar}
                 ></div>
             )}
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Mobile Header */}
-                <div className="lg:hidden flex justify-between items-center p-4 bg-gray-900 text-white border-b border-slate-700 shrink-0">
-                    <NavLink to="/home" className="flex items-center">
-                        <img src={logo} alt="Logo" className="h-10 w-auto" />
-                    </NavLink>
-                    <button onClick={toggleSidebar}>
-                        <Menu size={24} />
-                    </button>
+                {/* Header Section with Search - Now part of main layout */}
+                <div className="sticky top-0 -mb-2.5 z-40 bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-gray-950/75 border-b border-slate-700 px-4 py-2">
+                    <div className="flex items-center justify-between lg:justify-end gap-4 w-full">
+                        {/* Mobile Logo and Menu */}
+                        <div className="flex items-center lg:hidden">
+
+                            <button onClick={toggleSidebar}>
+                                <Menu size={24} className="text-white" />
+                            </button>
+                        </div>
+
+                        {/* Search Bar - Centered on larger screens */}
+                        <div className="flex-1 w-full">
+                            <Search />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Main Content Area */}

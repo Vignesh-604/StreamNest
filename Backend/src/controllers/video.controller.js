@@ -19,8 +19,8 @@ const publishVideo = asyncHandler(async (req, res) => {
     const thumbnailPath = req.files?.thumbnail[0]?.path
     if (!thumbnailPath) throw new ApiError(400, "Thumbnail Image is required")
 
-    const videoFile = await uploadOnCloudinary(videoFilePath)
-    const thumbnail = await uploadOnCloudinary(thumbnailPath)
+    const videoFile = await uploadOnCloudinary(videoFilePath, "video")
+    const thumbnail = await uploadOnCloudinary(thumbnailPath, "thumbnail")
 
     if (!videoFile) throw new ApiError(400, "Video file not found")
     if (!thumbnail) throw new ApiError(400, "Thumbnail not found")
@@ -53,7 +53,7 @@ const updateVideo = asyncHandler(async (req, res) => {
         const thumbnailPath = req.file?.path
         if (!thumbnailPath) throw new ApiError(400, "Cover Image file is missing")
 
-        const thumbnail = await uploadOnCloudinary(thumbnailPath)
+        const thumbnail = await uploadOnCloudinary(thumbnailPath, "thumbnail")
         if (!thumbnail) throw new ApiError(400, "Cover Image file is missing in cloudinary")
 
         const deleteOnCloud = await deleteFromCloudinary(video.thumbnail)
@@ -182,79 +182,63 @@ const getVideoById = asyncHandler(async (req, res) => {
     res.status(201).json(new ApiResponse(201, video, "Video fetched successfully"))
 })
 
-const togglePublishStatus = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    if (!videoId) throw new ApiError(400, "Video id required")
-
-    const video = await Video.findByIdAndUpdate(
-        videoId,
-        // using aggregation pipeline to use $not and toggle the value in 1 handshake
-        // alternative - isPublished: { $eq: ["$isPublished", false] } (if false then true or else false)
-        [
-            { $set: { isPublished: { $not: "$isPublished" } } },
-        ],
-        { new: true }
-    )
-    res.status(201).json(new ApiResponse(201, video, "Publish toggled"))
-})
-
 const getAllVideos = asyncHandler(async (req, res) => {
+    let { page = 1, limit = 12, query, sortBy, sortType, name } = req.query;
 
-    let { page = 1, limit = 12, query, sortBy, sortType, name } = req.query
+    page = parseInt(page, 10);
+    limit = parseInt(limit, 10);
+    page = Math.max(1, page);
+    limit = Math.min(20, Math.max(1, limit));
 
-    page = parseInt(page, 10)
-    limit = parseInt(limit, 10)
+    const pipeline = [];
 
-    page = Math.max(1, page)        // min page number be 1
-    limit = Math.min(20, Math.max(1, limit))    // Limit is between 1-20
-
-    const pipeline = []
-
-    // Search query
+    // Search query (Regex instead of $text search)
     if (query) {
         pipeline.push({
-            $match: {                   // runs a text search on string fields like title, desc, etc
-                $text: {
-                    $search: query
-                }
-            }
-        })
-    }
-
-    // Search by user id
-    if (name) {
-        if (!(typeof name === "string")) throw new ApiError(401, "UserId incorrect")
-
-        const userId = await User.findOne({ $or: [{ username: name }, { fullname: name }] })
-
-        pipeline.push({
             $match: {
-                owner: new mongoose.Types.ObjectId(userId._id)
+                title: { $regex: query, $options: "i" } // Case-insensitive title search
             }
-        })
+        });
     }
 
-    // Clone the pipeline to use for total count calculation
+    // Search by user fullname/username (Regex search)
+    if (name) {
+        if (typeof name !== "string") throw new ApiError(401, "Invalid username or fullname");
+
+        const users = await User.find({
+            $or: [
+                { fullname: { $regex: name, $options: "i" } },
+                { username: { $regex: name, $options: "i" } }
+            ]
+        }).select("_id");
+
+        if (users.length > 0) {
+            const userIds = users.map(user => user._id);
+            pipeline.push({
+                $match: {
+                    owner: { $in: userIds }
+                }
+            });
+        }
+    }
+
+    // Clone the pipeline for total count calculation
     const totalCountPipeline = [...pipeline];
 
     // Sorting by field in asc/desc order
-    const sortCategory = {}
-    if (sortBy && (sortType === "asc" || "desc")) {
-        sortCategory[sortBy] = sortType === "asc" ? 1 : -1
+    const sortCategory = {};
+    if (sortBy && (sortType === "asc" || sortType === "desc")) {
+        sortCategory[sortBy] = sortType === "asc" ? 1 : -1;
     } else {
-        sortCategory["createdAt"] = -1
+        sortCategory["createdAt"] = -1;
     }
-    pipeline.push({ $sort: sortCategory })
+    pipeline.push({ $sort: sortCategory });
 
     // Pagination
-    pipeline.push({
-        $skip: (page - 1) * limit
-    })
+    pipeline.push({ $skip: (page - 1) * limit });
+    pipeline.push({ $limit: limit });
 
-    pipeline.push({
-        $limit: limit
-    })
-
+    // Lookup user details
     pipeline.push({
         $lookup: {
             from: "users",
@@ -263,24 +247,24 @@ const getAllVideos = asyncHandler(async (req, res) => {
             as: "owner",
             pipeline: [
                 {
-                    $project: {
-                        fullname: 1, username: 1, avatar: 1
-                    }
+                    $project: { fullname: 1, username: 1, avatar: 1 }
                 }
             ]
         }
-    })
+    });
 
-    const videos = await Video.aggregate(pipeline)
+    const videos = await Video.aggregate(pipeline);
 
     // Get total count
-    totalCountPipeline.push({ $count: "total" })
-    const total = await Video.aggregate(totalCountPipeline)
+    totalCountPipeline.push({ $count: "total" });
+    const total = await Video.aggregate(totalCountPipeline);
 
-    if (!videos || !videos.length) res.status(200).json(new ApiResponse(200, [], "No videos available"))
+    if (!videos.length) {
+        return res.status(200).json(new ApiResponse(200, [], `No videos found for '${query || name || ""}'`));
+    }
 
-    else res.status(200).json(new ApiResponse(200, { videos, total }, "Videos fetched"))
-})
+    res.status(200).json(new ApiResponse(200, { videos, total }, "Videos fetched successfully"));
+});
 
 export {
     publishVideo,
@@ -289,5 +273,4 @@ export {
     getEditDetails,
     getVideoById,
     getAllVideos,
-    togglePublishStatus
 }
