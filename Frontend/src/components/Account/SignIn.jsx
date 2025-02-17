@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Eye, EyeOff, Film } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import logo from "../assets/Streamnest.png"
+import Loading from '../AppComponents/Loading';
 
 export default function SignIn({ onSwitchToRegister }) {
     const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ export default function SignIn({ onSwitchToRegister }) {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,17 +35,20 @@ export default function SignIn({ onSwitchToRegister }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setLoading(true);
+
         if (!formData.username && !formData.email) {
             return setErrorMessage('Please enter your username or email.');
         }
 
         axios.post('/api/users/login', formData)
             .then((res) => {
-                let userDetails = res.data.data.user;
-                Cookies.set('user', JSON.stringify(userDetails));
                 navigate('/home');
             })
-            .catch(error => setErrorMessage(error.response?.data?.data || 'An error occurred'));
+            .catch(error => {
+                setLoading(false)
+                setErrorMessage(error.response?.data?.data || 'An error occurred')
+            });
     };
 
     return (
@@ -64,58 +69,64 @@ export default function SignIn({ onSwitchToRegister }) {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-                <div>
-                    <label className="block text-lg font-semibold text-gray-300">
-                        Username or Email
-                    </label>
-                    <input
-                        type="text" name='username' id='username'
-                        className="w-full mt-3 rounded-xl border border-gray-600 bg-gray-900 px-5 py-4 text-xl text-white focus:ring-2 focus:ring-purple-500 outline-none"
-                        placeholder="Enter your username or email"
-                        value={formData.username}
-                        onChange={handleInput}
-                        required
-                    />
-                </div>
+            {
+                loading ? (
+                    <Loading auth={true} loader={{ setLoading }} />
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div>
+                            <label className="block text-lg font-semibold text-gray-300">
+                                Username or Email
+                            </label>
+                            <input
+                                type="text" name='username' id='username'
+                                className="w-full mt-3 rounded-xl border border-gray-600 bg-gray-900 px-5 py-4 text-xl text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                placeholder="Enter your username or email"
+                                value={formData.username}
+                                onChange={handleInput}
+                                required
+                            />
+                        </div>
 
-                <div>
-                    <label className="block text-lg font-semibold text-gray-300">
-                        Password
-                    </label>
-                    <div className="relative mt-3">
-                        <input
-                            name='password' id='password'
-                            className="w-full rounded-xl border border-gray-600 bg-gray-900 px-5 py-4 text-xl text-white focus:ring-2 focus:ring-purple-500 outline-none"
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Enter your password"
-                            value={formData.password}
-                            onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                            required
-                        />
+                        <div>
+                            <label className="block text-lg font-semibold text-gray-300">
+                                Password
+                            </label>
+                            <div className="relative mt-3">
+                                <input
+                                    name='password' id='password'
+                                    className="w-full rounded-xl border border-gray-600 bg-gray-900 px-5 py-4 text-xl text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="Enter your password"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 text-xl transition"
+                                >
+                                    {showPassword ? <EyeOff /> : <Eye />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {errorMessage && (
+                            <div className="p-4 bg-red-500/20 border border-red-400 text-lg font-semibold text-red-400 rounded-lg">
+                                {errorMessage}
+                            </div>
+                        )}
+
                         <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 text-xl transition"
+                            type="submit"
+                            className="w-full flex items-center justify-center rounded-2xl bg-purple-500 px-6 py-5 text-2xl font-bold text-white transition-all duration-300 hover:bg-purple-600 hover:shadow-xl"
                         >
-                            {showPassword ? <EyeOff /> : <Eye />}
+                            Sign In <ArrowRight className="ml-3" size={24} />
                         </button>
-                    </div>
-                </div>
-
-                {errorMessage && (
-                    <div className="p-4 bg-red-500/20 border border-red-400 text-lg font-semibold text-red-400 rounded-lg">
-                        {errorMessage}
-                    </div>
-                )}
-
-                <button
-                    type="submit"
-                    className="w-full flex items-center justify-center rounded-2xl bg-purple-500 px-6 py-5 text-2xl font-bold text-white transition-all duration-300 hover:bg-purple-600 hover:shadow-xl"
-                >
-                    Sign In <ArrowRight className="ml-3" size={24} />
-                </button>
-            </form>
+                    </form>
+                )
+            }
         </div>
     );
 }

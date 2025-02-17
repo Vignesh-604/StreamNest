@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, useParams, useNavigate, Outlet } from 'react-router-dom';
 import { Menu, X, Home, UserCircle, ListVideo, ThumbsUp, Clock, Users, LogOut, MonitorPlay, UserRoundCheck, NotepadText } from 'lucide-react';
 import axios from 'axios';
+import { decrypt } from '../Utils/utility';
 import Cookies from 'js-cookie';
 import logo from "../assets/Streamnest.png";
 import profile from "../assets/profile.webp";
@@ -11,7 +12,9 @@ export default function Sidebar() {
     const { channelId } = useParams();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-    const user = JSON.parse(Cookies.get("user"));
+
+    const signedIn = Cookies.get("user")
+    let user = signedIn ? decrypt() : null
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -161,7 +164,7 @@ export default function Sidebar() {
                     <div className="px-5 py-4 border-t border-gray-700 shrink-0">
                         <button
                             onClick={logout}
-                            className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800 transition-colors duration-300"
+                            className="flex w-full items-center cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800 transition-colors duration-300"
                         >
                             <LogOut className="h-5 w-5 mr-3" />
                             Log out
@@ -200,7 +203,7 @@ export default function Sidebar() {
 
                 {/* Main Content Area */}
                 <div className="flex-1 overflow-y-auto bg-[#0a0a26]/40">
-                    <Outlet context={JSON.parse(Cookies.get("user"))} />
+                    <Outlet context={user} />
                 </div>
             </div>
         </div>

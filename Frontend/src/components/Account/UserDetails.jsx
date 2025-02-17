@@ -75,7 +75,7 @@ export default function UserDetails() {
     const otherChannelStats = [
         { label: "Videos", value: userStats.totalVideos || 0, link: `/videos/${channelId}`, icon: <MonitorPlay className="w-8 h-8" /> },
         { label: "Posts", value: userStats.totalPosts || 0, link: `/post/u/${channelId}`, icon: <NotepadText className="w-8 h-8" /> },
-        { label: "Playlists", value: user.playlists || 0, link: `/playlist/u/${channelId}`, icon: <ListVideo className="w-8 h-8" /> },
+        { label: "Playlists", value: userStats.totalPlaylists || 0, link: `/playlist/u/${channelId}`, icon: <ListVideo className="w-8 h-8" /> },
     ];
 
     const CardContent = ({ icon, label, value }) => (
@@ -105,7 +105,7 @@ export default function UserDetails() {
 
                             {
                                 owner ? (
-                                    <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-colors">
+                                    <button onClick={() => setIsEditing(true)} className="flex items-center cursor-pointer gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-colors">
                                         <PencilLine className="w-4 h-4" />
                                         Edit Profile
                                     </button>
@@ -141,22 +141,10 @@ export default function UserDetails() {
                     owner && (
                         <>
                             {/* Activity Section */}
-                            <div className="mb-8">
+                            <div className="mb-6">
                                 <h2 className="text-2xl font-bold mb-4">My Activity</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {activityStats.map((stat, index) => (
-                                        <div key={index} onClick={() => navigate(stat.link, { state: user })} className="bg-[#24273a] p-6 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
-                                            <CardContent icon={stat.icon} label={stat.label} value={stat.value} />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Channel Section */}
-                            <div>
-                                <h2 className="text-2xl font-bold mb-4">My Channel</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {channelStats.map((stat, index) => (
                                         <div key={index} onClick={() => navigate(stat.link, { state: user })} className="bg-[#24273a] p-6 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
                                             <CardContent icon={stat.icon} label={stat.label} value={stat.value} />
                                         </div>
@@ -167,21 +155,23 @@ export default function UserDetails() {
                     )
                 }
 
+
                 {/* Channel Section */}
-                {
-                    !owner && (
-                        <div>
-                            <h2 className="text-2xl font-bold mb-4">Channel Activity</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {otherChannelStats.map((stat, index) => (
-                                    <div key={index} onClick={() => navigate(stat.link, { state: user })} className="bg-[#24273a] p-6 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
-                                        <CardContent icon={stat.icon} label={stat.label} value={stat.value} />
-                                    </div>
-                                ))}
+                <div>
+                    <h2 className="text-2xl font-bold mb-4">My Channel</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {(owner ? channelStats : otherChannelStats).map((stat, index) => (
+                            <div key={index} onClick={() => navigate(stat.link, { state: user })} className="bg-[#24273a] p-6 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
+                                <CardContent icon={stat.icon} label={stat.label} value={stat.value} />
                             </div>
-                        </div>
-                    )
-                }
+                        ))}
+                    </div>
+                    <div className="border border-gray-700/30 mt-4 py-2 text-xl font-semibold flex felx-row rounded-lg bg-[#24273a]">
+                        <h1 className="border-r pl-5 w-1/2">Total Likes: {userStats.totalLikes}</h1>
+                        <h1 className="border-l pl-5 w-1/2">Total Views: {userStats.totalViews}</h1>
+                    </div>
+                </div>
+
                 {/* Edit Profile Dialog */}
                 <EditProfileDialog isOpen={isEditing} onClose={() => setIsEditing(false)} user={user} setUser={setUser} />
             </div>

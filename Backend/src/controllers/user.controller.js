@@ -5,25 +5,26 @@ import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import CryptoJS from "crypto-js";
 
 const registerUser = asyncHandler(async (req, res) => {
 
     const { username, fullname, email, password } = req.body
 
     if ([fullname, username, email, password].some((field) => field?.trim() === "")) {
-        return res.status(400).json( new ApiResponse(400, "All input fields must be filled"))
+        return res.status(400).json(new ApiResponse(400, "All input fields must be filled"))
     }
 
     const existingUser = await User.findOne({
         $or: [{ username }, { email }]
     })
 
-    if (existingUser) return res.status(409).json( new ApiResponse(409, "User with email or username already exists"))
+    if (existingUser) return res.status(409).json(new ApiResponse(409, "User with email or username already exists"))
 
     const avatarPath = req.files?.avatar[0]?.path               // need checking for avatar img
 
     if (!avatarPath) {
-        return res.status(404).json( new ApiResponse(404, "Avatar Image is required"))
+        return res.status(404).json(new ApiResponse(404, "Avatar Image is required"))
     }
 
     const avatar = await uploadOnCloudinary(avatarPath)
@@ -42,15 +43,16 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
-    const createdUser = await User.findById(user._id).select(
-        "-password -refreshToken"
-    )
-    if (!createdUser) return res.status(500).json( new ApiResponse(500, "Something went wrong while registering the user"))
+    const createdUser = await User.findById(user._id).select(" _id username fullname avatar ")
+    const userData = CryptoJS.AES.encrypt(JSON.stringify(createdUser), process.env.VITE_KEY).toString()
+
+    if (!createdUser) return res.status(500).json(new ApiResponse(500, "Something went wrong while registering the user"))
 
     return res.status(201)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    .json(new ApiResponse(200, createdUser, "User Registered successfully!!"))
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .cookie("user", userData)
+        .json(new ApiResponse(200, createdUser, "User Registered successfully!!"))
 })
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -80,18 +82,21 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
         $or: [{ username }, { email }]
     })
-    if (!user) return res.status(404).json( new ApiResponse(404, "Incorrect username or email"))
+    if (!user) return res.status(404).json(new ApiResponse(404, "Incorrect username or email"))
 
     const validPassword = await user.isPasswordCorrect(password)
-    if (!validPassword) return res.status(404).json( new ApiResponse(404,"Password incorrect"))
+    if (!validPassword) return res.status(404).json(new ApiResponse(404, "Password incorrect"))
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+    const loggedInUser = await User.findById(user._id).select(" _id username fullname avatar ")
+
+    const userData = CryptoJS.AES.encrypt(JSON.stringify(loggedInUser), process.env.VITE_KEY).toString()
 
     return res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
+        .cookie("user", userData)
         .json(
             new ApiResponse(
                 200,
@@ -210,24 +215,24 @@ const getCurrentUser = asyncHandler(async (req, res) => {
                         $filter: {
                             input: "$likedVids",
                             as: "likedVid",
-                            cond: {$ne: ["$likedVid.video", null]}
+                            cond: { $ne: ["$likedVid.video", null] }
                         }
                     }
                 },
-                playlists :{
+                playlists: {
                     $size: "$playlists"
                 },
                 subscriptions: {
-                   $size: "$subscriptions" 
+                    $size: "$subscriptions"
                 }
             }
         },
         {
             $project: {
-                username:1,
+                username: 1,
                 fullname: 1,
                 avatar: 1,
-                createdAt:1,
+                createdAt: 1,
                 email: 1,
 
                 likedVidCount: 1,
@@ -292,7 +297,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             },
         },
         {
-            $lookup: {                      
+            $lookup: {
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
@@ -324,7 +329,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     ])
 
     if (!channel?.length) throw new ApiError(404, "Channel does not exist")
-    
+
     res.status(200).json(new ApiResponse(200, channel[0], "Channel found"))
 })
 

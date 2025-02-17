@@ -4,12 +4,16 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "./components/AppComponents/Sidebar";
 import ErrorPage from "./components/AppComponents/ErrorPage";
 import { useNetworkStatus, useAxiosInterceptor } from "./components/Utils/networkUtility.js";
+import { decrypt } from "./components/Utils/utility.js";
 
 function App() {
   const navigate = useNavigate();
   const isOffline = useNetworkStatus();
   const axiosOffline = useAxiosInterceptor();
-  const user = Cookies.get("user");
+
+  const signedIn = Cookies.get("user")
+
+  let user = signedIn ? decrypt() : null
 
   useEffect(() => {
     if (!user) {
@@ -24,7 +28,7 @@ function App() {
       ) : isOffline || axiosOffline ? (     // Checking for network connection
         <ErrorPage />
       ) : (
-          <Sidebar />
+        <Sidebar />
       )}
     </div>
   );

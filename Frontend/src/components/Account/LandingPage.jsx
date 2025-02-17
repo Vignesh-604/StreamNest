@@ -8,16 +8,17 @@ export default function LandingPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
-      <div className="max-md:hidden relative flex items-end px-4 pb-10 pt-60 sm:px-6 sm:pb-16 md:justify-center lg:px-8 lg:pb-24">
+      {/* Left section - Fixed, non-scrollable */}
+      <div className="max-md:hidden relative flex items-end lg:h-screen overflow-hidden">
         <div className="absolute inset-0">
           <img
-            className="h-full w-full rounded-md object-cover object-top"
+            className="h-full w-full object-cover object-top"
             src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d"
             alt="Content creator workspace"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-        <div className="relative">
+        <div className="relative w-full px-4 pb-10 pt-60 sm:px-6 sm:pb-16 lg:px-8 lg:pb-24">
           <div className="w-full max-w-xl xl:mx-auto xl:w-full xl:max-w-xl xl:pr-24">
             <h3 className="text-4xl font-bold text-white">
               Share your creativity with the world
@@ -56,12 +57,15 @@ export default function LandingPage() {
         </div>
       </div>
       
-      <div className="flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-2">
-        {showRegister ? (
-          <Register onSwitchToSignIn={() => setShowRegister(false)} />
-        ) : (
-          <SignIn onSwitchToRegister={() => setShowRegister(true)} />
-        )}
+      {/* Right section - Scrollable form container */}
+      <div className="relative h-screen overflow-auto bg-gradient-to-br from-gray-900 to-gray-800">
+        <div className="flex min-h-full w-full items-center justify-center p-2">
+          {showRegister ? (
+            <Register onSwitchToSignIn={() => setShowRegister(false)} />
+          ) : (
+            <SignIn onSwitchToRegister={() => setShowRegister(true)} />
+          )}
+        </div>
       </div>
     </div>
   );

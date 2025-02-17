@@ -29,9 +29,6 @@ const userSchema = new Schema({
         type: String,               //cloudinary url: using third party
         required: true
     },
-    coverImage: {
-        type: String
-    },
     password: {
         type: String,
         required: [true, "Password is required"]
