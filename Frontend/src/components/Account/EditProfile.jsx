@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import axios from "axios";
 import { X, Save, Eye, EyeOff } from "lucide-react";
 import PasswordStrengthIndicator from "./PasswordChecker";
+import { showCustomAlert } from "../Utils/utility";
 
 export default function EditProfile({ isOpen, onClose, user, setUser }) {
-    const [formData, setFormData] = useState({ fullname: user.fullname, email: user.email });
+    const [formData, setFormData] = useState({ fullname: user.fullname });
     const [avatarFile, setAvatarFile] = useState(null);
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -30,32 +31,37 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
         setLoading(true);
         setError("");
 
-        try {
-            // Update user details
-            if (formData.fullname !== user.fullname || formData.email !== user.email) {
-                const detailsResponse = await axios.patch("/api/users/update_details", formData);
-                setUser(detailsResponse.data.data);
-            }
+        // Update user details (fullname & email)
+        if (formData.fullname !== user.fullname) {
+            axios.patch("/api/users/update_details", { fullname: formData.fullname })
+                .then(res => {
+                    setUser(prev => ({ ...prev, fullname: res.data.data.fullname }))
+                    onClose()
+                })
+                .catch(err => setError(err.response?.data?.message || "Failed to update details"));
+        }
 
-            // Update avatar
-            if (avatarFile) {
-                const formData = new FormData();
-                formData.append("avatar", avatarFile);
-                const avatarResponse = await axios.patch("/api/users/update_avatar", formData, {
-                    headers: { "Content-Type": "multipart/form-data" }
-                });
-                setUser(prev => ({ ...prev, avatar: avatarResponse.data.data.avatar }));
-            }
+        // Update avatar
+        if (avatarFile) {
+            const formData = new FormData();
+            formData.append("avatar", avatarFile);
 
-            // Update password if entered
-            if (oldPassword && newPassword) {
-                await axios.patch("/api/users/update_password", { oldPassword, newPassword });
-            }
+            axios.patch("/api/users/update_avatar", formData, { headers: { "Content-Type": "multipart/form-data" } })
+                .then(res => {
+                    setUser(prev => ({ ...prev, avatar: res.data.data.avatar }))
+                    onClose()
+                })
+                .catch(err => setError(err.response?.data?.message || "Failed to update avatar"));
+        }
 
-            onClose();
-        } catch (error) {
-            console.error(error);
-            setError(error.response?.data?.message || "Something went wrong!");
+        // Update password if both old & new password fields are filled
+        if (oldPassword && newPassword) {
+            axios.patch("/api/users/update_password", { oldPassword, newPassword })
+                .then(() => {
+                    showCustomAlert("Password Changed Successfully!!")
+                    onClose()
+                })
+                .catch(err => setError(err.response?.data?.message || "Failed to update password"));
         }
 
         setLoading(false);
@@ -81,18 +87,6 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
                         />
                     </div>
 
-                    {/* Email */}
-                    <div>
-                        <label className="text-gray-400 text-sm">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 rounded-lg bg-[#2a2b3e] text-white border border-gray-700 focus:outline-none"
-                        />
-                    </div>
-
                     {/* Avatar Upload */}
                     <div>
                         <label className="text-gray-400 text-sm">Profile Picture</label>
@@ -100,14 +94,14 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
                             type="file"
                             accept="image/*"
                             onChange={handleAvatarChange}
-                            className="w-full text-gray-300"
+                            className="w-full px-4 py-2 rounded-lg bg-[#2a2b3e] cursor-pointer text-white border border-gray-700 focus:outline-none"
                         />
                     </div>
 
                     {/* Password Update */}
                     <div className="border-t border-gray-700 pt-4">
                         <h3 className="text-gray-400 text-sm mb-2">Change Password (Optional)</h3>
-                        
+
                         {/* Old Password */}
                         <div className="relative">
                             <input
@@ -118,7 +112,7 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
                                 className="w-full px-4 py-2 rounded-lg bg-[#2a2b3e] text-white border border-gray-700 focus:outline-none"
                             />
                             <button type="button" className="absolute right-3 top-2 text-gray-400" onClick={() => setShowOldPassword(!showOldPassword)}>
-                                {showOldPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                {showOldPassword ? <EyeOff className="w-5 h-5 cursor-pointer" /> : <Eye className="w-5 h-5 cursor-pointer" />}
                             </button>
                         </div>
 
@@ -132,7 +126,7 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
                                 className="w-full px-4 py-2 rounded-lg bg-[#2a2b3e] text-white border border-gray-700 focus:outline-none"
                             />
                             <button type="button" className="absolute right-3 top-2 text-gray-400" onClick={() => setShowNewPassword(!showNewPassword)}>
-                                {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                {showNewPassword ? <EyeOff className="w-5 h-5 cursor-pointer" /> : <Eye className="w-5 h-5 cursor-pointer" />}
                             </button>
                         </div>
 
@@ -146,7 +140,7 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2"
+                        className="w-full cursor-pointer bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2"
                         disabled={loading}
                     >
                         {loading ? "Saving..." : (
