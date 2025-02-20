@@ -5,14 +5,14 @@ import { Comment } from "../models/comment.models.js"
 import mongoose from "mongoose";
 
 // Not optimized code. May change in future
-const getVideoComments = asyncHandler( async(req, res) => {
-    const { videoId } = req.params
-    if (!videoId) throw new ApiError(402, "Provide a video Id")
+const getVideoComments = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    if (!videoId) throw new ApiError(402, "Provide a video Id");
 
-    const { page = 1, limit = 10} = req.query
-    // For next 10 comments increase page value "?page=2"
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
 
-    const commentsAggregate = Comment.aggregate([
+    const comments = await Comment.aggregate([
         {
             $match: { video: new mongoose.Types.ObjectId(videoId) }
         },
@@ -34,19 +34,15 @@ const getVideoComments = asyncHandler( async(req, res) => {
         },
         {
             $addFields: {
-                likes: {
-                    $size: "$likes"
-                },
-               isLiked: {
+                likes: { $size: "$likes" },
+                isLiked: {
                     $cond: {
-                        if: { $in:[ req.user?._id, "$likes.likedBy"] },
+                        if: { $in: [req.user?._id, "$likes.likedBy"] },
                         then: true,
                         else: false
                     }
                 },
-                owner: {
-                    $first: "$owner"
-                }
+                owner: { $first: "$owner" }
             }
         },
         {
@@ -64,29 +60,21 @@ const getVideoComments = asyncHandler( async(req, res) => {
                 updatedAt: 1
             }
         },
-    ])
+        { $skip: skip },
+        { $limit: parseInt(limit, 10) }
+    ]);
 
-    const options = {
-        page: parseInt(page, 10),       // current page number to display, default 10
-        limit: parseInt(limit, 10)      // limit of comments on each page, default 10
-    }
+    res.status(200).json(new ApiResponse(200, comments, "Video comments fetched"));
+});
 
-        const comments = await Comment.aggregatePaginate(
-            commentsAggregate, 
-            options
-        );
+const getPostComments = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+    if (!postId) throw new ApiError(402, "Provide a post Id");
 
-        res.status(200).json(new ApiResponse(200, comments, "Video comments fetched"));
-})
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
 
-const getPostComments = asyncHandler( async(req, res) => {
-    const { postId } = req.params
-    if (!postId) throw new ApiError(402, "Provide a post Id")
-
-    const { page = 1, limit = 10} = req.query
-    // For next 10 comments increase page value "?page=2"
-
-    const commentsAggregate = Comment.aggregate([
+    const comments = await Comment.aggregate([
         {
             $match: { post: new mongoose.Types.ObjectId(postId) }
         },
@@ -108,19 +96,15 @@ const getPostComments = asyncHandler( async(req, res) => {
         },
         {
             $addFields: {
-                likes: {
-                    $size: "$likes"
-                },
-               isLiked: {
+                likes: { $size: "$likes" },
+                isLiked: {
                     $cond: {
-                        if: { $in:[ req.user?._id, "$likes.likedBy"] },
+                        if: { $in: [req.user?._id, "$likes.likedBy"] },
                         then: true,
                         else: false
                     }
                 },
-                owner: {
-                    $first: "$owner"
-                }
+                owner: { $first: "$owner" }
             }
         },
         {
@@ -138,20 +122,13 @@ const getPostComments = asyncHandler( async(req, res) => {
                 updatedAt: 1
             }
         },
-    ])
+        { $skip: skip },
+        { $limit: parseInt(limit, 10) }
+    ]);
 
-    const options = {
-        page: parseInt(page, 10),       // current page number to display, default 10
-        limit: parseInt(limit, 10)      // limit of comments on each page, default 10
-    }
+    res.status(200).json(new ApiResponse(200, comments, "Post comments fetched"));
+});
 
-        const comments = await Comment.aggregatePaginate(
-            commentsAggregate, 
-            options
-        );
-
-        res.status(200).json(new ApiResponse(200, comments, "Post comments fetched"));
-})
 
 const addVideoComment = asyncHandler( async (req, res) => {
     const { videoId } = req.params

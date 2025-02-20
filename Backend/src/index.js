@@ -42,6 +42,7 @@ import dashboardRouter from "./routes/dashboard.routes.js"
 import videoRouter from "./routes/video.routes.js"
 import subscriptionRouter from "./routes/subscription.routes.js"
 import watchHistoryRouter from "./routes/watchHistory.routes.js"
+import cleanupRouter from "./routes/cleanup.routes.js"
 
 app.use("/api/users", userRouter)
 app.use("/api/post", postRouter)
@@ -52,5 +53,6 @@ app.use("/api/dashboard", dashboardRouter)
 app.use("/api/video", videoRouter)
 app.use("/api/subscription", subscriptionRouter)
 app.use("/api/watchHistory", watchHistoryRouter)
+app.use("/api/cleanup", cleanupRouter)
 
 export {app}

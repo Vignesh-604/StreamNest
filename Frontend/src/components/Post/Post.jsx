@@ -26,7 +26,7 @@ export default function PostItem() {
             .catch(error => error.response.status >= 500 ? navigate(-1) : console.log(error));
 
         axios.get(`/api/comment/post/${postId}`)
-            .then((res) => setComments(res.data.data.docs))
+            .then((res) => setComments(res.data.data))
             .catch(error => console.log(error));
     }, []);
 
@@ -75,7 +75,7 @@ export default function PostItem() {
             axios.post(`/api/comment/post/${postId}`, { content })
                 .then((res) => {
                     setComments([...comments, {
-                        ...res.data.data, 
+                        ...res.data.data,
                         likes: 0,
                         owner: {
                             username: currentUser.username,
@@ -90,13 +90,13 @@ export default function PostItem() {
     }
     const deleteComment = (id) => {
         axios.delete(`/api/comment/c/${id}`)
-        .then((res) => setComments(comments => comments.filter(com => com._id !== id)))
-        .catch(error => console.log(error))
+            .then((res) => setComments(comments => comments.filter(com => com._id !== id)))
+            .catch(error => console.log(error))
     }
 
     if (loading) return <Loading />
 
-return (
+    return (
         <div className="container mx-auto p-4 flex flex-col items-center md:mt-10">
             {post ? (
                 <div className="bg-gray-900 max-sm:w-[400px] md:w-[700px] lg:w-[1000px] w-full text-white p-6 rounded-lg mb-4 shadow-lg border border-purple-500/20">
@@ -168,7 +168,7 @@ return (
             ) : (
                 <h1 className="text-xl font-semibold text-purple-100">Loading...</h1>
             )}
-            
+
             <div className="container flex flex-col max-w-[1000px]">
                 <h1 className="text-xl font-semibold text-purple-100 mb-4">{comments.length} Comments</h1>
 
@@ -212,9 +212,9 @@ return (
                                 updatedAt={parseDate(comment.updatedAt)}
                                 likes={comment.likes}
                                 isLiked={comment.isLiked}
-                                fullname={comment.owner.fullname}
-                                username={comment.owner.username}
-                                avatar={comment.owner.avatar}
+                                fullname={comment.owner?.fullname}
+                                username={comment.owner?.username}
+                                avatar={comment.owner?.avatar}
                                 toggleLike={toggleCommentLike}
                                 deleteComment={deleteComment}
                             />

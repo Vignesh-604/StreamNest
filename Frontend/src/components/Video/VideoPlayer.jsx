@@ -39,7 +39,7 @@ function VideoPage() {
             .catch(error => console.log(error.response.data));
 
         axios.get(`/api/comment/video/${videoId}`)
-            .then((res) => setComments(res.data.data.docs))
+            .then((res) => setComments(res.data.data))
             .catch(error => console.log(error.response.data));
 
         axios.post(`/api/watchHistory/track/${videoId}`)
@@ -176,36 +176,36 @@ function VideoPage() {
                                         src={video.owner.avatar ? video.owner.avatar : profile}
                                         alt="Channel Logo"
                                         className="h-12 w-12 rounded-full border-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
-                                        />
+                                    />
                                     <div>
-                                    <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
-                                    {video.owner.fullname}
+                                        <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
+                                            {video.owner.fullname}
                                         </p>
                                         <p className="text-sm text-gray-400 transition-all duration-300 group-hover:text-emerald-300">
-                                        {video.subscribers} subscribers
+                                            {video.subscribers} subscribers
                                         </p>
                                     </div>
                                 </div>
-                                    <button
-                                        onClick={toggleSub}
-                                        className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
+                                <button
+                                    onClick={toggleSub}
+                                    className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
                                             ${video.isSubscribed
-                                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
-                                                : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
-                                            } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
-                                    >
-                                        {video.isSubscribed ? (
-                                            <>
-                                                <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
-                                                <span className="transition-all">Subscribed</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
-                                                <span className="transition-all text-xl">Subscribe</span>
-                                            </>
-                                        )}
-                                    </button>
+                                            ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                                            : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                                        } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
+                                >
+                                    {video.isSubscribed ? (
+                                        <>
+                                            <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                            <span className="transition-all">Subscribed</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
+                                            <span className="transition-all text-xl">Subscribe</span>
+                                        </>
+                                    )}
+                                </button>
                             </div>
 
                             <div className='flex flex-row items-center gap-x-8 w-full text-gray-400'>
@@ -293,9 +293,9 @@ function VideoPage() {
                                         updatedAt={parseDate(comment.updatedAt)}
                                         likes={comment.likes}
                                         isLiked={comment.isLiked}
-                                        fullname={comment.owner.fullname}
-                                        username={comment.owner.username}
-                                        avatar={comment.owner.avatar}
+                                        fullname={comment.owner?.fullname}
+                                        username={comment.owner?.username}
+                                        avatar={comment.owner?.avatar}
                                         toggleLike={toggleCommentLike}
                                         deleteComment={deleteComment}
                                     />
@@ -310,8 +310,8 @@ function VideoPage() {
                     <h2 className="text-xl font-semibold mb-2">More from this channel</h2>
                     {channelVideos.map(video => (
                         <div key={video.id} className="flex gap-2 cursor-pointer hover:bg-gray-800 rounded-lg p-2">
-                            <img 
-                                src={video.thumbnail} 
+                            <img
+                                src={video.thumbnail}
                                 alt={video.title}
                                 className="w-40 h-24 object-cover rounded-lg"
                             />
