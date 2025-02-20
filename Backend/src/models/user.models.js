@@ -33,6 +33,10 @@ const userSchema = new Schema({
         type: String,
         required: [true, "Password is required"]
     },
+    uploads: {
+        uploaded: { type: Number, default: 0 },
+        uploadLimit: { type: Number, default: 5 }
+    },
     refreshToken: {
         type: String
     }

@@ -34,7 +34,9 @@ const videoSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
         index: true
-    }
+    },
+    isExclusive: { type: Boolean, default: false }, 
+    price: { type: Number },
 },{
     timestamps: true
 });

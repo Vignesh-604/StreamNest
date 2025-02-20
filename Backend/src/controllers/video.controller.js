@@ -5,11 +5,19 @@ import { Video } from "../models/video.models.js"
 import { User } from "../models/user.models.js"
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import mongoose, { isValidObjectId } from "mongoose";
+import { Purchase } from "../models/purchase.model.js";
 
 const publishVideo = asyncHandler(async (req, res) => {
-
     let { title, description } = req.body
     if (!description) throw new ApiError(400, "Please put description")
+    
+    // Check user's upload limit
+    const user = await User.findById(req.user?._id)
+    if (!user) throw new ApiError(404, "User not found")
+
+    if (user.uploads.uploaded >= user.uploads.uploadLimit) {
+        throw new ApiError(403, "Upload limit reached")
+    }
 
     if (!title) title = req.files?.videoFile[0]?.originalname?.split(".")[0]
 
@@ -34,6 +42,11 @@ const publishVideo = asyncHandler(async (req, res) => {
         owner: req.user?._id
     })
     if (!video) throw new ApiError(400, "Could not upload video")
+
+    // Increment upload count
+    await User.findByIdAndUpdate(req.user?._id, {
+        $inc: { "uploads.uploaded": 1 }
+    })
 
     res.status(200).json(new ApiResponse(200, video, "Video uploaded successfully"))
 })
@@ -74,6 +87,11 @@ const deleteVideo = asyncHandler(async (req, res) => {
     const deleteVidFromCloud = await deleteFromCloudinary(video.videoFile)
     const deleteThumbnailFromCloud = await deleteFromCloudinary(video.thumbnail)
 
+    // Decrease uploaded count, ensuring it doesn't go below zero
+    await User.findByIdAndUpdate(video.owner, {
+        $inc: { "uploads.uploaded": -1 }
+    })
+    
     res.status(203).json(new ApiResponse(201, { deleteVidFromCloud, deleteThumbnailFromCloud }, "video deleted successfully"))
 })
 
@@ -92,6 +110,23 @@ const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     if (!isValidObjectId(videoId)) throw new ApiError(400, "Video id required")
 
+    // **Step 1: Get only _id and isExclusive to check access**
+    const videoMeta = await Video.findById(videoId).select("_id isExclusive").lean()
+    if (!videoMeta) throw new ApiError(404, "Video not found")
+
+    // **Step 2: If exclusive, check if the user has purchased it**
+    if (videoMeta.isExclusive) {
+        const hasAccess = await Purchase.findOne({
+            _id: req.user._id,
+            "purchasedVideos.videoId": videoId
+        }).lean()
+
+        if (!hasAccess) {
+            return res.status(401).json(new ApiResponse(401, null, "No access to this video"))
+        }
+    }
+
+    // **Step 3: Perform aggregation to get full details**
     const video = await Video.aggregate([
         {
             $match: { _id: new mongoose.Types.ObjectId(videoId) }
@@ -122,9 +157,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         },
         {
             $addFields: {
-                likes: {
-                    $size: "$likes"
-                },
+                likes: { $size: "$likes" },
                 isLiked: {
                     $cond: {
                         if: { $in: [req.user?._id, "$likes.likedBy"] },
@@ -132,20 +165,16 @@ const getVideoById = asyncHandler(async (req, res) => {
                         else: false
                     }
                 },
-                subscribers: {
-                    $size: "$subscribers"
-                },
-                owner: {
-                    $first: "$owner"
-                },
+                subscribers: { $size: "$subscribers" },
+                owner: { $first: "$owner" },
                 isSubscribed: {
                     $cond: {
                         if: { $in: [req.user?._id, "$subscribers.subscriber"] },
                         then: true,
                         else: false
                     }
-                },
-            },
+                }
+            }
         },
         {
             $project: {
@@ -170,16 +199,19 @@ const getVideoById = asyncHandler(async (req, res) => {
             }
         }
     ])
+
     if (!video || !video.length) throw new ApiError(400, "Didn't work")
 
-    // Increments views value 
+    const videoData = video[0]
+
+    // **Step 4: Increment views count**
     await Video.findByIdAndUpdate(
         videoId,
         { $inc: { views: 1 } },
         { new: true }
     ).select("views")
 
-    res.status(201).json(new ApiResponse(201, video, "Video fetched successfully"))
+    res.status(201).json(new ApiResponse(201, videoData, "Video fetched successfully"))
 })
 
 const getAllVideos = asyncHandler(async (req, res) => {

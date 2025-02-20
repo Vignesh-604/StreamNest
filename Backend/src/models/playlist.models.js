@@ -23,7 +23,9 @@ const playlistSchema = new Schema({
     owner: {
         type: Schema.Types.ObjectId,
         ref: "User"
-    }
+    },
+    isExclusive: { type: Boolean, default: false },
+    price: { type: Number },  
 }, {
     timestamps: true,
 });
