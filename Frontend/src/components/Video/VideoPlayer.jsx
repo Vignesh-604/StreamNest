@@ -32,7 +32,7 @@ function VideoPage() {
     useEffect(() => {
         axios.get(`/api/video/v/${videoId}`)
             .then((res) => {
-                const videoDetails = res.data.data[0]
+                const videoDetails = res.data.data
                 setVideo(videoDetails);
                 setLoading(false)
             })

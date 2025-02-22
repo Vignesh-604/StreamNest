@@ -101,11 +101,6 @@ const toggleVideoLike = asyncHandler( async (req, res) => {
 
 const getLikedVideos = asyncHandler( async (req, res) => {
     const user = req.user?._id
-    
-    // const videos = await Like.find({
-    //     likedBy: user,
-    //     video: {$exists: true}
-    // })
 
     const videos = await Like.aggregate([
         {
@@ -144,6 +139,7 @@ const getLikedVideos = asyncHandler( async (req, res) => {
                 "videos.thumbnail": 1,
                 "videos.views": 1,
                 "videos.duration": 1,
+                "videos.isExclusive": 1,
                 "videos.owner._id": 1,
                 "videos.owner.username": 1
             }

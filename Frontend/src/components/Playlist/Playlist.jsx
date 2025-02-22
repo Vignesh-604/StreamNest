@@ -176,6 +176,7 @@ export default function Playlist() {
                                             title={vid.title}
                                             description={vid.description}
                                             owner={vid.owner}
+                                            isExclusive={vid.isExclusive}
                                             views={vid.views}
                                             thumbnail={vid.thumbnail}
                                             duration={parseTime(vid.duration)}

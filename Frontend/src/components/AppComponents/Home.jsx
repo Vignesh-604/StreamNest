@@ -4,6 +4,7 @@ import axios from 'axios';
 import { timeAgo } from '../Utils/utility';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import Loading from './Loading';
+import { BadgeDollarSign } from 'lucide-react';
 
 export default function Home() {
     const currentUser = useOutletContext()
@@ -25,7 +26,7 @@ export default function Home() {
             })
             .catch(e => console.log(e.response.data))
     }, [search, page])
-    
+
     const userChannel = (e, id) => {
         e.stopPropagation()
         navigate(id !== currentUser._id ? `/channel/${id}` : "/channel")
@@ -39,8 +40,8 @@ export default function Home() {
                 <>
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 w-full max-w-screen-xl">
                         {videos.map(video => (
-                            <div 
-                                key={video._id} 
+                            <div
+                                key={video._id}
                                 className="card !bg-[#1a1b1f] "
                                 onClick={() => navigate(`/video/watch/${video._id}`)}
                             >
@@ -54,6 +55,13 @@ export default function Home() {
                                     <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white">
                                         {Math.round(video.duration) || "00:00"}
                                     </div>
+                                    {
+                                        video.isExclusive && (
+                                            <div className="absolute bottom-1 left-1 p-1 rounded-lg bg-black bg-opacity-40">
+                                                <BadgeDollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 drop-shadow-lg stroke-2" />
+                                            </div>
+                                        )
+                                    }
                                 </div>
 
                                 <div className="flex flex-row space-x-3 p-4">
@@ -93,16 +101,16 @@ export default function Home() {
                             <div className="inline-flex items-center space-x-3">
                                 <p className="mr-4">Page <span className="text-white font-medium">{page}</span> of <span className="text-white font-medium">{pageLimit}</span></p>
                                 <button
-                                    type="button" 
-                                    disabled={page <= 1} 
+                                    type="button"
+                                    disabled={page <= 1}
                                     onClick={() => setPage(--page)}
                                     className="rounded-md bg-[#1a1b1f] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                 >
                                     ← Previous
                                 </button>
                                 <button
-                                    type="button" 
-                                    disabled={page === pageLimit} 
+                                    type="button"
+                                    disabled={page === pageLimit}
                                     onClick={() => setPage(++page)}
                                     className="rounded-md bg-[#1a1b1f] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-color duration-200"
                                 >

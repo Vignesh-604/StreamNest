@@ -119,6 +119,7 @@ const getPlaylistById = asyncHandler( async (req, res) => {
                             description: 1,
                             thumbnail: 1,
                             views: 1,
+                            isExclusive: 1,
                             duration: 1,
                             owner: {
                                 _id : 1,

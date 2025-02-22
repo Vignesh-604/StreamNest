@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Video } from "../models/video.models.js"
 import mongoose from "mongoose";
+import { User } from "../models/user.models.js";
 
 // Get the channel stats like total video views, total subscribers, total videos, total likes etc.
 const getChannelStats = asyncHandler(async (req, res) => {
@@ -109,7 +110,9 @@ const getChannelVideos = asyncHandler(async (req, res) => {
 
     const videos = await Video.find({ owner: channelId })
 
-    res.status(200).json(new ApiResponse(200, videos, "Videos fetched"))
+    const {uploads} = await User.findById(channelId).select(" uploads -_id")
+
+    res.status(200).json(new ApiResponse(200, {videos, uploads}, "Videos fetched"))
 })
 
 export { getChannelStats, getChannelVideos }

@@ -1,52 +1,58 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import ReactLoading from 'react-loading';
-import { ArrowRight, Film } from 'lucide-react';
-import { showCustomAlert } from "../Utils/utility";
+import React, { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import ReactLoading from 'react-loading'
+import { ArrowRight, Film } from 'lucide-react'
+import { showCustomAlert } from "../Utils/utility"
+import Toggle from 'react-toggle'
+import "react-toggle/style.css";
 
 export default function NewVideo() {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [thumbnail, setThumbnail] = useState(null);
-    const [videoFile, setVideoFile] = useState(null);
-    const [thumbnailPreview, setThumbnailPreview] = useState(null);
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+    const [thumbnail, setThumbnail] = useState(null)
+    const [videoFile, setVideoFile] = useState(null)
+    const [thumbnailPreview, setThumbnailPreview] = useState(null)
+    const [isExclusive, setIsExclusive] = useState(false)
+    const [price, setPrice] = useState(5)
 
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     const [uploading, setUploading] = useState(false)
 
     const handleThumbnailChange = (e) => {
-        const file = e.target.files[0];
-        setThumbnail(file);
+        const file = e.target.files[0]
+        setThumbnail(file)
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setThumbnailPreview(reader.result);
-            reader.readAsDataURL(file);
+            const reader = new FileReader()
+            reader.onloadend = () => setThumbnailPreview(reader.result)
+            reader.readAsDataURL(file)
         }
-    };
+    }
 
     const handleUpload = (e) => {
         e.preventDefault()
         setUploading(true)
 
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        if (thumbnail) formData.append('thumbnail', thumbnail);
-        if (videoFile) formData.append('videoFile', videoFile);
+        const formData = new FormData()
+        formData.append('title', title)
+        formData.append('description', description)
+        isExclusive && formData.append('isExclusive', isExclusive)
+        if (price >= 5) formData.append('price', price)
+        if (thumbnail) formData.append('thumbnail', thumbnail)
+        if (videoFile) formData.append('videoFile', videoFile)
 
         axios.post('/api/video/new', formData)
             .then((res) => {
                 setTimeout(() => {
                     showCustomAlert('Video uploaded')
                 }, 500)
-                navigate(-1);
+                navigate(-1)
             })
             .catch(error => {
                 console.log(error.response.data)
                 setUploading(false)
-            });
-    };
+            })
+    }
 
     if (uploading) return (
         <div className="flex flex-col items-center mt-5 space-y-4">
@@ -97,29 +103,66 @@ export default function NewVideo() {
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-base font-semibold text-gray-300 mb-2">Video File</label>
-                                <input
-                                    required
-                                    type="file"
-                                    accept="video/*"
-                                    onChange={e => setVideoFile(e.target.files[0])}
-                                    className="w-full rounded-lg border border-gray-600 bg-gray-900/50 px-4 py-3 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none"
-                                />
+                            <div className='flex flex-row gap-4 justify-between'>
+                                <div>
+                                    <label className="block text-base font-semibold text-gray-300 mb-2">Exclusive video</label>
+                                    <div className="flex items-center space-x-4">
+                                        <Toggle
+                                            checked={isExclusive}
+                                            onChange={(e) => setIsExclusive(e.target.checked)}
+                                            icons={false}
+                                            className='my-3'
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className=''>
+                                    {isExclusive ? (
+                                        <>
+                                            <label className="block text-base font-semibold text-gray-300 mb-2">Video Price</label>
+                                            <input
+                                                type="number"
+                                                value={price}
+                                                onChange={(e) => setPrice(Number(e.target.value))}
+                                                className="flex-1 rounded-lg font-bold border border-gray-600 bg-gray-900/50 px-4 py-2 text-base text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                                placeholder="Enter price"
+                                                min="0"
+                                                step="0.01"
+                                            />
+                                        </>
+                                    ) : (
+                                        <div>
+
+                                        </div>
+                                    )}
+
+                                </div>
                             </div>
                         </div>
 
                         {/* Right Column */}
                         <div className="flex flex-col space-y-6">
-                            <div>
-                                <label className="block text-base font-semibold text-gray-300 mb-2">Thumbnail</label>
-                                <input
-                                    required
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleThumbnailChange}
-                                    className="w-full rounded-lg border border-gray-600 bg-gray-900/50 px-4 py-3 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none"
-                                />
+                            <div className='flex flex-row gap-4'>
+                                <div>
+                                    <label className="block text-base font-semibold text-gray-300 mb-2">Video File</label>
+                                    <input
+                                        required
+                                        type="file"
+                                        accept="video/*"
+                                        onChange={e => setVideoFile(e.target.files[0])}
+                                        className="w-full rounded-lg border border-gray-600 bg-gray-900/50 px-4 py-3 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-base font-semibold text-gray-300 mb-2">Thumbnail</label>
+                                    <input
+                                        required
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleThumbnailChange}
+                                        className="w-full rounded-lg border border-gray-600 bg-gray-900/50 px-4 py-3 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex-grow">
@@ -154,5 +197,5 @@ export default function NewVideo() {
                 </form>
             </div>
         </div>
-    );
+    )
 }

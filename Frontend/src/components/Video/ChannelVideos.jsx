@@ -3,7 +3,7 @@ import axios from "axios";
 import VideoItem from "./VideoItem";
 import { parseTime, showCustomAlert } from "../Utils/utility";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { PencilIcon, TrashIcon } from 'lucide-react'
+import { PencilIcon, SquarePlay, TrashIcon } from 'lucide-react'
 import { useOutletContext, useNavigate, Link, useParams, useLocation } from "react-router-dom";
 import { EllipsisVertical, Plus } from "lucide-react";
 import Loading from "../AppComponents/Loading";
@@ -12,21 +12,23 @@ export default function ChannelVideos() {
     const navigate = useNavigate()
     let currentUser = useOutletContext()
 
-    let {channelId} = useParams()
+    let { channelId } = useParams()
     let owner = (currentUser._id === channelId) || (channelId == undefined)
 
-    const {state} = useLocation()
+    const { state } = useLocation()
     currentUser = state !== null ? state : currentUser
 
-    const [loading, setLoading] = useState(true);  // Add loading state
+    const [loading, setLoading] = useState(true)
 
     const [videos, setVideos] = useState([]);
+    const [uploads, setUploads] = useState({})
 
     useEffect(() => {
         axios.get(`/api/dashboard/videos/${currentUser._id}`)
             .then((res) => {
-                setVideos(res.data.data)
-                setLoading(false);                 // Set loading to false after data is fetched
+                setVideos(res.data.data.videos)
+                setUploads(res.data.data.uploads)
+                setLoading(false)
             })
             .catch(error => console.log(error));
     }, []);
@@ -52,12 +54,17 @@ export default function ChannelVideos() {
                     <h1 className="font-extrabold text-start text-4xl">{owner ? "Your " : `${currentUser.fullname}'s `}Videos</h1>
                     {
                         owner && (
-                            <Link to={"/video/new"}
-                                className="flex items-center gap-2 font-semibold bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200"
-                            >
-                                <Plus className="w-5 h-5" />
-                                New Video
-                            </Link>
+                            <div className="flex flex-row gap-2">
+                                <h1 className="font-semibold text-lg flex items-center" title="Videos Uploaded">
+                                    <SquarePlay className="mr-1 bg-purple-500 rounded-md h-8 w-8"/> {uploads.uploaded}/{uploads.uploadLimit}
+                                </h1>
+                                <Link to={"/video/new"}
+                                    className="flex items-center gap-2 font-semibold bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200"
+                                >
+                                    <Plus className="w-5 h-5" />
+                                    New Video
+                                </Link>
+                            </div>
                         )
                     }
 
@@ -72,6 +79,7 @@ export default function ChannelVideos() {
                                             id={vid._id}
                                             title={vid.title}
                                             description={vid.description}
+                                            isExclusive={vid.isExclusive}
                                             owner={currentUser}
                                             views={vid.views}
                                             thumbnail={vid.thumbnail}

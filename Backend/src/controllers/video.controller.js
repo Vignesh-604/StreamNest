@@ -33,14 +33,30 @@ const publishVideo = asyncHandler(async (req, res) => {
     if (!videoFile) throw new ApiError(400, "Video file not found")
     if (!thumbnail) throw new ApiError(400, "Thumbnail not found")
 
-    const video = await Video.create({
+    let videoDetails = {
         title,
         description,
         videoFile: videoFile.url,
         thumbnail: thumbnail.url,
         duration: videoFile.duration,
         owner: req.user?._id
-    })
+    }
+
+    if (req.body.isExclusive) {
+        let { isExclusive, price } = req.body
+
+        isExclusive = isExclusive === "true" || isExclusive === true;
+
+        if (isExclusive && (!price || isNaN(price) || price <= 4)) {
+            throw new ApiError(400, "Price must be a valid number for exclusive videos");
+        }
+        if (isExclusive) {
+            videoDetails["isExclusive"] = isExclusive
+            videoDetails["price"] = price
+        }
+    }
+
+    const video = await Video.create(videoDetails)
     if (!video) throw new ApiError(400, "Could not upload video")
 
     // Increment upload count
@@ -91,7 +107,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(video.owner, {
         $inc: { "uploads.uploaded": -1 }
     })
-    
+
     res.status(203).json(new ApiResponse(201, { deleteVidFromCloud, deleteThumbnailFromCloud }, "video deleted successfully"))
 })
 
@@ -111,18 +127,19 @@ const getVideoById = asyncHandler(async (req, res) => {
     if (!isValidObjectId(videoId)) throw new ApiError(400, "Video id required")
 
     // **Step 1: Get only _id and isExclusive to check access**
-    const videoMeta = await Video.findById(videoId).select("_id isExclusive").lean()
+    const videoMeta = await Video.findById(videoId).select("_id isExclusive owner").lean()
     if (!videoMeta) throw new ApiError(404, "Video not found")
+        console.log(videoMeta.owner, req.user._id)
 
-    // **Step 2: If exclusive, check if the user has purchased it**
-    if (videoMeta.isExclusive) {
+    // Step 2: If exclusive, check if the user has purchased it OR bypass if user is the owner
+    if (videoMeta.isExclusive && videoMeta.owner.toString() !== req.user._id.toString()) {
         const hasAccess = await Purchase.findOne({
             _id: req.user._id,
             "purchasedVideos.videoId": videoId
         }).lean()
 
         if (!hasAccess) {
-            return res.status(401).json(new ApiResponse(401, null, "No access to this video"))
+            return res.status(401).json(new ApiResponse(401, "No access to this video"))
         }
     }
 
@@ -185,7 +202,7 @@ const getVideoById = asyncHandler(async (req, res) => {
                 createdAt: 1,
                 duration: 1,
                 views: 1,
-                isPublished: 1,
+                isExclusive: 1,
                 likes: 1,
                 isLiked: 1,
                 subscribers: 1,

@@ -3,6 +3,7 @@ import { Video } from "../models/video.models.js"
 import { Playlist } from "../models/playlist.models.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.models.js"
+import {asyncHandler} from "../utils/asyncHandler.js"
 
 const buyVideo = asyncHandler(async (req, res) => {
     const { userId } = req.user

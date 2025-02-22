@@ -17,6 +17,7 @@ export default function LikedVideos() {
             })
             .catch(error => console.log(error));
     }, []);
+    console.log(videos)
 
     const removeLiked = (id) => {
         showConfirmAlert(
@@ -52,6 +53,7 @@ export default function LikedVideos() {
                                                 description={vid.videos[0]?.description}
                                                 owner={vid.videos[0]?.owner[0]}
                                                 views={vid.videos[0]?.views}
+                                                isExclusive={vid.videos[0]?.isExclusive}
                                                 thumbnail={vid.videos[0]?.thumbnail}
                                                 duration={parseTime(vid.videos[0]?.duration)}
                                             />
