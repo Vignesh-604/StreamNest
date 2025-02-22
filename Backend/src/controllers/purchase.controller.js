@@ -5,8 +5,24 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.models.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
+const videoSale = asyncHandler(async (req, res) => {
+    const userId = req.user._id
+    const { videoId } = req.params
+
+    const video = await Video.findById(videoId).select(" _id isExclusive price ")
+    if (!video) return res.status(404).json(new ApiResponse(404, "Video not found"))
+    if (!video.isExclusive) return res.status(400).json(new ApiResponse(400, "This video is not exclusive"))
+
+    const purchase = await Purchase.findById(userId)
+    if (purchase?.purchasedVideos.some(v => v.videoId.toString() === videoId)) {
+        return res.status(400).json(new ApiResponse(400, "Video already purchased"))
+    }
+
+    return res.status(200).json(new ApiResponse(200, true, "Video not bought"))
+})
+
 const buyVideo = asyncHandler(async (req, res) => {
-    const { userId } = req.user
+    const userId = req.user._id
     const { videoId } = req.params
 
     const video = await Video.findById(videoId).select(" _id isExclusive price ")
@@ -26,7 +42,7 @@ const buyVideo = asyncHandler(async (req, res) => {
         await purchase.save()
     } else {
         await Purchase.create({
-            user: userId,
+            _id: userId,
             purchasedVideos: [{ videoId, amount: videoPrice }],
             totalAmount: videoPrice
         })
@@ -137,6 +153,7 @@ const buyUploadSlots = asyncHandler(async (req, res) => {
 
 
 export {
+    videoSale,
     buyVideo,
     buyPlaylist,
     getPurchaseHistory,

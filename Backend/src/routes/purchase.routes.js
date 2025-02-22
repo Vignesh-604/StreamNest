@@ -1,12 +1,14 @@
 import {Router} from "express"
-import { buyVideo, buyPlaylist, getPurchaseHistory, buyUploadSlots } from "../controllers/purchase.controller.js"
+import { videoSale, buyVideo, buyPlaylist, getPurchaseHistory, buyUploadSlots } from "../controllers/purchase.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router()
 
 router.use(verifyJWT)
 
-router.route("/buy/vide/:videoId").get(buyVideo)
+router.route("/check/:videoId").get(videoSale)
+
+router.route("/buy/video/:videoId").get(buyVideo)
 
 router.route("/buy/playlist/:playlistId").get(buyPlaylist)
 

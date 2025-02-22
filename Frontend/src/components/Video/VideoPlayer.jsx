@@ -32,8 +32,11 @@ function VideoPage() {
     useEffect(() => {
         axios.get(`/api/video/v/${videoId}`)
             .then((res) => {
-                const videoDetails = res.data.data
-                setVideo(videoDetails);
+                const videoDetails = res.data
+                if (videoDetails.status === 401) {
+                    navigate(`/video/buy/${videoId}`)
+                }
+                setVideo(videoDetails.data);
                 setLoading(false)
             })
             .catch(error => console.log(error.response.data));
@@ -168,14 +171,14 @@ function VideoPage() {
 
                             <div className='flex flex-row justify-between max-[500px]:flex-col mb-4'>
                                 <div
-                                    className="flex items-center text-sm text-gray-400 group cursor-pointer transition-all duration-200 hover:scale-110"
+                                    className="flex items-center text-sm text-gray-400 py-1 group cursor-pointer transition-all duration-200 hover:scale-110"
                                     title={video.owner.fullname}
                                     onClick={() => navigate(video.owner._id !== currentUser._id ? `/channel/${video.owner._id}` : "/channel")}
                                 >
                                     <img
                                         src={video.owner.avatar ? video.owner.avatar : profile}
                                         alt="Channel Logo"
-                                        className="h-12 w-12 rounded-full border-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
+                                        className="h-12 w-12 rounded-full border-2 mr-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
                                     />
                                     <div>
                                         <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
@@ -186,26 +189,30 @@ function VideoPage() {
                                         </p>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={toggleSub}
-                                    className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
+                                {
+                                    video.owner._id !== currentUser._id && (
+                                        <button
+                                            onClick={toggleSub}
+                                            className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
                                             ${video.isSubscribed
-                                            ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
-                                            : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
-                                        } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
-                                >
-                                    {video.isSubscribed ? (
-                                        <>
-                                            <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
-                                            <span className="transition-all">Subscribed</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
-                                            <span className="transition-all text-xl">Subscribe</span>
-                                        </>
-                                    )}
-                                </button>
+                                                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                                                    : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                                                } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
+                                        >
+                                            {video.isSubscribed ? (
+                                                <>
+                                                    <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                                    <span className="transition-all">Subscribed</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
+                                                    <span className="transition-all text-xl">Subscribe</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    )
+                                }
                             </div>
 
                             <div className='flex flex-row items-center gap-x-8 w-full text-gray-400'>

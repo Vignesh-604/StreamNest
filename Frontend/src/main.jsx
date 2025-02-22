@@ -17,6 +17,7 @@ import Home from './components/AppComponents/Home.jsx'
 import VideoPlayer from './components/Video/VideoPlayer.jsx'
 import EditVideo from './components/Video/EditVideo.jsx'
 import NewVideo from './components/Video/NewVideo.jsx'
+import BuyVideo from './components/Video/BuyVideo.jsx'
 import WatchHistory from './components/Video/WatchHistory.jsx'
 import LikedVideos from './components/Video/LikedVideos.jsx'
 import ChannelVideos from './components/Video/ChannelVideos.jsx'
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
             <Route path='/videos/:channelId' element={<ChannelVideos />} />
             <Route path='/video/edit/:videoId' element={<EditVideo />} />
             <Route path='/video/new' element={<NewVideo />} />
+            <Route path='/video/buy/:videoId' element={<BuyVideo />} />
             <Route path='/video/watch/:videoId' element={<VideoPlayer />} />
             <Route path='/liked' element={<LikedVideos />} />
             <Route path='/history' element={<WatchHistory />} />
