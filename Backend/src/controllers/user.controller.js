@@ -27,7 +27,7 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(404).json(new ApiResponse(404, "Avatar Image is required"))
     }
 
-    const avatar = await uploadOnCloudinary(avatarPath)
+    const avatar = await uploadOnCloudinary(avatarPath, "avatar")
 
     if (!avatar) {
         throw new ApiError(404, "Avatar not found!")
@@ -174,6 +174,10 @@ const changePassword = asyncHandler(async (req, res) => {
 
     return res.status(200)
         .json(new ApiResponse(200, {}, "Password updated!"))
+})
+
+const getUser = asyncHandler(async (req, res) => {
+    return res.status(200).json(new ApiResponse(200, req.user, "User"))
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -339,6 +343,7 @@ export {
     logoutUser,
     refreshAccessToken,
     changePassword,
+    getUser,
     getCurrentUser,
     updateDetails,
     updateAvatar,

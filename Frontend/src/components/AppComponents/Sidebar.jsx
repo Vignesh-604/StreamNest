@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useParams, useNavigate, Outlet } from 'react-router-dom';
 import { Menu, X, Home, UserCircle, ListVideo, ThumbsUp, Clock, Users, LogOut, MonitorPlay, UserRoundCheck, NotepadText, BadgeDollarSign } from 'lucide-react';
 import axios from 'axios';
@@ -9,12 +9,22 @@ import profile from "../assets/profile.webp";
 import Search from "./Search"
 
 export default function Sidebar() {
-    const { channelId } = useParams();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
 
     const signedIn = Cookies.get("user")
-    let user = signedIn ? decrypt() : null
+    const [data, setUserData] = useState(signedIn ? decrypt(signedIn) : null);
+    const [user, setUser] = useState({...data, setUserData});
+    
+    useEffect(() => {
+        if (user) {
+            axios.get(`/api/users/me`)
+                .then(res => {
+                    setUserData(res.data.data)
+                })
+                .catch(e => console.error(e.response.data));
+        }
+    }, [])
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -48,17 +58,17 @@ export default function Sidebar() {
                     {/* User Profile Section */}
                     <NavLink to={"/channel"} className="flex group items-center space-x-3 px-5 py-1 mb-6 shrink-0 rounded-lg -my-5 border border-purple-950/30 mx-6 p-6 cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/50">
                         <img
-                            src={user.avatar}
-                            alt={user.username}
+                            src={data.avatar}
+                            alt={data.dataname}
                             onError={(e) => e.target.src = profile}
                             className="h-12 w-12 rounded-full border-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
                         />
                         <div className="text-white">
                             <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
-                                {user.fullname}
+                                {data.fullname}
                             </p>
                             <p className="text-sm text-gray-400 transition-all duration-300 group-hover:text-emerald-300">
-                                @{user.username}
+                                @{data.username}
                             </p>
                         </div>
                     </NavLink>

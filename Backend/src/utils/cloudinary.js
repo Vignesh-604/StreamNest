@@ -14,12 +14,12 @@ const uploadOnCloudinary = async (localFilepath, type) => {
 
         // Define folder structure
         const folderMap = {
-            avatar: "streamnest/avatars",
+            avatar: "streamnest/avatar",
             thumbnail: "streamnest/thumbnails",
             video: "streamnest/videos"
         };
 
-        const folder = folderMap[type] || "streamnest/misc";
+        const folder = folderMap[type] || "streamnest/user";
 
         // Upload File to Cloudinary
         const response = await cloudinary.uploader.upload(localFilepath, {
@@ -41,19 +41,18 @@ const uploadOnCloudinary = async (localFilepath, type) => {
 // Delete File from Cloudinary
 const deleteFromCloudinary = async (url) => {
     const parts = url.split("/")
-    const name = parts[parts.length - 1]
-    const file = name.split(".")
+    const fileNameWithExt = parts[parts.length - 1]
+    const folderName = parts[parts.length - 2]
 
-    const public_id = file[0]
-    const ext = file[1]
+    const [public_id, ext] = fileNameWithExt.split(".")
 
     const response = await cloudinary.uploader.destroy(
-        `streamnest/${public_id}`,
+        `streamnest/${folderName}/${public_id}`,
         { resource_type: ext === "mp4" ? "video" : "image" }
     );
 
-    if (response.result === "ok") console.log("File deleted:", name)
-    if (response.result === "not found") console.log("File not found")
+    // if (response.result === "ok") console.log("✅ File deleted:", public_id)
+    // if (response.result === "not found") console.log("⚠️ File not found")
     return response
 };
 

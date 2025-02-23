@@ -2,6 +2,7 @@ import {Router} from "express"
 import { 
     changePassword, 
     getCurrentUser, 
+    getUser, 
     getUserChannelProfile,
     loginUser, 
     logoutUser, 
@@ -25,7 +26,6 @@ router.route("/register").post(
 
 router.route("/login").post(loginUser)
 
-// secured routes
 router.route("/logout").post(verifyJWT, logoutUser)
 
 router.route("/refresh_token").post(refreshAccessToken)
@@ -33,6 +33,8 @@ router.route("/refresh_token").post(refreshAccessToken)
 router.route("/update_password").patch(verifyJWT, changePassword)
 
 router.route("/current_user").get(verifyJWT, getCurrentUser)
+
+router.route("/me").get(verifyJWT, getUser)
 
 router.route("/update_details").patch(verifyJWT, updateDetails)
 

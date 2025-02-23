@@ -11,6 +11,7 @@ export default function Register({ onSwitchToSignIn }) {
     const [formData, setFormData] = useState({
         fullname: '',
         username: '',
+        email: '',
         password: '',
         confirmPassword: ''
     });
@@ -181,23 +182,36 @@ export default function Register({ onSwitchToSignIn }) {
 
                         <div className="grid md:grid-cols-2 gap-8">
                             <div>
-                                <label className="block text-lg font-semibold text-gray-300">Profile Picture</label>
+                                <label className="block text-lg font-semibold text-gray-300">Email</label>
                                 <input
-                                    className="w-full mt-3 rounded-xl border border-gray-600 bg-gray-900 px-5 py-10 text-lg text-white focus:ring-2 focus:ring-purple-500 outline-none"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleAvatarChange}
+                                    className="w-full mt-3 rounded-xl border border-gray-600 bg-gray-900 px-5 py-4 text-lg md:text-xl text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                    name="email"
+                                    placeholder="Choose a email"
                                     required
+                                    value={formData.email}
+                                    onChange={handleInput}
                                 />
                             </div>
-                            <div>
-                                <label className="block text-lg font-semibold text-gray-300">Preview</label>
-                                <div className="mt-3 h-28 w-28 rounded-full border-4 border-gray-600 flex items-center justify-center overflow-hidden bg-gray-900">
-                                    {avatarPreview ? (
-                                        <img src={avatarPreview} alt="Avatar preview" className="h-full w-full object-cover" />
-                                    ) : (
-                                        <span className="text-gray-400 text-lg">No image</span>
-                                    )}
+                            <div className='flex gap-2'>
+                                <div>
+                                    <label className="block text-lg font-semibold text-gray-300">Profile Picture</label>
+                                    <input
+                                        className="w-full mt-3 rounded-xl border border-gray-600 bg-gray-900 px-5 py-10 text-lg text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleAvatarChange}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-lg font-semibold text-gray-300">Preview</label>
+                                    <div className="mt-3 h-28 w-28 rounded-full border-4 border-gray-600 flex items-center justify-center overflow-hidden bg-gray-900">
+                                        {avatarPreview ? (
+                                            <img src={avatarPreview} alt="Avatar preview" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <span className="text-gray-400 text-lg">No image</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

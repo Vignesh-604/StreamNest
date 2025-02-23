@@ -17,7 +17,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
 
         // Find the user without password and token
-        const user = await User.findById(decodedToken._id).select("-password, -refreshToken")
+        const user = await User.findById(decodedToken._id).select(" _id fullname username uploads avatar ")
 
         if (!user) throw new ApiError(401, "Invalid Access Token")
 

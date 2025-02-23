@@ -3,6 +3,7 @@ import axios from "axios";
 import { X, Save, Eye, EyeOff } from "lucide-react";
 import PasswordStrengthIndicator from "./PasswordChecker";
 import { showCustomAlert } from "../Utils/utility";
+import { useOutletContext } from "react-router-dom";
 
 export default function EditProfile({ isOpen, onClose, user, setUser }) {
     const [formData, setFormData] = useState({ fullname: user.fullname });
@@ -13,6 +14,8 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const {setUserData} = useOutletContext()
 
     if (!isOpen) return null;
 
@@ -26,8 +29,7 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         setLoading(true);
         setError("");
 
@@ -36,6 +38,7 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
             axios.patch("/api/users/update_details", { fullname: formData.fullname })
                 .then(res => {
                     setUser(prev => ({ ...prev, fullname: res.data.data.fullname }))
+                    setUserData(user => ({...user, fullname: res.data.data.fullname }))
                     onClose()
                 })
                 .catch(err => setError(err.response?.data?.message || "Failed to update details"));
@@ -49,6 +52,7 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
             axios.patch("/api/users/update_avatar", formData, { headers: { "Content-Type": "multipart/form-data" } })
                 .then(res => {
                     setUser(prev => ({ ...prev, avatar: res.data.data.avatar }))
+                    setUserData(user => ({ ...user, avatar: res.data.data.avatar }))
                     onClose()
                 })
                 .catch(err => setError(err.response?.data?.message || "Failed to update avatar"));
@@ -139,9 +143,8 @@ export default function EditProfile({ isOpen, onClose, user, setUser }) {
 
                     {/* Submit Button */}
                     <button
-                        type="submit"
-                        className="w-full cursor-pointer bg-[#7c3aed] hover:bg-[#6d28d9] px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2"
-                        disabled={loading}
+                        onClick={handleSubmit}
+                        className={`w-full bg-[#7c3aed] hover:bg-[#6d28d9] cursor-pointer px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2 ${loading ? "hidden" : ""}`}
                     >
                         {loading ? "Saving..." : (
                             <>
