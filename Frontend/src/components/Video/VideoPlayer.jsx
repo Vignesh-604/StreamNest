@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
 import { parseDate } from '../Utils/utility';
-import { BellRing, CalendarArrowDown, Eye, List, ThumbsUp, UserPlus } from 'lucide-react';
+import { BadgeDollarSign, BellRing, CalendarArrowDown, Eye, List, SquarePlay, ThumbsUp, UserPlus } from 'lucide-react';
 import Comment from '../Post/Comment';
 import { X } from "lucide-react";
 
@@ -33,13 +33,14 @@ function VideoPage() {
         axios.get(`/api/video/v/${videoId}`)
             .then((res) => {
                 const videoDetails = res.data
-                if (videoDetails.status === 401) {
-                    navigate(`/video/buy/${videoId}`)
-                }
                 setVideo(videoDetails.data);
                 setLoading(false)
             })
-            .catch(error => console.log(error.response.data));
+            .catch(error => {
+                if (error.status == "401") {
+                    navigate(`/video/buy/${videoId}`)
+                }
+            });
 
         axios.get(`/api/comment/video/${videoId}`)
             .then((res) => setComments(res.data.data))
@@ -345,17 +346,27 @@ function VideoPage() {
                                 <X className="h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
                             </button>
                         </div>
-                        <ul className="rounded-lg shadow-inner shadow-slate-800">
-                            {playlists.map(playlist => (
-                                <li
-                                    key={playlist._id}
-                                    className="p-2 hover:bg-gray-700 rounded cursor-pointer"
-                                    onClick={() => addToPlaylist(playlist._id)}
-                                >
-                                    {playlist.name}
-                                </li>
-                            ))}
-                        </ul>
+                        {playlists.length > 0 ? (
+                            <ul className="rounded-lg shadow-inner shadow-slate-800">
+                                {
+                                    playlists.map(playlist => (
+                                        <li
+                                            key={playlist._id}
+                                            className="p-2 hover:bg-gray-700 rounded cursor-pointer flex justify-between"
+                                            onClick={() => addToPlaylist(playlist._id)}
+                                        >
+                                            <h1>{playlist.name}</h1>
+                                            <span className="flex">
+                                                {playlist.isExclusive && <BadgeDollarSign className="text-green-500 mr-2" />}
+                                                {playlist.videos.length} <SquarePlay />
+                                            </span>
+                                        </li>
+                                    ))
+                                }
+                            </ul>
+                        ) : (
+                            <h1 className="font-semibold mt-6">No playlists available</h1>
+                        )}
                     </div>
                 </div>
             )}

@@ -1,37 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppComponents/Loading';
-import { showCustomAlert } from '../Utils/utility';
+import { showConfirmAlert, showCustomAlert } from '../Utils/utility';
 
 const VideoDetails = () => {
+    const currentUser = useOutletContext();
     const [loading, setLoading] = useState(true);
     const { videoId } = useParams();
     const [video, setVideo] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`/api/purchase/check/${videoId}`)
+        axios.get(`/api/purchase/info/${videoId}`)
             .then(res => {
-                axios.get(`/api/video/v/${videoId}`)
-                    .then((res) => {
-                        const videoDetails = res.data.data;
-                        setVideo(videoDetails);
-                        setLoading(false);
-                    })
-                    .catch(error => console.log(error.response.data));
+                const { hasAccess, video } = res.data.data;
+                if (!hasAccess) {
+                    navigate(-1); // Redirect if the video is not purchased
+                } else {
+                    setVideo(video);
+                    setLoading(false);
+                }
             })
-            .catch(e => navigate(-1))
-
+            .catch(error => console.log(error.response.data));
     }, [videoId]);
+    
 
     const buyVideo = () => {
-        axios.get(`/api/purchase/buy/video/${videoId}`)
-            .then(res => {
-                showCustomAlert("Video purchased successfully")
-                navigate(`/video/watch/${videoId}`)
-            })
-            .catch(e => console.log(e.response.data))
+        showConfirmAlert(
+            `Are you sure you wanna buy this Video for ₹${video.price}?`,
+            "",
+            () => {
+                axios.get(`/api/purchase/buy/video/${videoId}`)
+                    .then(res => {
+                        showCustomAlert("Video purchased successfully")
+                        navigate(`/video/watch/${videoId}`)
+                    })
+                    .catch(e => console.log(e.response.data))
+            }
+        )
     }
 
     if (loading) return <Loading />
@@ -76,7 +83,7 @@ const VideoDetails = () => {
 
                     {/* Title and Description */}
                     <div className="flex-grow">
-                        <h1 className="text-white text-xl font-semibold mb-2">
+                        <h1 className="text-white text-xl font-semibold mb-1">
                             {video.title}
                         </h1>
                         <div className="flex flex-col md:flex-row gap-1 md:items-center md:gap-2 text-sm text-gray-400 mb-4">

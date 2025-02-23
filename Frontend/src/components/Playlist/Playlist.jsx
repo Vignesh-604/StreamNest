@@ -16,20 +16,23 @@ export default function Playlist() {
     const [playlist, setPlaylist] = useState(null);
     const [newTitle, setNewTitle] = useState("");
     const [newDescription, setNewDescription] = useState("");
+    const [access, setAccess] = useState(false)
 
     let owner = (currentUser?._id === channelId) || (channelId == undefined)
 
     useEffect(() => {
+
         axios.get(`/api/playlist/${id}`)
             .then(res => {
-                const plst = res.data.data;
-                setPlaylist(plst);
-                setNewTitle(plst.name);
-                setNewDescription(plst.description);
-                setLoading(false);
+                const plst = res.data.data.playlist;
+                setAccess(res.data.data.access)
+                setPlaylist(plst)
+                setNewTitle(plst.name)
+                setNewDescription(plst.description)
+                setLoading(false)
             })
-            .catch(error => error.response.status == 404 ? navigate(-1) : console.log(error));
-    }, []);
+            .catch(error => error.response.status == 404 ? navigate(-1) : console.log(error))
+    }, [])
 
     const removeVideo = (vidId) => {
         showConfirmAlert(
@@ -38,16 +41,16 @@ export default function Playlist() {
             () => {
                 axios.delete(`/api/playlist/video/${vidId}/${id}`)
                     .then(res => {
-                        setPlaylist({ 
-                            ...playlist, 
-                            videos: playlist.videos.filter(vid => vid?._id !== vidId) 
+                        setPlaylist({
+                            ...playlist,
+                            videos: playlist.videos.filter(vid => vid?._id !== vidId)
                         });
                         showCustomAlert("Removed!", "Video has been successfully removed from the playlist.");
                     })
                     .catch(e => console.log(e.response.data));
             }
         );
-    };   
+    };
 
     const deletePlaylist = () => {
         showConfirmAlert(
@@ -72,6 +75,20 @@ export default function Playlist() {
             })
             .catch(e => console.log(e.response.data));
     };
+
+    const buyPlaylist = () => {
+        showConfirmAlert(
+            `Are you sure you wanna buy this Playlist for ${playlist.price}?`,
+            `Buying this playlist will give you access to all the exclusive videos of this playlist`,
+            () => {
+                axios.get(`/api/purchase/buy/playlist/${id}`)
+                .then(res => {
+                    showCustomAlert("Playlist purchased successfully")
+                })
+                .catch(e => console.log(e.response.data))
+            }
+        )
+    }
 
     if (loading) return <Loading />;
 
@@ -129,6 +146,7 @@ export default function Playlist() {
                                 <h2 className="text-lg text-gray-400/70 m-2">
                                     Videos: {playlist.videos.length}
                                 </h2>
+                                <hr className="border-purple-500/20 my-4" />
 
                                 {owner && (
                                     editMode ? (
@@ -163,6 +181,26 @@ export default function Playlist() {
                                         </div>
                                     )
                                 )}
+
+                                {
+                                    (!owner && (playlist.isExclusive && !access)) && (
+                                        playlist.isExclusive && (
+                                            <div className="flex-shrink-0 w-full md:w-auto mt-4 md:mt-0">
+                                                {playlist.isExclusive && (
+                                                    <div className="bg-white/5 px-4 py-2 rounded-xl mb-3">
+                                                        <div className="text-green-400 font-medium">Exclusive playlist</div>
+                                                    </div>
+                                                )}
+                                                <button
+                                                    className="w-full cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl font-medium"
+                                                    onClick={buyPlaylist}
+                                                >
+                                                    Buy ${playlist.price}
+                                                </button>
+                                            </div>
+                                        )
+                                    )
+                                }
                             </div>
                         </div>
 

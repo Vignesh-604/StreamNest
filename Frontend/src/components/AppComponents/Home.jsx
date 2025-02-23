@@ -27,6 +27,11 @@ export default function Home() {
             .catch(e => console.log(e.response.data))
     }, [search, page])
 
+    const userChannel = (e, id) => {
+        e.stopPropagation()
+        navigate(id !== currentUser._id ? `/channel/${id}` : "/channel")
+    }
+
     if (loading) return <Loading />;
 
     return (
@@ -64,7 +69,7 @@ export default function Home() {
                                         title={video.owner[0].fullname}
                                         src={video.owner[0].avatar}
                                         className="rounded-full object-cover w-10 h-10 min-w-[40px] mt-1 cursor-pointer hover:ring-2 hover:ring-purple-500"
-                                        onClick={(e) => navigate(video.owner[0]._id !== currentUser._id ? `/channel/${video.owner[0]._id}` : "/channel")}
+                                        onClick={(e) => userChannel(e, video.owner[0]._id)}
                                     />
 
                                     <div className='flex-col'>
@@ -75,8 +80,8 @@ export default function Home() {
                                         <p
                                             title={video.owner[0].fullname}
                                             className="text-gray-400 text-sm hover:text-purple-400 cursor-pointer"
-                                            onClick={(e) => navigate(video.owner[0]._id !== currentUser._id ? `/channel/${video.owner[0]._id}` : "/channel")}
-                                            >
+                                            onClick={(e) => userChannel(e, video.owner[0]._id)}
+                                        >
                                             {video.owner[0].fullname} · @{video.owner[0].username}
                                         </p>
                                         <p className="text-gray-500 text-sm mt-1">{video.views} views · {timeAgo(video.createdAt)}</p>
