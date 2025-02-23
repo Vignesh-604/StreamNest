@@ -12,6 +12,7 @@ import UserDetails from './components/Account/UserDetails.jsx'
 // App components
 import ErrorPage from './components/AppComponents/ErrorPage.jsx'
 import Home from './components/AppComponents/Home.jsx'
+import PurchaseHistory from './components/AppComponents/PurchaseHistory.jsx'
 
 // Video components
 import VideoPlayer from './components/Video/VideoPlayer.jsx'
@@ -54,6 +55,7 @@ const router = createBrowserRouter(
             <Route path='/video/watch/:videoId' element={<VideoPlayer />} />
             <Route path='/liked' element={<LikedVideos />} />
             <Route path='/history' element={<WatchHistory />} />
+            <Route path='/purchases' element={<PurchaseHistory />} />
 
             {/* Subscription Routes */}
             <Route path='/subscriptions' element={<Subscriptions />} />

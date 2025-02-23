@@ -120,7 +120,7 @@ export default function SignIn({ onSwitchToRegister }) {
 
                         <button
                             type="submit"
-                            className="w-full flex items-center justify-center rounded-2xl bg-purple-500 px-6 py-5 text-2xl font-bold text-white transition-all duration-300 hover:bg-purple-600 hover:shadow-xl"
+                            className="w-full flex items-center justify-center rounded-2xl cursor-pointer bg-purple-500 px-6 py-5 text-2xl font-bold text-white transition-all duration-300 hover:bg-purple-600 hover:shadow-xl"
                         >
                             Sign In <ArrowRight className="ml-3" size={24} />
                         </button>

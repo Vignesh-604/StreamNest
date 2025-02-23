@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import VideoItem from "./VideoItem";
-import { parseTime, showCustomAlert } from "../Utils/utility";
+import { parseTime, showConfirmAlert, showCustomAlert } from "../Utils/utility";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { PencilIcon, SquarePlay, TrashIcon } from 'lucide-react'
+import { BadgeDollarSign, PencilIcon, SquarePlay, TrashIcon } from 'lucide-react'
 import { useOutletContext, useNavigate, Link, useParams, useLocation } from "react-router-dom";
 import { EllipsisVertical, Plus } from "lucide-react";
 import Loading from "../AppComponents/Loading";
@@ -22,6 +22,7 @@ export default function ChannelVideos() {
 
     const [videos, setVideos] = useState([]);
     const [uploads, setUploads] = useState({})
+    let limit = uploads.uploaded === uploads.uploadLimit
 
     useEffect(() => {
         axios.get(`/api/dashboard/videos/${currentUser._id}`)
@@ -41,7 +42,23 @@ export default function ChannelVideos() {
                     showCustomAlert('Video Deleted')
                 }, 500)
             })
-            .catch(error => console.log(error.response.data))
+            .catch(error => console.log(error))
+    }
+
+    const buyUploads = () => {
+        showConfirmAlert(
+            `Are you sure you want to buy 5 more uploads for ₹20?`,
+            `This will increase your upload limit from ${uploads.uploadLimit} to ${uploads.uploadLimit + 5}`,
+            () => {
+                axios.get(`/api/purchase/buy/uploads`)
+                    .then(res => {
+                        const data = res.data.data;
+                        setUploads(uploads => ({...uploads, uploadLimit: uploads.uploadLimit + 5}))
+                        showCustomAlert('Extra upload slots bought successfully!!')
+                    })
+                    .catch(e => console.error(e.response.data.message))
+            }
+        )
     }
 
     if (loading) return <Loading />;
@@ -56,14 +73,25 @@ export default function ChannelVideos() {
                         owner && (
                             <div className="flex flex-row gap-2">
                                 <h1 className="font-semibold text-lg flex items-center" title="Videos Uploaded">
-                                    <SquarePlay className="mr-1 bg-purple-500 rounded-md h-8 w-8"/> {uploads.uploaded}/{uploads.uploadLimit}
+                                    <SquarePlay className="mr-1 bg-purple-500 rounded-md h-8 w-8" /> {uploads.uploaded}/{uploads.uploadLimit}
                                 </h1>
-                                <Link to={"/video/new"}
-                                    className="flex items-center gap-2 font-semibold bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200"
-                                >
-                                    <Plus className="w-5 h-5" />
-                                    New Video
-                                </Link>
+                                {
+                                    !limit ? (
+                                        <button onClick={buyUploads}
+                                            className="flex items-center cursor-pointer gap-2 font-semibold bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200 hover:scale-95"
+                                        >
+                                            <BadgeDollarSign className="w-5 h-5" />
+                                            Buy Uploads
+                                        </button>
+                                    ) : (
+                                        <Link to={"/video/new"}
+                                            className="flex items-center gap-2 font-semibold bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200 hover:scale-95"
+                                        >
+                                            <Plus className="w-5 h-5" />
+                                            New Video
+                                        </Link>
+                                    )
+                                }
                             </div>
                         )
                     }

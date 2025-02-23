@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useParams, useNavigate, Outlet } from 'react-router-dom';
-import { Menu, X, Home, UserCircle, ListVideo, ThumbsUp, Clock, Users, LogOut, MonitorPlay, UserRoundCheck, NotepadText } from 'lucide-react';
+import { Menu, X, Home, UserCircle, ListVideo, ThumbsUp, Clock, Users, LogOut, MonitorPlay, UserRoundCheck, NotepadText, BadgeDollarSign } from 'lucide-react';
 import axios from 'axios';
 import { decrypt } from '../Utils/utility';
 import Cookies from 'js-cookie';
@@ -109,6 +109,16 @@ export default function Sidebar() {
                                 >
                                     <Clock className="h-5 w-5 mr-3" />
                                     Watch History
+                                </NavLink>
+                                <NavLink
+                                    to="/purchases"
+                                    className={({ isActive }) =>
+                                        `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
+                                        }`
+                                    }
+                                >
+                                    <BadgeDollarSign className="h-5 w-5 mr-3" />
+                                    Purchases
                                 </NavLink>
                             </div>
 

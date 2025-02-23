@@ -91,13 +91,13 @@ const buyVideo = asyncHandler(async (req, res) => {
     const videoPrice = video.price
 
     if (purchase) {
-        purchase.purchasedVideos.push({ videoId, amount: videoPrice })
+        purchase.purchasedVideos.push({ videoId, amount: videoPrice, purchasedAt: new Date() })
         purchase.totalAmount += videoPrice
         await purchase.save()
     } else {
         await Purchase.create({
             _id: userId,
-            purchasedVideos: [{ videoId, amount: videoPrice }],
+            purchasedVideos: [{ videoId, amount: videoPrice, purchasedAt: new Date() }],
             totalAmount: videoPrice
         })
     }
@@ -154,64 +154,71 @@ const getPurchaseHistory = asyncHandler(async (req, res) => {
 
     const purchase = await Purchase.findOne({ _id: userId })
         .populate({
-            path: "purchasedVideos.videoId",
-            select: "title thumbnail duration owner",
-            populate: {
-                path: "owner",
-                select: "fullname username avatar"
-            }
+            path: "purchasedVideos",
+            select: "videoId playlistId purchasedAt amount",
+            populate: [{
+                path: "videoId",
+                select: "title thumbnail duration owner views",
+                populate: {
+                    path: "owner",
+                    select: "fullname username avatar"
+                }
+            },
+            {
+                path: "playlistId",
+                select: "name owner",
+                populate: {
+                    path: "owner",
+                    select: "fullname username avatar"
+                }
+            }]
         })
         .populate({
-            path: "purchasedVideos.playlistId",
+            path: "purchasedPlaylists.playlistId",
             select: "name owner",
             populate: {
                 path: "owner",
                 select: "fullname username avatar"
             }
         })
-        .populate({
-            path: "purchasedPlaylists.playlistId",
-            select: "name poster owner",
-            populate: {
-                path: "owner",
-                select: "fullname username avatar"
-            }
-        })
-        .populate("purchasedUploads") // Fetch purchased uploads
+        .populate("purchasedUploads")
         .lean()
 
     if (!purchase) {
-        return res.status(404).json(new ApiResponse(404, "No purchases found"))
+        return res.status(204).json(new ApiResponse(204, [], "No purchases found"))
     }
 
     res.status(200).json(new ApiResponse(200, purchase, "Purchase history retrieved"))
 })
 
 const buyUploadSlots = asyncHandler(async (req, res) => {
-    const { uploadCount } = req.params
-    if (!uploadCount || uploadCount <= 0) return res.status(404).json(new ApiResponse(400, "Invalid upload count"))
-
     const user = await User.findById(req.user?._id)
     if (!user) return res.status(404).json(new ApiResponse(404, "User not found"))
 
-    // Assume price per upload slot is fixed (or fetched dynamically)
-    const amount = uploadCount * PRICE_PER_UPLOAD_SLOT
+    const amount = 20
+    const uploadCount = 5
 
-    // Update purchase history
-    await Purchase.findByIdAndUpdate(
-        req.user._id,
-        {
-            $push: { purchasedUploads: { uploadCount, amount, purchasedAt: new Date() } }
-        },
-        { upsert: true, new: true }
-    )
+    let purchase = await Purchase.findById(req.user._id)
 
-    // Increase upload limit
+    if (!purchase) {
+        purchase = await Purchase.create({
+            _id: req.user._id,
+            purchasedUploads: [{ uploadCount, amount, purchasedAt: new Date() }],
+            purchasedPlaylists: [],
+            purchasedVideos: [],
+            totalAmount: amount
+        })
+    } else {
+        purchase.purchasedUploads.push({ uploadCount, amount, purchasedAt: new Date() })
+        purchase.totalAmount += amount
+        await purchase.save()
+    }
+
     await User.findByIdAndUpdate(req.user?._id, {
         $inc: { "uploads.uploadLimit": uploadCount }
     })
 
-    res.status(200).json(new ApiResponse(200, `${uploadCount} uploads purchased`))
+    res.status(200).json(new ApiResponse(200, `${uploadCount} uploads purchased`));
 })
 
 

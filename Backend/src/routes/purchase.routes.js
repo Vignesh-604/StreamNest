@@ -12,7 +12,7 @@ router.route("/buy/video/:videoId").get(buyVideo)
 
 router.route("/buy/playlist/:playlistId").get(buyPlaylist)
 
-router.route("/buy/playlist/:uploadCount").get(buyUploadSlots)
+router.route("/buy/uploads").get(buyUploadSlots)
 
 router.route("/track").get(getPurchaseHistory)
 
