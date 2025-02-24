@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "@backend_url/api/:path*"
+      "destination": "https://streamnest.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",

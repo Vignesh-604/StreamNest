@@ -56,5 +56,3 @@ app.use("/api/subscription", subscriptionRouter)
 app.use("/api/watchHistory", watchHistoryRouter)
 app.use("/api/cleanup", cleanupRouter)
 app.use("/api/purchase", purchaseRouter)
-
-export {app}
