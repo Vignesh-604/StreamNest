@@ -4,7 +4,7 @@ import img from "../assets/thumbnail.jpg";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import Loading from '../AppComponents/Loading';
-import { parseDate } from '../Utils/utility';
+import { parseDate, timeAgo } from '../Utils/utility';
 import { BadgeDollarSign, BellRing, CalendarArrowDown, Eye, List, SquarePlay, ThumbsUp, UserPlus } from 'lucide-react';
 import Comment from '../Post/Comment';
 import { X } from "lucide-react";
@@ -19,40 +19,59 @@ function VideoPage() {
     const [content, setContent] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [playlists, setPlaylists] = useState([]);
-
-    // Dummy data for channel videos
-    const channelVideos = [
-        { id: 1, title: "Sample Video 1", views: "12K", timestamp: "2 days ago", thumbnail: img },
-        { id: 2, title: "Sample Video 2", views: "8K", timestamp: "4 days ago", thumbnail: img },
-        { id: 3, title: "Sample Video 3", views: "15K", timestamp: "1 week ago", thumbnail: img },
-        { id: 4, title: "Sample Video 4", views: "20K", timestamp: "2 weeks ago", thumbnail: img },
-    ];
+    const [moreVideos, setMoreVideos] = useState([]);
+    const [dataLoaded, setDataLoaded] = useState(false);
 
     // Load Video and comments
     useEffect(() => {
-        axios.get(`/api/video/v/${videoId}`)
+        setLoading(true);
+        setDataLoaded(false);
+        
+        // Fetch video details
+        const fetchVideoDetails = axios.get(`/api/video/v/${videoId}`)
             .then((res) => {
-                const videoDetails = res.data
+                const videoDetails = res.data;
                 setVideo(videoDetails.data);
-                setLoading(false)
             })
             .catch(error => {
-                if (error.status == "401") {
-                    navigate(`/video/buy/${videoId}`)
+                console.log("Error fetching video:", error);
+                if (error.response && error.response.status === 401) {
+                    navigate(`/video/buy/${videoId}`);
                 }
             });
 
-        axios.get(`/api/comment/video/${videoId}`)
+        // Fetch comments
+        const fetchComments = axios.get(`/api/comment/video/${videoId}`)
             .then((res) => setComments(res.data.data))
-            .catch(error => console.log(error.response.data));
+            .catch(error => console.log("Error fetching comments:", error));
 
-        axios.post(`/api/watchHistory/track/${videoId}`)
-            .catch(error => console.log(error.response.data));
+        // Track watch history
+        const trackWatchHistory = axios.post(`/api/watchHistory/track/${videoId}`)
+            .catch(error => console.log("Error tracking history:", error));
 
-    }, [videoId])
+        // Fetch more videos
+        const fetchMoreVideos = axios.get(`/api/dashboard/more/${currentUser._id}`)
+            .then((res) => {
+                setMoreVideos(res.data.data || []);
+            })
+            .catch(error => console.log("Error fetching more videos:", error));
+
+        // Wait for all requests to complete
+        Promise.all([fetchVideoDetails, fetchComments, trackWatchHistory, fetchMoreVideos])
+            .then(() => {
+                setLoading(false);
+                setDataLoaded(true);
+            })
+            .catch(error => {
+                console.log("Error in Promise.all:", error);
+                setLoading(false);
+            });
+    }, [videoId, currentUser._id]);
 
     // Subscribe/ unsubscribe
     const toggleSub = () => {
+        if (!video || !video.owner) return;
+        
         axios.post(`/api/subscription/channel/${video.owner._id}`)
             .then(res => {
                 setVideo({
@@ -61,11 +80,13 @@ function VideoPage() {
                     subscribers: res.data.data == null ? --video.subscribers : ++video.subscribers
                 })
             })
-            .catch(e => console.log(e.response.data))
+            .catch(e => console.log(e.response?.data || e));
     }
 
     // Like / unlike video
     const toggleVideoLike = () => {
+        if (!videoId) return;
+        
         axios.post(`/api/like/v/${videoId}`)
             .then((res) => setVideo(
                 video => ({
@@ -79,27 +100,28 @@ function VideoPage() {
 
     // Add comment
     const addComment = () => {
-        if (content && content.trim()) {
+        if (!content || !content.trim() || !videoId) return;
 
-            axios.post(`/api/comment/video/${videoId}`, { content })
-                .then((res) => {
-                    setComments([...comments, {
-                        ...res.data.data,
-                        likes: 0,
-                        owner: {
-                            username: currentUser.username,
-                            fullname: currentUser.fullname,
-                            avatar: currentUser.avatar,
-                        }
-                    }])
-                    setContent("")
-                })
-                .catch(error => console.log(error))
-        }
+        axios.post(`/api/comment/video/${videoId}`, { content })
+            .then((res) => {
+                setComments([...comments, {
+                    ...res.data.data,
+                    likes: 0,
+                    owner: {
+                        username: currentUser.username,
+                        fullname: currentUser.fullname,
+                        avatar: currentUser.avatar,
+                    }
+                }])
+                setContent("")
+            })
+            .catch(error => console.log(error))
     }
 
     // Delete comment
     const deleteComment = (id) => {
+        if (!id) return;
+        
         axios.delete(`/api/comment/c/${id}`)
             .then((res) => setComments(comments => comments.filter(com => com._id !== id)))
             .catch(error => console.log(error))
@@ -107,6 +129,8 @@ function VideoPage() {
 
     // Toggle comment like
     const toggleCommentLike = (commentId) => {
+        if (!commentId) return;
+        
         axios.post(`/api/like/c/${commentId}`)
             .then((res) => setComments(
                 comments => comments.map(comment =>
@@ -123,26 +147,43 @@ function VideoPage() {
     // Toggle modal visibility
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
-        if (!isModalOpen) {
+        if (!isModalOpen && currentUser && currentUser._id) {
             // Fetch playlists only when opening the modal
             axios.get(`/api/playlist/user/${currentUser._id}`)
-                .then((res) => setPlaylists(res.data.data))
-                .catch(error => console.log(error.response.data));
+                .then((res) => setPlaylists(res.data.data || []))
+                .catch(error => console.log(error.response?.data || error));
         }
     }
 
-
     // Add video to selected playlist 
     const addToPlaylist = (playlistId) => {
-        axios.post(`/api/playlist/video/${videoId}/${playlistId}`,)
+        if (!videoId || !playlistId) return;
+        
+        axios.post(`/api/playlist/video/${videoId}/${playlistId}`)
             .then(res => {
                 console.log('Video added to playlist');
                 setIsModalOpen(false);  // Close the modal after adding
             })
-            .catch(error => console.log(error.response.data));
+            .catch(error => console.log(error.response?.data || error));
     };
 
     if (loading) return <Loading />;
+    
+    // Safety check - if video data isn't loaded properly
+    if (!dataLoaded || !video) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen text-white">
+                <h2 className="text-2xl font-semibold mb-4">Unable to load video</h2>
+                <p className="text-gray-400 mb-4">There was a problem loading this video.</p>
+                <button 
+                    onClick={() => navigate("/")}
+                    className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600"
+                >
+                    Return to home
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col mx-14 max-w-screen-2xl">
@@ -154,11 +195,11 @@ function VideoPage() {
                             className="w-full h-full object-contain rounded-lg"
                             controls
                             controlsList="nodownload"
-                            poster={video.thumbnail ? video.thumbnail : img}
+                            poster={video?.thumbnail ? video.thumbnail : img}
                             autoPlay muted
                             onError={e => e.target.poster = img}
                         >
-                            <source src={video.videoFile} type="video/mp4" />
+                            <source src={video?.videoFile} type="video/mp4" />
                             Your browser does not support the video tag.
                         </video>
                     </div>
@@ -167,53 +208,55 @@ function VideoPage() {
                     <div className="w-full p-4 flex flex-col">
                         <div>
                             <h1 className="text-2xl font-semibold mb-4 lg:line-clamp-3">
-                                {video.title}
+                                {video?.title || "Untitled Video"}
                             </h1>
 
                             <div className='flex flex-row justify-between max-[500px]:flex-col mb-4'>
-                                <div
-                                    className="flex items-center text-sm text-gray-400 py-1 group cursor-pointer transition-all duration-200 hover:scale-110"
-                                    title={video.owner.fullname}
-                                    onClick={() => navigate(video.owner._id !== currentUser._id ? `/channel/${video.owner._id}` : "/channel")}
-                                >
-                                    <img
-                                        src={video.owner.avatar ? video.owner.avatar : profile}
-                                        alt="Channel Logo"
-                                        className="h-12 w-12 rounded-full border-2 mr-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
-                                    />
-                                    <div>
-                                        <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
-                                            {video.owner.fullname}
-                                        </p>
-                                        <p className="text-sm text-gray-400 transition-all duration-300 group-hover:text-emerald-300">
-                                            {video.subscribers} subscribers
-                                        </p>
+                                {video?.owner && (
+                                    <div
+                                        className="flex items-center text-sm text-gray-400 py-1 group cursor-pointer transition-all duration-200 hover:scale-110"
+                                        title={video.owner.fullname}
+                                        onClick={() => navigate(video.owner._id !== currentUser._id ? `/channel/${video.owner._id}` : "/channel")}
+                                    >
+                                        <img
+                                            src={video.owner.avatar ? video.owner.avatar : profile}
+                                            alt="Channel Logo"
+                                            className="h-12 w-12 rounded-full border-2 mr-2 border-transparent transition-all duration-300 group-hover:border-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
+                                            onError={e => e.target.src = profile}
+                                        />
+                                        <div>
+                                            <p className="font-semibold transition-all duration-300 group-hover:text-emerald-400">
+                                                {video.owner.fullname}
+                                            </p>
+                                            <p className="text-sm text-gray-400 transition-all duration-300 group-hover:text-emerald-300">
+                                                {video.subscribers} subscribers
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                                {
-                                    video.owner._id !== currentUser._id && (
-                                        <button
-                                            onClick={toggleSub}
-                                            className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
-                                            ${video.isSubscribed
-                                                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
-                                                    : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
-                                                } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
-                                        >
-                                            {video.isSubscribed ? (
-                                                <>
-                                                    <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
-                                                    <span className="transition-all">Subscribed</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
-                                                    <span className="transition-all text-xl">Subscribe</span>
-                                                </>
-                                            )}
-                                        </button>
-                                    )
-                                }
+                                )}
+                                
+                                {video?.owner && video.owner._id !== currentUser._id && (
+                                    <button
+                                        onClick={toggleSub}
+                                        className={`group cursor-pointer relative flex items-center justify-center gap-2 w-48 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 
+                                        ${video.isSubscribed
+                                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                                                : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+                                            } shadow-lg hover:shadow-xl hover:shadow-purple-500/20`}
+                                    >
+                                        {video.isSubscribed ? (
+                                            <>
+                                                <BellRing className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                                <span className="transition-all">Subscribed</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserPlus className="w-7 h-7 transition-transform group-hover:scale-110" />
+                                                <span className="transition-all text-xl">Subscribe</span>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
                             </div>
 
                             <div className='flex flex-row items-center gap-x-8 w-full text-gray-400'>
@@ -223,7 +266,7 @@ function VideoPage() {
                                         absoluteStrokeWidth
                                         className={video.isLiked ? "me-2 text-blue-600" : "me-2"}
                                     />
-                                    {video.likes}
+                                    {video.likes || 0}
                                 </span>
                                 <span className="inline-flex items-center mr-2" title='Views'>
                                     <Eye
@@ -231,7 +274,7 @@ function VideoPage() {
                                         absoluteStrokeWidth
                                         className="me-2"
                                     />
-                                    {video.views}
+                                    {video.views || 0}
                                 </span>
                                 <span className="inline-flex items-center mr-2" title='Uploaded at'>
                                     <CalendarArrowDown
@@ -239,7 +282,7 @@ function VideoPage() {
                                         absoluteStrokeWidth
                                         className="me-2"
                                     />
-                                    {parseDate(video.createdAt)}
+                                    {video.createdAt ? parseDate(video.createdAt) : "Unknown date"}
                                 </span>
                                 <span
                                     className="inline-flex items-center mr-2 cursor-pointer"
@@ -255,7 +298,9 @@ function VideoPage() {
                                 </span>
                             </div>
 
-                            <p className="mt-4 line-clamp-6 text-gray-400 mb-4" title='video.description'>{video.description}</p>
+                            <p className="mt-4 line-clamp-6 text-gray-400 mb-4" title={video.description || ''}>
+                                {video.description || "No description available"}
+                            </p>
                         </div>
                     </div>
 
@@ -265,9 +310,9 @@ function VideoPage() {
 
                         <div name="ADD-COMMENT" className='flex items-start mt-4 w-full'>
                             <img
-                                src={currentUser.avatar}
-                                alt={`${currentUser.name} avatar`}
-                                onError={e => e.target.src = img}
+                                src={currentUser?.avatar}
+                                alt={`${currentUser?.name || 'User'} avatar`}
+                                onError={e => e.target.src = profile}
                                 className="h-10 w-10 rounded-full object-cover mr-3"
                             />
 
@@ -286,7 +331,10 @@ function VideoPage() {
                             >
                                 Cancel
                             </button>
-                            <button onClick={addComment}>
+                            <button 
+                                onClick={addComment}
+                                className="hover:text-white hover:bg-slate-800 px-2 rounded-full"
+                            >
                                 Comment
                             </button>
                         </div>
@@ -298,12 +346,12 @@ function VideoPage() {
                                         key={comment._id}
                                         id={comment._id}
                                         content={comment.content}
-                                        updatedAt={parseDate(comment.updatedAt)}
-                                        likes={comment.likes}
-                                        isLiked={comment.isLiked}
-                                        fullname={comment.owner?.fullname}
-                                        username={comment.owner?.username}
-                                        avatar={comment.owner?.avatar}
+                                        updatedAt={comment.updatedAt ? parseDate(comment.updatedAt) : ""}
+                                        likes={comment.likes || 0}
+                                        isLiked={comment.isLiked || false}
+                                        fullname={comment.owner?.fullname || "Anonymous"}
+                                        username={comment.owner?.username || "user"}
+                                        avatar={comment.owner?.avatar || profile}
                                         toggleLike={toggleCommentLike}
                                         deleteComment={deleteComment}
                                     />
@@ -313,23 +361,32 @@ function VideoPage() {
                     </div>
                 </div>
 
-                {/* Channel Videos Section - Hidden on lg screens and below */}
+                {/* More Videos Section - Hidden on lg screens and below */}
                 <div className="hidden xl:flex flex-col w-[30%] mt-5 gap-4">
-                    <h2 className="text-xl font-semibold mb-2">More from this channel</h2>
-                    {channelVideos.map(video => (
-                        <div key={video.id} className="flex gap-2 cursor-pointer hover:bg-gray-800 rounded-lg p-2">
-                            <img
-                                src={video.thumbnail}
-                                alt={video.title}
-                                className="w-40 h-24 object-cover rounded-lg"
-                            />
-                            <div className="flex flex-col">
-                                <h3 className="font-medium line-clamp-2">{video.title}</h3>
-                                <p className="text-sm text-gray-400">{video.views} views</p>
-                                <p className="text-sm text-gray-400">{video.timestamp}</p>
+                    <h2 className="text-xl font-semibold mb-2">More videos</h2>
+                    {moreVideos && moreVideos.length > 0 ? (
+                        moreVideos.map(videoItem => (
+                            <div 
+                                key={videoItem._id} 
+                                className="flex gap-2 p-2 card"
+                                onClick={() => navigate(`/video/${videoItem._id}`)}
+                            >
+                                <img
+                                    src={videoItem.thumbnail || img}
+                                    alt={videoItem.title || "Video thumbnail"}
+                                    className="w-40 h-24 object-cover rounded-lg"
+                                    onError={e => e.target.src = img}
+                                />
+                                <div className="flex flex-col">
+                                    <h3 className="font-medium line-clamp-2">{videoItem.title || "Untitled video"}</h3>
+                                    <p className="text-sm text-gray-400">{videoItem.views || 0} views</p>
+                                    <p className="text-sm text-gray-400">{videoItem.createdAt ? timeAgo(videoItem.createdAt) : "Unknown"}</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="text-gray-400">No more videos available</p>
+                    )}
                 </div>
             </div>
 
@@ -346,7 +403,7 @@ function VideoPage() {
                                 <X className="h-7 w-7 text-white hover:bg-gray-500 hover:bg-opacity-15 rounded-xl" />
                             </button>
                         </div>
-                        {playlists.length > 0 ? (
+                        {playlists && playlists.length > 0 ? (
                             <ul className="rounded-lg shadow-inner shadow-slate-800">
                                 {
                                     playlists.map(playlist => (
@@ -358,7 +415,7 @@ function VideoPage() {
                                             <h1>{playlist.name}</h1>
                                             <span className="flex">
                                                 {playlist.isExclusive && <BadgeDollarSign className="text-green-500 mr-2" />}
-                                                {playlist.videos.length} <SquarePlay />
+                                                {playlist.videos?.length || 0} <SquarePlay />
                                             </span>
                                         </li>
                                     ))

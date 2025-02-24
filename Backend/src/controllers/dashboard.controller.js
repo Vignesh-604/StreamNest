@@ -115,4 +115,17 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, {videos, uploads}, "Videos fetched"))
 })
 
-export { getChannelStats, getChannelVideos }
+const getRandomChannelVideos = asyncHandler(async (req, res) => {
+    const { channelId } = req.params
+    if (!channelId) throw new ApiError(400, "No channel ID mentioned")
+
+    const videos = await Video.aggregate([
+        { $match: { owner: new mongoose.Types.ObjectId(channelId) } },
+        { $sample: { size: 5 } },
+        { $project: { thumbnail: 1, title: 1, views: 1, createdAt: 1, _id: 1 } }
+    ]);
+console.log(videos)
+    res.status(200).json(new ApiResponse(200, videos, "Random videos fetched"));
+})
+
+export { getChannelStats, getChannelVideos, getRandomChannelVideos }
