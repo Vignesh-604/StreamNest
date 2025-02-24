@@ -4,7 +4,7 @@ import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 
-dotenv.config({ path: "./.env" })    // loading environment variables from a .env file.
+dotenv.config({ path: "./env" })    // loading environment variables from a .env file.
 
 const app = express()
 
