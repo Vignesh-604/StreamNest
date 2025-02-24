@@ -69,7 +69,7 @@ const togglePostLike = asyncHandler( async (req, res) => {
 
 // Toggle Video Like
 const toggleVideoLike = asyncHandler( async (req, res) => {
-    const {videoId} = req.params
+    const { videoId } = req.params
     if (!videoId?.trim()) throw new ApiError(401, "No videoID")
 
     const user = req.user?._id
@@ -81,21 +81,15 @@ const toggleVideoLike = asyncHandler( async (req, res) => {
     })
 
     if (videoLike) {
-        await Like.findOneAndDelete({
-            likedBy: user,
-            video: videoId
-        })
-        if (!videoLike) throw new ApiError(402, "Could not dislike Video")
-
-        res.status(202).json( new ApiResponse(202, "", "video like removed"))
+        await Like.deleteOne({ _id: videoLike._id })
+        return res.status(202).json(new ApiResponse(202, "", "Video like removed"))
     } else {
         videoLike = await Like.create({
             likedBy: user,
             video: videoId
         })
-        if (!videoLike) throw new ApiError(402, "Could not like Video")
 
-        res.status(202).json( new ApiResponse(202,videoLike, "video liked"))
+        return res.status(201).json(new ApiResponse(201, videoLike, "Video liked"))
     }
 })
 

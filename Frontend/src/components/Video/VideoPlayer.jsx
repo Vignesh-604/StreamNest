@@ -149,9 +149,9 @@ function VideoPage() {
             <div className="text-white flex gap-6 max-xl:items-start">
                 <div className="flex flex-col xl:w-[70%] w-full">
                     {/* Video Player Section */}
-                    <div className="w-full max-h-[580px] flex mt-5 justify-center items-center rounded-lg bg-black">
+                    <div className="w-full h-[580px] flex mt-5 justify-center items-center rounded-lg bg-black">
                         <video
-                            className="w-[1400px] h-auto max-h-full object-contain rounded-lg"
+                            className="w-full h-full object-contain rounded-lg"
                             controls
                             controlsList="nodownload"
                             poster={video.thumbnail ? video.thumbnail : img}

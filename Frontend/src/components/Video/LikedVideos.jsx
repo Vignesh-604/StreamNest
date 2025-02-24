@@ -15,66 +15,74 @@ export default function LikedVideos() {
                 setVideos(res.data.data)
                 setLoading(false)
             })
-            .catch(error => console.log(error));
-    }, []);
-    console.log(videos)
+            .catch(error => {
+                console.error("Error fetching liked videos:", error)
+                setLoading(false)
+            })
+    }, [])
 
-    const removeLiked = (id) => {
+    const removeLiked = (videoId) => {
         showConfirmAlert(
             "Remove Liked Video?",
-            "Are you sure you want to remove this video from your liked videos? This action cannot be undone.",
+            "",
             () => {
-                axios.delete(`/api/likes/remove/${id}`)
-                    .then(() => {
+                axios.post(`/api/like/v/${videoId}`)
+                    .then((res) => {
                         showCustomAlert("Removed!", "Video has been removed from your liked videos.");
-                        setVideos(videos.filter(vid => vid._id !== id));
+                        setVideos(prevVideos => prevVideos.filter(vid => 
+                            vid.videos[0]?._id !== videoId
+                        ))
                     })
-                    .catch(error => console.log(error));
+                    .catch(error => {
+                        console.error("Error removing video:", error);
+                        showCustomAlert("Error", "Failed to remove video. Please try again.");
+                    });
             }
         );
     };
 
-    if (loading) return <Loading />
+    if (loading) return <Loading />;
 
     return (
         <div className="flex flex-col items-center bg-[#0a0a26]/40 text-white px-6 py-8 min-h-screen">
-            <div className="bg-[#24273a] rounded-lg p-8 mb-8 w-full ">
+            <div className="bg-[#24273a] rounded-lg p-8 mb-8 w-full">
                 <h1 className="font-extrabold text-start text-4xl mb-10">Liked Videos</h1>
-                {
-                    videos.length ?
-                        (
-                            <div className="grid gap-6 lg:grid-cols-2">
-                                {
-                                    videos.map((vid) => (
-                                        <div key={vid._id} className="flex justify-between card">
-                                            <VideoItem
-                                                id={vid.videos[0]?._id}
-                                                title={vid.videos[0]?.title}
-                                                description={vid.videos[0]?.description}
-                                                owner={vid.videos[0]?.owner[0]}
-                                                views={vid.videos[0]?.views}
-                                                isExclusive={vid.videos[0]?.isExclusive}
-                                                thumbnail={vid.videos[0]?.thumbnail}
-                                                duration={parseTime(vid.videos[0]?.duration)}
-                                            />
-                                            <div className="flex items-start mt-6">
-                                                <button
-                                                    onClick={() => removeLiked(vid._id)}
-                                                    className="flex justify-center md:items-center transform hover:scale-120"
-                                                    title="Remove video"
-                                                >
-                                                    <X className="m-2 h-7 w-7 text-white hover:bg-gray-500/20 hover:bg-opacity-15 rounded-xl" />
-                                                </button>
-                                            </div>
+                {videos && videos.length > 0 ? (
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        {videos.map((vid) => {
+                            const videoData = vid.videos?.[0];
+                            if (!videoData) return null;
 
-                                        </div>
-                                    ))
-                                }
-                            </div>
-                        ) : (
-                            <h1 className="flex justify-center font-bold text-start text-4xl mt-7 mb-10">No Liked Videos</h1>
-                        )
-                }
+                            return (
+                                <div key={videoData._id} className="flex justify-between card">
+                                    <VideoItem
+                                        id={videoData._id}
+                                        title={videoData.title}
+                                        description={videoData.description}
+                                        owner={videoData.owner?.[0]}
+                                        views={videoData.views}
+                                        isExclusive={videoData.isExclusive}
+                                        thumbnail={videoData.thumbnail}
+                                        duration={parseTime(videoData.duration)}
+                                    />
+                                    <div className="flex items-start mt-6">
+                                        <button
+                                            onClick={() => removeLiked(videoData._id)}
+                                            className="flex justify-center md:items-center transform hover:scale-105 transition-transform"
+                                            title="Remove video"
+                                        >
+                                            <X className="m-2 h-7 w-7 text-white hover:bg-gray-500/20 rounded-xl" />
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <h1 className="flex justify-center font-bold text-start text-4xl mt-7 mb-10">
+                        No Liked Videos
+                    </h1>
+                )}
             </div>
         </div>
     );
