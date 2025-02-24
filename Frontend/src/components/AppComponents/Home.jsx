@@ -21,28 +21,62 @@ export default function Home() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`/api/video/${search ? `${search}&` : "?"}page=${page}`)
+        setError(null);
+        
+        // Use relative URL to automatically use the correct protocol (http/https)
+        const apiUrl = `/api/video/${search ? `${search}&` : "?"}page=${page}`;
+        
+        axios.get(apiUrl)
             .then(res => {
-                // Add error handling for the response structure
-                if (res.data && res.data.data) {
-                    const data = res.data.data;
-                    setVideos(Array.isArray(data.videos) ? data.videos : []);
+                console.log("API response:", res.data); // Debug log
+                
+                // Enhanced response structure handling with multiple fallbacks
+                if (res.data) {
+                    // Handle different possible response structures
+                    const data = res.data.data || res.data;
                     
-                    // Safely handle the total count
-                    if (data.total && Array.isArray(data.total) && data.total.length > 0) {
-                        setTotal(data.total[0]?.total || 0);
+                    // Handle videos array with fallbacks
+                    if (data.videos) {
+                        setVideos(Array.isArray(data.videos) ? data.videos : []);
+                    } else if (Array.isArray(data)) {
+                        setVideos(data);
+                    } else {
+                        setVideos([]);
+                    }
+                    
+                    // Handle total count with flexible fallbacks
+                    if (data.total) {
+                        if (Array.isArray(data.total) && data.total.length > 0) {
+                            setTotal(data.total[0]?.total || 0);
+                        } else if (typeof data.total === 'number') {
+                            setTotal(data.total);
+                        } else {
+                            setTotal(0);
+                        }
+                    } else if (res.data.total) {
+                        // Check if total is directly in res.data
+                        if (Array.isArray(res.data.total) && res.data.total.length > 0) {
+                            setTotal(res.data.total[0]?.total || 0);
+                        } else if (typeof res.data.total === 'number') {
+                            setTotal(res.data.total);
+                        } else {
+                            setTotal(0);
+                        }
                     } else {
                         setTotal(0);
                     }
                 } else {
-                    console.log("Invalid response structure:", res.data);
+                    console.error("Empty or invalid response:", res);
                     setVideos([]);
                     setTotal(0);
+                    setError("Invalid response from server");
                 }
             })
-            .catch(e => {
-                console.log("Error fetching videos:", e);
-                setError("Failed to load videos");
+            .catch(err => {
+                console.error("Error fetching videos:", err.response?.data || err.message || err);
+                setError("Failed to load videos. Please try again later.");
+                setVideos([]);
+                setTotal(0);
             })
             .finally(() => {
                 setLoading(false);
@@ -85,6 +119,21 @@ export default function Home() {
         return video.owner[0];
     };
 
+    // Function to safely format duration
+    const formatDuration = (duration) => {
+        if (!duration) return "00:00";
+        
+        try {
+            const totalSeconds = Math.round(duration);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        } catch (e) {
+            console.error("Error formatting duration:", e);
+            return "00:00";
+        }
+    };
+
     return (
         <div className="bg-[#0a0a26]/10 flex flex-col items-center justify-start p-4 mt-2.5">
             {videos?.length > 0 ? (
@@ -98,18 +147,21 @@ export default function Home() {
                             return (
                                 <div
                                     key={video._id}
-                                    className="card !bg-[#1a1b1f] "
+                                    className="card !bg-[#1a1b1f] cursor-pointer hover:shadow-lg transition-shadow duration-300"
                                     onClick={() => navigate(`/video/watch/${video._id}`)}
                                 >
                                     <div className="relative">
                                         <img
                                             src={video.thumbnail ? video.thumbnail : img}
                                             alt={`Thumbnail for ${video.title || 'Untitled Video'}`}
-                                            onError={(e) => e.target.src = img}
+                                            onError={(e) => {
+                                                console.log("Thumbnail load error, using fallback");
+                                                e.target.src = img;
+                                            }}
                                             className="w-full h-[200px] object-cover rounded-t-lg border-b border-b-gray-800"
                                         />
                                         <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white">
-                                            {video.duration ? Math.round(video.duration) : "00:00"}
+                                            {formatDuration(video.duration)}
                                         </div>
                                         {
                                             video.isExclusive && (
@@ -126,7 +178,10 @@ export default function Home() {
                                             src={owner.avatar || img}
                                             className="rounded-full object-cover w-10 h-10 min-w-[40px] mt-1 cursor-pointer hover:ring-2 hover:ring-purple-500"
                                             onClick={(e) => userChannel(e, owner._id)}
-                                            onError={(e) => e.target.src = img}
+                                            onError={(e) => {
+                                                console.log("Avatar load error, using fallback");
+                                                e.target.src = img;
+                                            }}
                                         />
 
                                         <div className='flex-col'>
@@ -181,8 +236,16 @@ export default function Home() {
                     </div>
                 </>
             ) : (
-                <div className="text-gray-400 text-lg mt-10">
-                    No videos found {search ? `for the given query "${search.replace("?query=", "")}"` : ""}
+                <div className="text-center py-10 bg-[#1a1b1f] rounded-lg p-8 w-full max-w-screen-xl">
+                    <p className="text-gray-400 text-lg">
+                        No videos found {search ? `for the given query "${search.replace("?query=", "")}"` : ""}
+                    </p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white"
+                    >
+                        Refresh
+                    </button>
                 </div>
             )}
         </div>
