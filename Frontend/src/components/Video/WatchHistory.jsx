@@ -169,6 +169,7 @@ export default function WatchHistory() {
                                     return (
                                         <div key={vid._id} className="flex justify-between card">
                                             <VideoItem
+                                                id= {videoData._id}
                                                 title={videoData.title || "Untitled Video"}
                                                 description={videoData.description || ""}
                                                 owner={owner}

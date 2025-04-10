@@ -28,7 +28,6 @@ export default function Home() {
         
         axios.get(apiUrl)
             .then(res => {
-                console.log("API response:", res.data); // Debug log
                 
                 // Enhanced response structure handling with multiple fallbacks
                 if (res.data) {

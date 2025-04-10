@@ -22,6 +22,9 @@ function VideoPage() {
     const [moreVideos, setMoreVideos] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
+    let owner = currentUser._id === video?.owner._id
+    console.log(owner)
+
     // Load Video and comments
     useEffect(() => {
         setLoading(true);
@@ -31,6 +34,7 @@ function VideoPage() {
         const fetchVideoDetails = axios.get(`/api/video/v/${videoId}`)
             .then((res) => {
                 const videoDetails = res.data;
+                console.log(videoDetails.data)
                 setVideo(videoDetails.data);
             })
             .catch(error => {
@@ -50,7 +54,7 @@ function VideoPage() {
             .catch(error => console.log("Error tracking history:", error));
 
         // Fetch more videos
-        const fetchMoreVideos = axios.get(`/api/dashboard/more/${currentUser._id}`)
+        const fetchMoreVideos = axios.get(`/api/dashboard/more/${owner ? currentUser._id : video?.owner?._id}`)
             .then((res) => {
                 setMoreVideos(res.data.data || []);
             })
@@ -369,7 +373,7 @@ function VideoPage() {
                             <div 
                                 key={videoItem._id} 
                                 className="flex gap-2 p-2 card"
-                                onClick={() => navigate(`/video/${videoItem._id}`)}
+                                onClick={() => navigate(`/video/watch/${videoItem._id}`)}
                             >
                                 <img
                                     src={videoItem.thumbnail || img}

@@ -1,11 +1,67 @@
 import { SearchIcon, ArrowDownWideNarrow, ArrowUpNarrowWide, Users, X, Filter } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef, memo } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Search() {
+// Custom hook to preserve input focus
+function usePersistentInput(initialValue = "") {
+    const [value, setValue] = useState(initialValue);
+    const inputRef = useRef(null);
+
+    const onChange = useCallback((e) => {
+        setValue(e.target.value);
+        // Ensure focus stays on the input
+        if (inputRef.current) {
+            const currentPos = e.target.selectionStart;
+            // Use setTimeout to ensure the selection happens after React's state update
+            setTimeout(() => {
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                    inputRef.current.setSelectionRange(currentPos, currentPos);
+                }
+            }, 0);
+        }
+    }, []);
+
+    return [value, onChange, inputRef, setValue];
+}
+
+// Memoized search input component
+const SearchInput = memo(({ value, onChange, placeholder, onKeyDown, inputRef }) => {
+    return (
+        <input
+            ref={inputRef}
+            type="text"
+            className="flex-grow bg-transparent tracking-wider text-white outline-none placeholder-gray-500"
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+            autoComplete="off"
+        />
+    );
+});
+
+// Memoized channel input component
+const ChannelInput = memo(({ value, onChange, placeholder, onKeyDown, inputRef }) => {
+    return (
+        <input
+            ref={inputRef}
+            type="text"
+            className="w-full bg-transparent tracking-wider text-white outline-none placeholder-gray-500"
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+            autoComplete="off"
+        />
+    );
+});
+
+// Main Search component wrapped in memo to prevent unnecessary re-renders
+const Search = memo(function Search() {
     const navigate = useNavigate();
-    const [query, setQuery] = useState("");
-    const [channelName, setChannelName] = useState("");
+    const [query, onQueryChange, queryInputRef, setQuery] = usePersistentInput("");
+    const [channelName, onChannelChange, channelInputRef, setChannelName] = usePersistentInput("");
     const [sortType, setSortType] = useState("desc");
     const [sortBy, setSortBy] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -22,7 +78,7 @@ export default function Search() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const submitSearch = () => {
+    const submitSearch = useCallback(() => {
         const params = new URLSearchParams();
         if (query.trim()) params.append("query", query);
         if (channelName) params.append("name", channelName);
@@ -30,14 +86,36 @@ export default function Search() {
         if (sortBy) params.append("sortBy", sortBy);
         navigate(`home?${params.toString()}`);
         setIsDialogOpen(false);
-    }
+    }, [query, channelName, sortType, sortBy, navigate]);
 
-    const clearSearch = () => {
+    const clearSearch = useCallback(() => {
         setQuery("");
-    }
+        // Ensure focus is maintained
+        if (queryInputRef.current) {
+            setTimeout(() => {
+                queryInputRef.current.focus();
+            }, 0);
+        }
+    }, [setQuery, queryInputRef]);
 
-    // Mobile Search Dialog
-    const MobileDialog = () => (
+    const handleSortByChange = useCallback((e) => {
+        setSortBy(e.target.value);
+    }, []);
+
+    const toggleSortType = useCallback(() => {
+        if (sortBy !== "") {
+            setSortType(prevType => prevType === "desc" ? "asc" : "desc");
+        }
+    }, [sortBy]);
+
+    const handleKeyDown = useCallback((e) => {
+        if (e.key === 'Enter') {
+            submitSearch();
+        }
+    }, [submitSearch]);
+
+    // Mobile Search Dialog - Memoized
+    const MobileDialog = useCallback(() => (
         <div className="fixed inset-0 z-50 bg-gray-950/95 flex flex-col">
             <div className="flex justify-between items-center p-4 border-b border-gray-800">
                 <h2 className="text-white text-lg font-semibold">Search</h2>
@@ -52,12 +130,12 @@ export default function Search() {
                     <label className="text-sm text-gray-400">Search</label>
                     <div className="flex items-center rounded-lg bg-gray-900 px-3 py-2 border border-gray-700">
                         <SearchIcon className="h-5 w-5 text-gray-400 mr-2" />
-                        <input
-                            type="text"
-                            className="flex-grow bg-transparent tracking-wider text-white outline-none placeholder-gray-500"
-                            placeholder="Search for videos..."
+                        <SearchInput 
                             value={query}
-                            onChange={(e) => setQuery(e.target.value)}
+                            onChange={onQueryChange}
+                            placeholder="Search for videos..."
+                            onKeyDown={handleKeyDown}
+                            inputRef={queryInputRef}
                         />
                     </div>
                 </div>
@@ -67,12 +145,12 @@ export default function Search() {
                     <label className="text-sm text-gray-400">Channel</label>
                     <div className="flex items-center rounded-lg bg-gray-900 px-3 py-2 border border-gray-700">
                         <Users className="h-5 w-5 text-gray-400 mr-2" />
-                        <input
-                            type="text"
-                            className="w-full bg-transparent tracking-wider text-white outline-none placeholder-gray-500"
-                            placeholder="Enter channel name"
+                        <ChannelInput 
                             value={channelName}
-                            onChange={(e) => setChannelName(e.target.value)}
+                            onChange={onChannelChange}
+                            placeholder="Enter channel name"
+                            onKeyDown={handleKeyDown}
+                            inputRef={channelInputRef}
                         />
                     </div>
                 </div>
@@ -84,7 +162,7 @@ export default function Search() {
                         <select
                             className="flex-grow rounded-lg bg-gray-900 px-3 py-2 text-white border border-gray-700 outline-none"
                             value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
+                            onChange={handleSortByChange}
                         >
                             <option value="">Sort by</option>
                             <option value="likes">Likes</option>
@@ -94,7 +172,7 @@ export default function Search() {
 
                         <button
                             className={`p-2 rounded-lg border border-gray-700 ${sortBy === "" ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-800"}`}
-                            onClick={() => sortBy !== "" && setSortType(sortType === "desc" ? "asc" : "desc")}
+                            onClick={toggleSortType}
                             disabled={sortBy === ""}
                         >
                             {sortType === "desc" ? (
@@ -116,21 +194,20 @@ export default function Search() {
                 </div>
             </div>
         </div>
-    );
+    ), [query, channelName, sortBy, sortType, onQueryChange, onChannelChange, handleSortByChange, toggleSortType, submitSearch, handleKeyDown, queryInputRef, channelInputRef]);
 
-    // Desktop Search Bar
-    const DesktopSearch = () => (
+    // Desktop Search Bar - Memoized
+    const DesktopSearch = useCallback(() => (
         <div className="flex items-center gap-2 w-full">
             {/* Search Input with reduced width and clear/search buttons */}
             <div className="flex items-center rounded-lg bg-gray-900 px-3 py-2 w-3/5 border max-md:w-full border-gray-700">
                 <SearchIcon className="h-5 w-5 text-gray-400 mr-2" />
-                <input
-                    type="text"
-                    className="flex-grow bg-transparent tracking-wider text-white outline-none placeholder-gray-500"
-                    placeholder="Search"
+                <SearchInput 
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && submitSearch()}
+                    onChange={onQueryChange}
+                    placeholder="Search"
+                    onKeyDown={handleKeyDown}
+                    inputRef={queryInputRef}
                 />
                 {query && (
                     <>
@@ -154,13 +231,12 @@ export default function Search() {
             {/* Channel Filter with increased width */}
             <div className="hidden md:flex items-center rounded-lg bg-gray-900 px-3 py-2 border border-gray-700 flex-grow">
                 <Users className="h-5 w-5 text-gray-400 mr-2" />
-                <input
-                    type="text"
-                    className="w-full bg-transparent tracking-wider text-white outline-none placeholder-gray-500"
-                    placeholder="Channel"
+                <ChannelInput 
                     value={channelName}
-                    onChange={(e) => setChannelName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && submitSearch()}
+                    onChange={onChannelChange}
+                    placeholder="Channel"
+                    onKeyDown={handleKeyDown}
+                    inputRef={channelInputRef}
                 />
             </div>
 
@@ -168,7 +244,7 @@ export default function Search() {
             <select
                 className="hidden md:block rounded-lg bg-gray-900 px-3 py-2 text-white border border-gray-700 outline-none cursor-pointer"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={handleSortByChange}
             >
                 <option value="">Sort by</option>
                 <option value="likes">Likes</option>
@@ -179,7 +255,7 @@ export default function Search() {
             {/* Sort Direction Toggle */}
             <button
                 className={`hidden md:block p-2 rounded-lg border border-gray-700 ${sortBy === "" ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-800"}`}
-                onClick={() => sortBy !== "" && setSortType(sortType === "desc" ? "asc" : "desc")}
+                onClick={toggleSortType}
                 disabled={sortBy === ""}
                 title={sortType === "desc" ? "Descending" : "Ascending"}
             >
@@ -198,7 +274,7 @@ export default function Search() {
                 <Filter className="h-5 w-5 text-white" />
             </button>
         </div>
-    );
+    ), [query, channelName, sortBy, sortType, onQueryChange, onChannelChange, handleSortByChange, toggleSortType, submitSearch, clearSearch, handleKeyDown, queryInputRef, channelInputRef]);
 
     return (
         <>
@@ -206,4 +282,6 @@ export default function Search() {
             {isDialogOpen && <MobileDialog />}
         </>
     );
-}
+});
+
+export default Search;

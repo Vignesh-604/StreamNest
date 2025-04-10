@@ -67,7 +67,6 @@ export default function ChannelVideos() {
         <div className="flex flex-col items-center bg-[#0a0a26]/40 text-white px-6 py-8 min-h-screen">
             <div className="bg-[#24273a] rounded-lg p-8 mb-8 w-full ">
                 <div className='flex justify-between mb-6'>
-                    {/* <h1 className="font-bold text-start text-5xl mt-7 mb-10 mx-2">Videos</h1> */}
                     <h1 className="font-extrabold text-start text-4xl">{owner ? "Your " : `${currentUser.fullname}'s `}Videos</h1>
                     {
                         owner && (
@@ -76,7 +75,7 @@ export default function ChannelVideos() {
                                     <SquarePlay className="mr-1 bg-purple-500 rounded-md h-8 w-8" /> {uploads.uploaded}/{uploads.uploadLimit}
                                 </h1>
                                 {
-                                    !limit ? (
+                                    limit ? (
                                         <button onClick={buyUploads}
                                             className="flex items-center cursor-pointer gap-2 font-semibold bg-[#8A3FFC] hover:bg-[#7B37E5] px-4 py-2 rounded-lg transition-all duration-200 hover:scale-95"
                                         >

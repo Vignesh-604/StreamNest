@@ -124,7 +124,7 @@ const getRandomChannelVideos = asyncHandler(async (req, res) => {
         { $sample: { size: 5 } },
         { $project: { thumbnail: 1, title: 1, views: 1, createdAt: 1, _id: 1 } }
     ]);
-console.log(videos)
+
     res.status(200).json(new ApiResponse(200, videos, "Random videos fetched"));
 })
 
