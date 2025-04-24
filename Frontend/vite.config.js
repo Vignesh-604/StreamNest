@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -11,5 +12,5 @@ export default defineConfig({
       "/api": process.env.VITE_PROXY
     }
   },
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
 })

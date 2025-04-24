@@ -12,7 +12,7 @@ export default function WatchHistory() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get("/api/watchHistory/")
+        axios.get("/api/watchHistory")
             .then((res) => {
                 // More robust data validation
                 if (res.data) {

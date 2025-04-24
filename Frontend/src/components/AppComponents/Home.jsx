@@ -24,7 +24,7 @@ export default function Home() {
         setError(null);
         
         // Use relative URL to automatically use the correct protocol (http/https)
-        const apiUrl = `/api/video/${search ? `${search}&` : "?"}page=${page}`;
+        const apiUrl = `/api/video${search ? `${search}&` : "?"}page=${page}`;
         
         axios.get(apiUrl)
             .then(res => {
