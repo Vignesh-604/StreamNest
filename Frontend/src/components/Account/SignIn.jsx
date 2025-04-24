@@ -19,7 +19,7 @@ export default function SignIn({ onSwitchToRegister }) {
 
     useEffect(() => {
         const user = Cookies.get('user') ? true : false;
-        if (user) navigate('/');
+        if (user) navigate('/home');
     }, []);
 
     const handleInput = (e) => {

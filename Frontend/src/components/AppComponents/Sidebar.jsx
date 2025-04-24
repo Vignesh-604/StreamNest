@@ -24,7 +24,19 @@ export default function Sidebar() {
                 })
                 .catch(e => console.error(e.response.data));
         }
-    }, [])
+    }, []);
+
+    // Close sidebar when screen size changes
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) {
+                setIsOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -37,22 +49,23 @@ export default function Sidebar() {
     };
 
     return (
-        <div className="flex max-h-screen w-screen overflow-hidden ">
+        <div className="flex max-h-screen w-screen overflow-hidden">
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-950 border-r border-slate-700 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
-                    }`}
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-950 border-r border-slate-700 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+                    isOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}
             >
                 <div className="flex flex-col h-full">
                     {/* Top Section with Logo */}
                     <div className="flex items-center justify-between p-5 mx-auto">
                         <NavLink to="/home" className="-m-1.5 p-1.5">
                             <span className="sr-only">StreamNest</span>
-                            <img src={logo} alt="Logo" className="h-28 " />
+                            <img src={logo} alt="Logo" className="h-28" />
                         </NavLink>
-                        {/* <button className="text-white lg:hidden" onClick={toggleSidebar}>
+                        <button className="text-white lg:hidden" onClick={toggleSidebar}>
                             <X size={24} />
-                        </button> */}
+                        </button>
                     </div>
 
                     {/* User Profile Section */}
@@ -86,6 +99,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <Home className="h-5 w-5 mr-3" />
                                     Home
@@ -96,6 +110,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <UserRoundCheck className="h-5 w-5 mr-3" />
                                     Subscriptions
@@ -106,6 +121,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <ThumbsUp className="h-5 w-5 mr-3" />
                                     Liked Videos
@@ -116,6 +132,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <Clock className="h-5 w-5 mr-3" />
                                     Watch History
@@ -126,6 +143,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <BadgeDollarSign className="h-5 w-5 mr-3" />
                                     Purchases
@@ -142,6 +160,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <ListVideo className="h-5 w-5 mr-3" />
                                     Playlists
@@ -152,6 +171,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <MonitorPlay className="h-5 w-5 mr-3" />
                                     Videos
@@ -162,6 +182,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <NotepadText className="h-5 w-5 mr-3" />
                                     Posts
@@ -172,6 +193,7 @@ export default function Sidebar() {
                                         `flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-purple-500 text-white' : 'text-gray-200 hover:bg-gray-800'
                                         }`
                                     }
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     <Users className="h-5 w-5 mr-3" />
                                     Subscribers
@@ -204,12 +226,11 @@ export default function Sidebar() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 {/* Header Section with Search - Now part of main layout */}
-                <div className="sticky top-0 -mb-2.5 z-40 bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-gray-950/75 border-b border-slate-700 px-4 py-2">
-                    <div className="flex items-center justify-between lg:justify-end gap-4 w-full">
+                <div className="sticky top-0 -mb-2.5 z-10 bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-gray-950/75 border-b border-slate-700 px-4 py-2">
+                    <div className="flex items-center justify-between gap-4 w-full">
                         {/* Mobile Logo and Menu */}
                         <div className="flex items-center lg:hidden">
-
-                            <button onClick={toggleSidebar}>
+                            <button onClick={toggleSidebar} className="p-2 hover:bg-gray-800 rounded-lg">
                                 <Menu size={24} className="text-white" />
                             </button>
                         </div>
